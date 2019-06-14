@@ -156,7 +156,7 @@ TODO - Add in writing from app to device example.
 Import the module using the following:
 
 ```javascript
-import RNBluetoothClassic from 'react-native-bluetooth-classic';
+import RNBluetoothClassic, {BTEvents} from 'react-native-bluetooth-classic';
 ```
 
 In all cases the following API/Events are available within Javascript for both Android and IOS (no code splitting) if there are any native calls that are not available on the native side, the promise will be rejected with an appropriate message (kind of like UnssupportedOperationException since I'm used to Java) - I found this important as I see no point in duplicating code as the whole purpose of React Native was for me not to.

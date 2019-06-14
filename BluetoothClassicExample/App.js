@@ -5,6 +5,15 @@ import RNBluetoothClassic, {BTEvents} from 'react-native-bluetooth-classic';
 import Toast, {DURATION} from 'react-native-easy-toast'
 import Buffer from 'buffer';
 
+const formatDate = (date) => {
+  return date.getUTCFullYear() + "/" +
+    ("0" + (date.getUTCMonth()+1)).slice(-2) + "/" +
+    ("0" + date.getUTCDate()).slice(-2) + " " +
+    ("0" + date.getUTCHours()).slice(-2) + ":" +
+    ("0" + date.getUTCMinutes()).slice(-2) + ":" +
+    ("0" + date.getUTCSeconds()).slice(-2);
+}
+
 const DeviceList = ({devices, onPress, style}) => 
   <ScrollView style={styles.listContainer} contentContainerStyle={styles.container}>
     {devices.map((device,i) => {
@@ -25,8 +34,8 @@ const DeviceConnection = ({device, scannedData}) =>
     <ScrollView style={{flex: 1}} contentContainerStyle={{justifyContent:'flex-end'}}>
       {scannedData.map((data) => {
         return (
-          <View style={{flexDirection:'row', justifyContent:'flex-start'}}>
-            <Text>{data.timestamp.toDateString()}</Text>
+          <View key={data.timestamp.toISOString()} style={{flexDirection:'row', justifyContent:'flex-start'}}>
+            <Text>{formatDate(data.timestamp)}</Text>
             <Text>{' > '}</Text>
             <Text>{data.data}</Text>
           </View>          
