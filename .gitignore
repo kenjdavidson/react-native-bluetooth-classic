@@ -38,6 +38,7 @@ build/
 .gradle
 local.properties
 *.iml
+.settings/
 
 # BUCK
 buck-out/
@@ -47,4 +48,5 @@ buck-out/
 # VSCode
 #
 .vscode/
-      
+.project
+.classpath
