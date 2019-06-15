@@ -507,10 +507,10 @@ public class RNBluetoothClassicModule
       if (device != null) {
         mBluetoothService.connect(device);
       } else {
-        promise.reject(new Exception("Could not connect to " + id));
+        promise.reject(new Exception("No device found with id " + id));
       }
     } else {
-      promise.resolve(true);
+      promise.reject(new Exception("BluetoothAdapter is not enabled"));
     }
   }
 

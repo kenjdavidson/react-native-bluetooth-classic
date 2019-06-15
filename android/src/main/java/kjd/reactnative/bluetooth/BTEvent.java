@@ -37,7 +37,9 @@ public enum BTEvent {
 
     public static WritableMap eventNames() {
         WritableMap events = Arguments.createMap();
-        Arrays.stream(BTEvent.values()).forEach(e -> events.putString(e.name(), e.code));
+        for(BTEvent event : BTEvent.values()) {
+            events.putString(event.name(), event.code);
+        }
         return events;
     }
 }
