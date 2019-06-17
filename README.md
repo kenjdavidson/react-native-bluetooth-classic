@@ -12,70 +12,31 @@ The purpose of this was three fold:
 
 ## Getting started
 
-### Install Local
+### Install from NPM
 
-```
-$ git clone kenjdavidson/react-native-bluetooth-classic
-$ cd MyReactNativeProject
-$ npm install ../react-native-bluetooth-classic --save
-```
-
-When installing locally you may run into issues with NPM >5 where symlink are created.  After googling a bunch it seems like this is a pretty well known 'issue'.  Thanks to a posting [by a smarter person than I](https://github.com/facebook/metro/issues/1#issuecomment-501143843) this has been resolved by updating the `metro.config.js` file in the application project to the following:
-
-```
-let path = require('path');
-module.exports = {
-    transformer: {
-        getTransformOptions: async () => ({
-            transform: {
-                experimentalImportSupport: false,
-                inlineRequires: false
-            }
-        })
-    },
-    resolver: {
-        /* This configuration allows you to build React-Native modules and
-         * test them without having to publish the module. Any exports provided
-         * by your source should be added to the "target" parameter. Any import
-         * not matched by a key in target will have to be located in the embedded
-         * app's node_modules directory.
-         */
-        extraNodeModules: new Proxy(
-            /* The first argument to the Proxy constructor is passed as 
-             * "target" to the "get" method below.
-             * Put the names of the libraries included in your reusable
-             * module as they would be imported when the module is actually used.
-             */
-            {
-                'react-native-bluetooth-classic': path.resolve(__dirname, '../')
-            },
-            {
-                get: (target, name) =>
-                {
-                    if (target.hasOwnProperty(name))
-                    {
-                        return target[name];
-                    }
-                    return path.join(process.cwd(), `node_modules/${name}`);
-                }
-            }
-        )
-    },
-    projectRoot: path.resolve(__dirname),
-    watchFolders: [
-        path.resolve(__dirname, '../')
-    ]
-};
-```
-
-### Install from NPM (may not be complete yet)
 ```
 $ npm install react-native-bluetooth-classic --save
 ```
 
-### Automatic installation
+### Install from NPM (local)
 
-I was able to link the project with the BluetoothClassicExample project using the following command (see the local NPM install above).  
+Currently the project is not posted on NPM, it may in the future.  In order to install locally the following steps are required:
+
+```
+$ git clone https://github.com/kenjdavidson/react-native-bluetooth-classic
+```
+
+With NPM lower than version 5 just running the command `npm install file://../` will install correctly.  In NPM 5+ this creates a symlink which will stop React Native / Metro from working.  In order to resolve this there are two options:
+
+1. Manually install the react-native-bluetooth-classic project into node_modules
+2. Use the following, which will package and install the local project into node_modules.  For more information on install-local please see (Install Local)[https://www.npmjs.com/package/install-local].
+
+```
+npm install install-local
+install-local ../react-native-bluetooth-classic
+```
+
+### Automatic installation
 
 `$ react-native link react-native-bluetooth-classic`
 
@@ -100,7 +61,7 @@ I was able to link the project with the BluetoothClassicExample project using th
   	```
 3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
   	```
-      compile project(':react-native-bluetooth-classic')
+      implementation project(':react-native-bluetooth-classic')
   	```
 
 ##### Annoyances

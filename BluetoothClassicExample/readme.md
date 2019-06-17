@@ -4,31 +4,83 @@ Testing application for react-native-bluetooth-classic module.
 
 ## Setup
 
-When setting up the example application, there are a number of items that might need to be managed manually:
+When attempting to setup and configure the local project, there are a couple possible issues that may be run into.  I've documented all the pain points I had while configuring the BluetoothClassicExample so that if they occur you will be able to resolve them and continue testing.
 
-1. When attempting to run, you'll need to double check that the module and app are configured for your version of Android Studio.  In my case when first setting these up, I was running into an issue where I only had API 28 available, but the `react-native-library` and `react-native` commands provided separate versions:
+### Android 
+The version of Android SDK which was created when using `react-native-library` and `react-native init` were different. 
 
-  - Firstly the module project was defaulting to 0.20.0 when attempting to build, this caused the app to throw errors stating that the Module didn't override the correct methods.  To resovle this, I had to install the peer-dependancies locally so that I could update the module project and use the correct version of React Native that I was expecting (0.59.9).
-  - https://github.com/spatie/npm-install-peers#readme
+  - Firstly the module project was defaulting to 0.20.0 when attempting to build, this caused the app to throw errors stating that the Module didn't override the correct methods.  To resovle this, I had to install the peer-dependancies locally so that I could update the module project and use the correct version of React Native that I was expecting (0.59.9) (npm-install-peers#readme)[https://github.com/spatie/]
+  - Edit - since resolving the second issue I no longer needed peer dependencies as my project was linked locally and could therefore be run.  The only issue was that I had to do development through the BluetoothClassicExample imported library, instead of on it's project workspace (as the two react-native versions still conflicted so editing directly caused 0.20.0 to be used and caused errors.)
 
 2. The second issue was that NPM 5+ performs symlinking of local projects, for that reason you'll see something that looks like this:
   ```
   $ ls -l node_modules/react-native-bluetooth-classic
   lrwxr-xr-x  1 user  group  5 13 Jun 12:46 node_modules/react-native-bluetooth-classic -> ../..
   ```
+  to correct this use the following (install-local)[https://www.npmjs.com/package/install-local].  Sadly after doing so I ran into some other issues, which caused some problems.  It made the build process intolerable since I had to continually `install-local` when changing the library code.
 
-  to correct this use the following:
-  - https://www.npmjs.com/package/install-local
+3. When installing locally you may run into issues with NPM > 5 where symlink are created.  After googling a bunch it seems like this is a pretty well known 'issue'.  Thanks to a posting [by a smarter person than I](https://github.com/facebook/metro/issues/1#issuecomment-501143843) this has been resolved by updating the `metro.config.js` file in the application project to the following:
 
-3. 
+```
+let path = require('path');
+module.exports = {
+    transformer: {
+        getTransformOptions: async () => ({
+            transform: {
+                experimentalImportSupport: false,
+                inlineRequires: false
+            }
+        })
+    },
+    resolver: {
+        /* This configuration allows you to build React-Native modules and
+         * test them without having to publish the module. Any exports provided
+         * by your source should be added to the "target" parameter. Any import
+         * not matched by a key in target will have to be located in the embedded
+         * app's node_modules directory.
+         */
+        extraNodeModules: new Proxy(
+            /* The first argument to the Proxy constructor is passed as 
+             * "target" to the "get" method below.
+             * Put the names of the libraries included in your reusable
+             * module as they would be imported when the module is actually used.
+             */
+            {
+                'react-native-bluetooth-classic': path.resolve(__dirname, '../')
+            },
+            {
+                get: (target, name) =>
+                {
+                    if (target.hasOwnProperty(name))
+                    {
+                        return target[name];
+                    }
+                    return path.join(process.cwd(), `node_modules/${name}`);
+                }
+            }
+        )
+    },
+    projectRoot: path.resolve(__dirname),
+    watchFolders: [
+        path.resolve(__dirname, '../')
+    ]
+};
+```
 
-## Running
+## Running Application
 
+### Android
 Once configured, the application can be run from a number of methods:
 
-1. Through VSCode using the commands `Apple/shift/P React-Native: Run Android on Emulator`
+1. Through VSCode using the commands 
+```
+Apple/Shift/P 
+React-Native: Run Android on Emulator
+```
 
 2. Through Android Studio clicking the `run` button
+
+### IOS
 
 ## Usage
 
@@ -40,4 +92,6 @@ Displays a list of devices currently connected.  Clicking on a device will bring
 
 ### Device Connection
 
-Displays a text area and text field allowing you to send and monitor communication.  
+Displays a text area and text field allowing you to send and monitor communication.  Scanned data will be displayed on the screen with the timestamp.
+
+TODO - add support for sending data to a device
