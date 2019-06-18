@@ -7,7 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B3E7B58A1CC2AC0600A0062D /* RNBluetoothClassic.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNBluetoothClassic.m */; };
+		E8D2258922B7C9E700A0CF65 /* RNBluetoothClassic.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D2258822B7C9E700A0CF65 /* RNBluetoothClassic.swift */; };
+		E8D2258B22B7CA9F00A0CF65 /* RNBluetoothClassic.m in Sources */ = {isa = PBXBuildFile; fileRef = E8D2258A22B7CA9F00A0CF65 /* RNBluetoothClassic.m */; };
+		E8D2258D22B7CACA00A0CF65 /* BTEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D2258C22B7CACA00A0CF65 /* BTEvent.swift */; };
+		E8D2258F22B7CB0100A0CF65 /* BTRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D2258E22B7CB0100A0CF65 /* BTRequest.swift */; };
+		E8D2259122B7CB0D00A0CF65 /* BTState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D2259022B7CB0D00A0CF65 /* BTState.swift */; };
+		E8D225D922B8847200A0CF65 /* BluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D225D822B8847200A0CF65 /* BluetoothDevice.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,8 +29,13 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNBluetoothClassic.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNBluetoothClassic.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		B3E7B5881CC2AC0600A0062D /* RNBluetoothClassic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNBluetoothClassic.h; sourceTree = "<group>"; };
-		B3E7B5891CC2AC0600A0062D /* RNBluetoothClassic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNBluetoothClassic.m; sourceTree = "<group>"; };
+		E8D2258722B7C9E700A0CF65 /* RNBluetoothClassic-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNBluetoothClassic-Bridging-Header.h"; sourceTree = "<group>"; };
+		E8D2258822B7C9E700A0CF65 /* RNBluetoothClassic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNBluetoothClassic.swift; sourceTree = "<group>"; };
+		E8D2258A22B7CA9F00A0CF65 /* RNBluetoothClassic.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNBluetoothClassic.m; sourceTree = "<group>"; };
+		E8D2258C22B7CACA00A0CF65 /* BTEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTEvent.swift; sourceTree = "<group>"; };
+		E8D2258E22B7CB0100A0CF65 /* BTRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTRequest.swift; sourceTree = "<group>"; };
+		E8D2259022B7CB0D00A0CF65 /* BTState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTState.swift; sourceTree = "<group>"; };
+		E8D225D822B8847200A0CF65 /* BluetoothDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothDevice.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,9 +60,14 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				B3E7B5881CC2AC0600A0062D /* RNBluetoothClassic.h */,
-				B3E7B5891CC2AC0600A0062D /* RNBluetoothClassic.m */,
+				E8D225D822B8847200A0CF65 /* BluetoothDevice.swift */,
+				E8D2259022B7CB0D00A0CF65 /* BTState.swift */,
+				E8D2258E22B7CB0100A0CF65 /* BTRequest.swift */,
+				E8D2258C22B7CACA00A0CF65 /* BTEvent.swift */,
+				E8D2258A22B7CA9F00A0CF65 /* RNBluetoothClassic.m */,
+				E8D2258822B7C9E700A0CF65 /* RNBluetoothClassic.swift */,
 				134814211AA4EA7D00B7C361 /* Products */,
+				E8D2258722B7C9E700A0CF65 /* RNBluetoothClassic-Bridging-Header.h */,
 			);
 			sourceTree = "<group>";
 		};
@@ -82,20 +97,22 @@
 		58B511D31A9E6C8500147676 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = Facebook;
 				TargetAttributes = {
 					58B511DA1A9E6C8500147676 = {
 						CreatedOnToolsVersion = 6.1.1;
+						LastSwiftMigration = 1020;
 					};
 				};
 			};
 			buildConfigurationList = 58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "RNBluetoothClassic" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 58B511D21A9E6C8500147676;
 			productRefGroup = 58B511D21A9E6C8500147676;
@@ -112,7 +129,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B3E7B58A1CC2AC0600A0062D /* RNBluetoothClassic.m in Sources */,
+				E8D225D922B8847200A0CF65 /* BluetoothDevice.swift in Sources */,
+				E8D2259122B7CB0D00A0CF65 /* BTState.swift in Sources */,
+				E8D2258922B7C9E700A0CF65 /* RNBluetoothClassic.swift in Sources */,
+				E8D2258F22B7CB0100A0CF65 /* BTRequest.swift in Sources */,
+				E8D2258D22B7CACA00A0CF65 /* BTEvent.swift in Sources */,
+				E8D2258B22B7CA9F00A0CF65 /* RNBluetoothClassic.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,18 +145,27 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -167,18 +198,27 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -203,32 +243,41 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = (
-				"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../../../React/**",
-					"$(SRCROOT)/../../react-native/React/**",
-				);
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = RNBluetoothClassic;
-				SKIP_INSTALL = YES;
-			};
-			name = Debug;
-		};
-		58B511F11A9E6C8500147676 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/../../../React/**",
 					"$(SRCROOT)/../../react-native/React/**",
 				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNBluetoothClassic;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNBluetoothClassic-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		58B511F11A9E6C8500147676 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)/../../../React/**",
+					"$(SRCROOT)/../../react-native/React/**",
+				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = RNBluetoothClassic;
+				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNBluetoothClassic-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

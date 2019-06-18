@@ -1,11 +1,11 @@
 
-import { NativeModules, DeviceEventEmitter } from 'react-native';
+import { Platform, NativeModules, DeviceEventEmitter } from 'react-native';
 import { Buffer } from 'buffer';
 
 const { RNBluetoothClassic } = NativeModules;
 const NOOP = () => {};
 
-export const BTEvents = RNBluetoothClassic.getConstants().BTEvents;
+export const BTEvents = Platform.OS === 'ios' ? RNBluetoothClassic.BTEvents : RNBluetoothClassic.getConstants().BTEvents;
 
 /**
  * Listen for the specified event.

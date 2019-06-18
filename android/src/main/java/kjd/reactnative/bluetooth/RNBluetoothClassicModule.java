@@ -746,10 +746,9 @@ public class RNBluetoothClassicModule
     params.putString("address", device.getAddress());
     params.putString("id", device.getAddress());
 
-    if (device.getBluetoothClass() != null) {
-      params.putInt("class", device.getBluetoothClass().getDeviceClass());
-    }
-
+    // Extra Android specific details
+    params.putInt("class", device.getBluetoothClass() != null
+            ? device.getBluetoothClass().getDeviceClass() : -1);
     return params;
   }
 
