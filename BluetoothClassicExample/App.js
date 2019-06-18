@@ -1,9 +1,10 @@
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, TextInput, View, ScrollView, TouchableOpacity} from 'react-native';
+import {Platform, StyleSheet, Text, TextInput, View, ScrollView, TouchableOpacity, StatusBar} from 'react-native';
 import RNBluetoothClassic, {BTEvents} from '@kenjdavidson/react-native-bluetooth-classic';
 import Toast, {DURATION} from 'react-native-easy-toast'
 import Buffer from 'buffer';
+import { catchClause } from '@babel/types';
 
 const formatDate = (date) => {
   return date.getUTCFullYear() + "/" +
@@ -13,6 +14,12 @@ const formatDate = (date) => {
     ("0" + date.getUTCMinutes()).slice(-2) + ":" +
     ("0" + date.getUTCSeconds()).slice(-2);
 }
+
+const AppStatusBar = ({backgroundColor, ...props}) => (
+  <View style={[styles.statusbar, {backgroundColor}]}>
+    <StatusBar translucent backgroundColor={backgroundColor} {...props} />
+  </View> 
+) 
 
 const DeviceList = ({devices, onPress, style}) => 
   <ScrollView style={styles.listContainer} contentContainerStyle={styles.container}>
@@ -61,7 +68,7 @@ export default class App extends React.Component {
   }
 
   componentWillMount() {     
-    this.initializeDevices();
+    this.initialize();
 
     RNBluetoothClassic.addListener(BTEvents.READ, this.handleRead);
   }
@@ -80,16 +87,28 @@ export default class App extends React.Component {
     this.setState({scannedData});
   }
 
-  async initializeDevices() {
-    try {
-      let connectedDevice = await RNBluetoothClassic.getConnectedDevice();
-      this.setState({connectedDevice});
-    } catch(error) {
-      let devices = await RNBluetoothClassic.list();
+  async initialize() {
+    let enabled = await RNBluetoothClassic.isEnabled();
+    let newState = { bluetoothEnabled: enabled, devices: []};
 
-      console.log(devices);
-      this.setState({deviceList: devices}); 
+    if (enabled) {
+      try {
+        let connectedDevice = await RNBluetoothClassic.getConnectedDevice();
+        newState.connectedDevice = connectedDevice;
+      } catch(error) {
+        try {
+          let devices = await RNBluetoothClassic.list();
+  
+          console.log('initializeDevices::list')
+          console.log(devices);
+          newState.deviceList = devices;
+        } catch(error) {
+          console.error(error.message);
+        }     
+      }
     }   
+
+    this.setState(newState);
   }
 
   async connectToDevice(device) {
@@ -114,17 +133,24 @@ export default class App extends React.Component {
 
   render() {
     let title = !this.state.connectedDevice ? 'Connected Devices' : this.state.connectedDevice.name;    
+    let connectedColor = !this.state.bluetoothEnabled ? styles.toolbarButton.color : 'green';
     return (
       <View style={styles.container}>
+        <AppStatusBar backgroundColor={styles.statusbar.backgroundColor} barStyle="light-content"></AppStatusBar>
         <View style={styles.toolbar}>
           <Text style={styles.toolbarText}>{title}</Text>
+          {this.state.bluetoothEnabled
+            ? (<Text style={[styles.toolbarButton, {color: connectedColor}]}>O</Text>)
+            : null
+          }
           {this.state.connectedDevice != undefined
             ? (<Text style={styles.toolbarButton} onPress={this.unselectDevice}>X</Text>) 
             : null
           }
         </View>
         {!this.state.connectedDevice
-          ? <DeviceList devices={this.state.deviceList}
+          ? <DeviceList 
+              devices={this.state.deviceList}
               onPress={this.selectDevice}></DeviceList> 
           : <DeviceConnection device={this.state.device} scannedData={this.state.scannedData}></DeviceConnection>
         }    
@@ -134,7 +160,14 @@ export default class App extends React.Component {
   }
 }
 
+const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBar.currentHeight;
+const APPBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
+
 const styles = StyleSheet.create({
+  statusbar: {
+    height: STATUSBAR_HEIGHT,
+    backgroundColor: '#222'
+  },
   toolbar: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
@@ -144,7 +177,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     paddingLeft: 16,
     paddingRight: 16,
-    height: 52
+    height: APPBAR_HEIGHT
   },
   toolbarText: {
     flex: 1,

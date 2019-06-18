@@ -23,7 +23,6 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		140ED2AC1D01E1AD002B40FF /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
-		1E68315DC4834DA3B0F0ADCA /* libRNBluetoothClassic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97F95DFB93424D4A9BBFD7DC /* libRNBluetoothClassic.a */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
@@ -40,6 +39,8 @@
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
 		E8D225D722B8084F00A0CF65 /* RNSwiftBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D225D622B8084F00A0CF65 /* RNSwiftBridge.swift */; };
+		E8D2261622B9251B00A0CF65 /* libRNBluetoothClassic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E8D2261522B924D300A0CF65 /* libRNBluetoothClassic.a */; };
+		E8D2261F22B95D1300A0CF65 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8D2261E22B95D1300A0CF65 /* ExternalAccessory.framework */; };
 		ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
 		ED2971652150620600B7C4FE /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED2971642150620600B7C4FE /* JavaScriptCore.framework */; };
 /* End PBXBuildFile section */
@@ -318,19 +319,19 @@
 			remoteGlobalIDString = ED296FEE214C9CF800B7C4FE;
 			remoteInfo = "jsiexecutor-tvOS";
 		};
-		E8D225CF22B7F84800A0CF65 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FA9CB36188354631A1E3C555 /* RNBluetoothClassic.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 134814201AA4EA6300B7C361;
-			remoteInfo = RNBluetoothClassic;
-		};
 		E8D225D122B8032A00A0CF65 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = 83CBBA2D1A601D0E00E9B192;
 			remoteInfo = React;
+		};
+		E8D2261422B924D300A0CF65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D2261022B924D300A0CF65 /* RNBluetoothClassic.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNBluetoothClassic;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -364,9 +365,12 @@
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
 		E8D225D522B8084E00A0CF65 /* BluetoothClassicExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BluetoothClassicExample-Bridging-Header.h"; sourceTree = "<group>"; };
 		E8D225D622B8084F00A0CF65 /* RNSwiftBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNSwiftBridge.swift; sourceTree = "<group>"; };
+		E8D2261022B924D300A0CF65 /* RNBluetoothClassic.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNBluetoothClassic.xcodeproj; path = ../../ios/RNBluetoothClassic.xcodeproj; sourceTree = "<group>"; };
+		E8D2261D22B95D0500A0CF65 /* BluetoothClassicExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = BluetoothClassicExample.entitlements; path = BluetoothClassicExample/BluetoothClassicExample.entitlements; sourceTree = "<group>"; };
+		E8D2261E22B95D1300A0CF65 /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
+		E8D2262922B9787800A0CF65 /* protocolStrings.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = protocolStrings.sh; path = "build-script/protocolStrings.sh"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
-		FA9CB36188354631A1E3C555 /* RNBluetoothClassic.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNBluetoothClassic.xcodeproj; path = "../node_modules/react-native-bluetooth-classic/ios/RNBluetoothClassic.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -388,6 +392,7 @@
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,
 				00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */,
 				00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */,
+				E8D2261F22B95D1300A0CF65 /* ExternalAccessory.framework in Frameworks */,
 				00C302E81ABCBA2D00DB3ED1 /* libRCTImage.a in Frameworks */,
 				133E29F31AD74F7200F7D852 /* libRCTLinking.a in Frameworks */,
 				00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */,
@@ -395,7 +400,7 @@
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
-				1E68315DC4834DA3B0F0ADCA /* libRNBluetoothClassic.a in Frameworks */,
+				E8D2261622B9251B00A0CF65 /* libRNBluetoothClassic.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -508,6 +513,7 @@
 		13B07FAE1A68108700A75B9A /* BluetoothClassicExample */ = {
 			isa = PBXGroup;
 			children = (
+				E8D2261D22B95D0500A0CF65 /* BluetoothClassicExample.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -517,6 +523,7 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				E8D225D622B8084F00A0CF65 /* RNSwiftBridge.swift */,
 				E8D225D522B8084E00A0CF65 /* BluetoothClassicExample-Bridging-Header.h */,
+				E8D2262922B9787800A0CF65 /* protocolStrings.sh */,
 			);
 			name = BluetoothClassicExample;
 			sourceTree = "<group>";
@@ -547,6 +554,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E8D2261E22B95D1300A0CF65 /* ExternalAccessory.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
@@ -575,6 +583,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				E8D2261022B924D300A0CF65 /* RNBluetoothClassic.xcodeproj */,
 				5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
 				00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */,
@@ -587,7 +596,6 @@
 				832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */,
 				00C302DF1ABCB9EE00DB3ED1 /* RCTVibration.xcodeproj */,
 				139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */,
-				FA9CB36188354631A1E3C555 /* RNBluetoothClassic.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -644,10 +652,10 @@
 			name = "Recovered References";
 			sourceTree = "<group>";
 		};
-		E8D225CC22B7F84700A0CF65 /* Products */ = {
+		E8D2261122B924D300A0CF65 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E8D225D022B7F84800A0CF65 /* libRNBluetoothClassic.a */,
+				E8D2261522B924D300A0CF65 /* libRNBluetoothClassic.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -681,6 +689,7 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
+				E8D2262022B9656700A0CF65 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -745,6 +754,17 @@
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = FSLWKH263C;
 						LastSwiftMigration = 1020;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 0;
+							};
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.WAC = {
+								enabled = 1;
+							};
+						};
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -821,8 +841,8 @@
 					ProjectRef = 146833FF1AC3E56700842450 /* React.xcodeproj */;
 				},
 				{
-					ProductGroup = E8D225CC22B7F84700A0CF65 /* Products */;
-					ProjectRef = FA9CB36188354631A1E3C555 /* RNBluetoothClassic.xcodeproj */;
+					ProductGroup = E8D2261122B924D300A0CF65 /* Products */;
+					ProjectRef = E8D2261022B924D300A0CF65 /* RNBluetoothClassic.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -1095,11 +1115,11 @@
 			remoteRef = E8D225CA22B7F84400A0CF65 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		E8D225D022B7F84800A0CF65 /* libRNBluetoothClassic.a */ = {
+		E8D2261522B924D300A0CF65 /* libRNBluetoothClassic.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libRNBluetoothClassic.a;
-			remoteRef = E8D225CF22B7F84800A0CF65 /* PBXContainerItemProxy */;
+			remoteRef = E8D2261422B924D300A0CF65 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -1166,6 +1186,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+		};
+		E8D2262022B9656700A0CF65 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n$SRCROOT/build-script/protocolStrings.sh\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1303,6 +1340,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = BluetoothClassicExample/BluetoothClassicExample.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = FSLWKH263C;
@@ -1332,6 +1370,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = BluetoothClassicExample/BluetoothClassicExample.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FSLWKH263C;
 				HEADER_SEARCH_PATHS = (

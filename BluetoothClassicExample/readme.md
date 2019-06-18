@@ -67,6 +67,28 @@ module.exports = {
 };
 ```
 
+### IOS
+
+IOS requires that UISupportedExternalAccessoryProtocols are configured within the Info.plist file.  As per the MFi these values should not be made available or stored within git unless working with the specific vendor.  The IOS build has been updated to include a merging of during the Run Scripts phase:
+
+Info.plist 
+~/BluetoothClassicExample.plist
+
+You're responsible for creating this file:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>UISupportedExternalAccessoryProtocols</key>
+  <array>
+    <string>com.allflex-europe.gprplus_110</string>
+  </array>
+</dict>
+</plist>
+```
+
 ## Running Application
 
 ### Android
@@ -82,6 +104,14 @@ React-Native: Run Android on Emulator
 
 ### IOS
 
+In order to debug remotely (live device) the remote ip needs to be updated, as per the documentation for (React Native Debugging)[https://facebook.github.io/react-native/docs/debugging] do the following:
+
+- On iOS devices, open the file RCTWebSocketExecutor.m and change "localhost" to the IP address of your computer, then select "Debug JS Remotely" from the Developer Menu.
+
+or 
+
+- Select "Dev Settings" from the Developer Menu, then update the "Debug server host for device" setting to match the IP address of your computer.
+ 
 ## Usage
 
 The application contains two screens:

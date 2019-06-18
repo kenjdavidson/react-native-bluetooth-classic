@@ -8,50 +8,72 @@
 
 import Foundation
 import ExternalAccessory
+import CoreBluetooth
 
 @objc(RNBluetoothClassic)
-class RNBluetoothClassic : RCTEventEmitter {
+class RNBluetoothClassic : RCTEventEmitter, StreamDelegate {
     
     let manager: EAAccessoryManager
+    let central: CBCentralManager
+    var peripheral:BluetoothDevice?;
     
     /**
      Initialize the RNBluetoothClassic.
      */
     override init() {
         self.manager = EAAccessoryManager.shared()
+        self.central = CBCentralManager()
         
         super.init()
     }
     
+    
     /**
+     RCTEventEmitter -
+     Turned off the main queue setup for now - testing.  But this will need to be turned
+     on as the ExternalAccessory event handling needs to occur on a separate thread and
+     be haneled correctly.
+     */
+    @objc
+    override static func requiresMainQueueSetup() -> Bool {
+        return false;
+    }
+    
+    /**
+     RCTEventEmitter -
      Match the getConstants() method on Android.  The difference being that
      in index.js we need to pull from different locations RNBluetoothClassic.BTEvents
      rather than RNBluetoothClassic.getConstants().BTEvents.
      */
     override func constantsToExport() -> [AnyHashable : Any]! {
         return [
-            "BTEvents": BTEvent.eventNamesDictionary()
+            "BTEvents": BTEvent.asDictionary()
         ];
     }
     
     /**
+     RCTEventEmitter -
      Return the supported events for the RCTEventEmitter to test.
      */
     override func supportedEvents() -> [String] {
-        return BTEvent.eventNamesArray()
+        return BTEvent.asArray()
     }
     
     /**
-     Turned off the main queue setup for now - testing.  But this will need to be turned
-     on as the ExternalAccessory event handling needs to occur on a separate thread and
-     be haneled correctly.
+     StreamDelegate -
+     handles in/out stream events
      */
-    func requiresMainQueueSetup() -> Bool {
-        return false;
+    func stream(
+        _ aStream: Stream,
+        handle eventCode: Stream.Event
+    ) {
+        NSLog("Stream data available")
     }
     
     /**
-     Attempts to request that bluetooth be enabled.
+     Attempts to request that bluetooth be enabled.  I don't believe that EAExternalAccessory
+     allows for this, but I think that CBCentralManager does, I'll have to look into
+     implementing this in the future.
      - parameter _: bluetooth was enabled successfully
      - parameter reject: unable to attempt/enable bluetooth
      */
@@ -59,18 +81,28 @@ class RNBluetoothClassic : RCTEventEmitter {
     func requestEnable(
         _ resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
-        ) -> Void {
-        
+    ) -> Void {
+        let msg: String = "requestEnabled is not implemented on IOS"
+        reject("error", msg, NSError())
     }
     
     /**
-     Whether or not bluetooth is currently enabled.
+     Whether or not bluetooth is currently enabled - currently this is done by using the
+     CoreBluetooth (BLE) framework, as it should hopefully be good enough for performing
+     bluetooth system tasks.
      - parameter _: resovles with true|false based on enable
      - parameter reject: should never be rejected
      */
     @objc
-    func isEnabled(_ resolve: RCTPromiseResolveBlock) -> Void {
-        
+    func isEnabled(
+        _ resolve: RCTPromiseResolveBlock,
+        rejecter reject: RCTPromiseRejectBlock
+    ) -> Void {
+        if #available(iOS 10.0, *) {
+            resolve(central.state == CBManagerState.poweredOn)
+        } else {
+            resolve(central.state.rawValue == CBCentralManagerState.poweredOn.rawValue)
+        }
     }
     
     /**
@@ -82,20 +114,24 @@ class RNBluetoothClassic : RCTEventEmitter {
      - parameter reject: should never be rejected
      */
     @objc
-    func list(_ resolve: RCTPromiseResolveBlock) -> Void {        
+    func list(
+        _ resolve: RCTPromiseResolveBlock,
+        rejecter reject: RCTPromiseRejectBlock
+    ) -> Void {
         var accessories:[NSDictionary] = [NSDictionary]()
         for accessory in manager.connectedAccessories {
             let device = BluetoothDevice(accessory)
             accessories.append(device.write())
         }
-        
         resolve(accessories)
     }
     
     /**
      Allows the user to pair a device with the phone.  Uses the
      EAAccessoryManager.shared().showBluetoothAccessoryPicker(withNameFilter, completion)
-     which pops up a system dialog.
+     which pops up a system dialog.  Currently this method just rejects automatically as
+     the EAExternalAccessory library requires that pairing be done at the system
+     level.
      - parameter _: the name predicate used for filtering, passed through
      - parameter resolve: saved for use with the completion delegate
      - parameter reject: saved for use with the completion delgate
@@ -105,12 +141,15 @@ class RNBluetoothClassic : RCTEventEmitter {
         _ predicate: NSPredicate?,
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
-        ) -> Void {
-    
+    ) -> Void {
+        let msg: String = "discoverUnpairedDevices is not implemented on IOS"
+        reject("error", msg, NSError())
     }
     
     /**
-     Unsure if this is possible, may be auto reject
+     Unsure if this is possible, may be auto reject.  Currently this method just rejects
+     automatically as the EAExternalAccessory library requires that discovery be done at
+     the system level.
      - parameter _: resolve the cancellation
      - parameter reject: reject the cancellation
      */
@@ -118,13 +157,16 @@ class RNBluetoothClassic : RCTEventEmitter {
     func cancelDiscovery(
         _ resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
-        ) -> Void {
-        
+    ) -> Void {
+        let msg: String = "cancelDiscovery is not implemented on IOS"
+        reject("error", msg, NSError())
     }
     
     /**
      Attempts to pair a specific device - will get a list of available devices
-     and then pair it as such.
+     and then pair it as such.  Currently this method just rejects automatically as
+     the EAExternalAccessory library requires that pairing be done at the system
+     level.
      - parameter deviceId: the Address/Id of the device
      - parameter resolve: saved for use with the completion delegate
      - parameter reject: saved for use with the completion delgate
@@ -134,12 +176,15 @@ class RNBluetoothClassic : RCTEventEmitter {
         _ deviceId: String,
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
-        ) -> Void {
-        
+    ) -> Void {
+        let msg: String = "pairDevice is not implemented on IOS"
+        reject("error", msg, NSError())
     }
     
     /**
-     Unpair the specified device.
+     Unpair the specified device.  Currently this method just rejects automatically as
+     the EAExternalAccessory library requires that pairing be done at the system
+     level
      - parameter deviceId: the Address/Id of the device
      - parameter resolve: resolve the unpairing
      - parameter reject: reject the unpairing
@@ -149,12 +194,17 @@ class RNBluetoothClassic : RCTEventEmitter {
         _ deviceId: String,
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
-        ) -> Void {
-        
+    ) -> Void {
+        let msg: String = "unpairDevice is not implemented on IOS"
+        reject("error", msg, NSError())
     }
     
     /**
-     Opens an EASession to the requested device.
+     Determines whether the device is still connected and attempts to open
+     a connection to it.  This is done by providing the self to the BluetoothDevice
+     as a delegate during the open request.  If the device cannot be connected to,
+     fails connection or bluetooth is just not enabled, then the request
+     is rejected.
      - parameter _: the device in which to connect
      - parameter resolve: resolve when the connection has been established
      - parameter reject: reject a failed connection
@@ -164,8 +214,33 @@ class RNBluetoothClassic : RCTEventEmitter {
         _ deviceId: String,
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
-        ) -> Void {
+    ) -> Void {
+        // First disconnect the current device if there was one selected
+        if peripheral != nil {
+            peripheral?.disconnect()
+            peripheral = nil
+        }
         
+        // Now check to see that the device is still connected and available
+        // using the EAAccessoryManager, if found we create a new BluetoothDevice
+        // which will be responsible for managing our connection
+        let accessories = manager.connectedAccessories
+        for accessory in accessories {
+            if accessory.name == deviceId {
+                peripheral = BluetoothDevice(accessory)
+                break
+            }
+        }
+        
+        if peripheral != nil {
+            // Determine the protocol to use, this is done by getting a list of the available
+            // protocols from plist and selecting the first one matching the device.
+            let protocolString: String? = nil
+            peripheral?.connect(protocolString: protocolString!, delegate: self)
+            resolve(peripheral?.write())
+        }
+        
+        reject("error", "Unable to connect to device ${deviceId}", NSError())
     }
     
     /**
@@ -177,8 +252,14 @@ class RNBluetoothClassic : RCTEventEmitter {
     func disconnect(
         _ resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
-        ) -> Void {
+    ) -> Void {
+        if peripheral != nil {
+            peripheral?.disconnect()
+            peripheral = nil
+            resolve(true)
+        }
         
+        resolve(false)
     }
     
     /**
@@ -187,7 +268,7 @@ class RNBluetoothClassic : RCTEventEmitter {
      */
     @objc
     func isConnected(_ resolve: RCTPromiseResolveBlock) -> Void {
-        
+        resolve(peripheral?.accessory.isConnected ?? false)
     }
     
     /**
@@ -195,8 +276,13 @@ class RNBluetoothClassic : RCTEventEmitter {
      - parameter _: resolve with either the connected device or null.
      */
     @objc
-    func getConnectedDevice(_ resolve: RCTPromiseResolveBlock) -> Void {
-        
+    func getConnectedDevice(
+        _ resolve: RCTPromiseResolveBlock,
+        rejecter reject: RCTPromiseRejectBlock) -> Void {
+        if peripheral != nil {
+            resolve(peripheral?.write())
+        }
+        reject("error", "No bluetooth device connected", NSError())
     }
     
     /**
@@ -208,9 +294,11 @@ class RNBluetoothClassic : RCTEventEmitter {
     @objc
     func writeToDevice(
         _ message: String,
-        resolver resolve: RCTPromiseResolveBlock
-        ) -> Void {
-        
+        resolver resolve: RCTPromiseResolveBlock,
+        rejecter reject: RCTPromiseRejectBlock
+    ) -> Void {
+        let msg: String = "writeToDevice is not implemented on IOS"
+        reject("error", msg, NSError())
     }
     
     /**
@@ -276,7 +364,7 @@ class RNBluetoothClassic : RCTEventEmitter {
      */
     @objc
     func isAvailable(_ resolve: RCTPromiseResolveBlock) {
-        
+        resolve(peripheral?.hasAvailableBytes())
     }
     
     /**

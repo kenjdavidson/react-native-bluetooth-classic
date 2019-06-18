@@ -21,17 +21,17 @@ enum BTEvent : String, CaseIterable {
     case READ = "read"
     case ERROR = "error"
     
-    static func eventNamesDictionary() -> NSDictionary {
-        let events:NSDictionary = NSDictionary()
+    static func asDictionary() -> NSDictionary {
+        let events:NSDictionary = NSMutableDictionary()
         
         for event in BTEvent.allCases {
-            events.setValue(event.self, forKey: event.rawValue)
+            events.setValue(event.rawValue, forKey: "\(event)")
         }
         
         return events
     }
     
-    static func eventNamesArray() -> [String] {
+    static func asArray() -> [String] {
         var events:[String] = [String]()
         
         for event in BTEvent.allCases {

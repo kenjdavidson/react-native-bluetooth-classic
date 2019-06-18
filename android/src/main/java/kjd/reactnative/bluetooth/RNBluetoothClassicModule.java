@@ -540,7 +540,7 @@ public class RNBluetoothClassicModule
     if (mBluetoothService.isConnected()) {
       promise.resolve(deviceToWritableMap(mBluetoothService.connectedDevice()));
     }
-    promise.reject(new Error("No bluetooth devices connected"));
+    promise.reject(new Error("No bluetooth device connected"));
   }
 
 

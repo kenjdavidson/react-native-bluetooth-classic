@@ -12,12 +12,13 @@
 
 @interface RCT_EXTERN_MODULE(RNBluetoothClassic, RCTEventEmitter)
 
-RCT_EXTERN_METHOD(requestEnable (RCTPromiseResolveBlock)resolve
-                  rejecter: (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(isEnabled: (RCTPromiseResolveBlock)resolve
-                  rejecter: (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(list (RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(requestEnable: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(isEnabled: (RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(list: (RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject)
 
 @end
