@@ -9,7 +9,6 @@
   "dependencies": {
     "react": "16.8.3",
     "react-native": "0.59.9",
-    "react-native-bluetooth-classic": "file:..",
     "react-native-easy-toast": "^1.2.0"
   },
   "devDependencies": {

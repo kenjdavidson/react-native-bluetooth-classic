@@ -44,7 +44,7 @@ module.exports = {
              * module as they would be imported when the module is actually used.
              */
             {
-                'react-native-bluetooth-classic': path.resolve(__dirname, '../')
+                '@kenjdavidson/react-native-bluetooth-classic': path.resolve(__dirname, '../')
             },
             {
                 get: (target, name) =>

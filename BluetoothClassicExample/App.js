@@ -1,7 +1,7 @@
 
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, TextInput, View, ScrollView, TouchableOpacity} from 'react-native';
-import RNBluetoothClassic, {BTEvents} from 'react-native-bluetooth-classic';
+import RNBluetoothClassic, {BTEvents} from '@kenjdavidson/react-native-bluetooth-classic';
 import Toast, {DURATION} from 'react-native-easy-toast'
 import Buffer from 'buffer';
 
