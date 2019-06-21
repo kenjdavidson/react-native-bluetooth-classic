@@ -243,12 +243,11 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
      - parameter reject: saved for use with the completion delgate
      */
     @objc
-    func discoverUnpairedDevices(
-        _ predicate: NSPredicate?,
+    func discoverDevices(
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
-        let msg: String = "discoverUnpairedDevices is not implemented on IOS"
+        let msg: String = "discoverDevices is not implemented on IOS"
         reject("error", msg, NSError())
     }
     

@@ -55,4 +55,16 @@ RCT_EXTERN_METHOD(setAdapterName: (NSString)name
                   resolver: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 
+// Currently unimplemented
+RCT_EXTERN_METHOD(discoverDevices: resolver: (RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(cancelDiscovery: resolver: (RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(pairDevice: (NSString)deviceId
+                  resolver: (RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(unpairDevice: (NSString)deviceId
+                  resolver: (RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject)
+
 @end

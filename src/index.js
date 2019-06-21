@@ -22,21 +22,21 @@ class DeviceEventSubscription {
 }
 
 /**
- * As per the documentation the NativeEventEmitter is used for IOS event subscriptions.  Extending
- * this way provides IntelliSense and added control - at the cost of more typing if any functionality
- * is added or removed. 
- * 
- * I've done (and will do) my best to maintain as much code between Android and IOS as possible, removing
- * the requirement for any Platform.OS logic within the React Native components.  If there are any times
- * when this isn't possible, it'll be well documented.
- * 
- * TODO look into which method is better this.function = nativeModule.function or 
- * function = (...) => nativeModule.function(...).  At this point it all depends on what makes VSCode
- * more standable when using the library.
+ * Combines some common functionality between NativeEventEmitter and DeviceEventEmitter for
+ * IOS and Android respectively.  The key thing here is that we need to:
+ * - Make the Native methods available in JS (check)
+ * - Make the add|remove listener functionality available in JS(check)
+ * - Make the remove() functionality available in JS (check)
+ *
+ * I decided to stick with the IOS side as the main way of doing things because I found it
+ * more annoying up front and would therefore want to be reminded of in whenever fixes
+ * or features are added.
  */
 class RNBluetoothClassic extends NativeEventEmitter {
   constructor(nativeModule) {
     super(nativeModule)
+
+    if (Platform.OS === 'android') this._nativeModule = nativeModule;
 
     this.requestEnable = nativeModule.requestEnable;
     this.isEnabled = nativeModule.isEnabled;

@@ -124,9 +124,9 @@ class DeviceConnection extends React.Component {
               onPress={() => this.sendData()}>
               <Text>Send</Text>
             </TouchableOpacity>
-          </View>  
-          <KeyboardSpacer/>
+          </View>            
         </View>
+        { Platform.OS == 'ios' ? <KeyboardSpacer/> : null}        
       </View>
     )
   }
@@ -213,13 +213,8 @@ export default class App extends React.Component {
     this.setState({connectedDevice: undefined})
   }
 
-  async writeToDevice(msg) {
-    let result = await RNBluetoothClassic.write(msg);
-  }
-
   selectDevice = (device) => this.connectToDevice(device);
   unselectDevice = () => this.disconnectFromDevice();
-  onSend = (msg) => this.writeToDevice(msg);
 
   render() {
     let connectedColor = !this.state.bluetoothEnabled ? styles.toolbarButton.color : 'green';
@@ -246,6 +241,11 @@ export default class App extends React.Component {
   }
 }
 
+/**
+ * The statusbar height goes wonky on Huawei with a notch - not sure if its the notch or the
+ * Huawei but the fact that the notch is different than the status bar makes the statusbar 
+ * go below the notch (even when the notch is on).
+ */
 const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBar.currentHeight;
 const APPBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
 

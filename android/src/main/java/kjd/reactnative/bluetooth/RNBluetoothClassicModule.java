@@ -254,47 +254,6 @@ public class RNBluetoothClassicModule
   }
 
   /**
-   * Pair a specific device.  This will attempt to pair the device and register a single purpose
-   * listener for when the device is paired/failed.
-   * <p>
-   * This may need to be deprecated in the future, as this was only for kitkat (from the docs)
-   * and I don't particularly see a purpose for it now.  It would be better off having a general
-   * purpose listener that will let us know when any device has just bonded.
-   *
-   * @param device Device
-   *
-   */
-  private void pairDevice(BluetoothDevice device) throws DevicePairingException {
-    try {
-      if (D) Log.d(TAG, "Start Pairing...");
-      Method m = device.getClass().getMethod("createBond", (Class[]) null);
-      m.invoke(device, (Object[]) null);
-      registerDevicePairingReceiver(device.getAddress(), BluetoothDevice.BOND_BONDED);
-      if (D) Log.d(TAG, "Pairing finished.");
-    } catch (Exception e) {
-      Log.e(TAG, "Cannot pair device", e);
-      throw new DevicePairingException(e);
-    }
-  }
-
-  /**
-   * Performs the unpairing of the requested device.
-   *
-   * @param device to be unpaired
-   */
-  private void unpairDevice(BluetoothDevice device) throws DevicePairingException {
-    try {
-      if (D) Log.d(TAG, "Start Unpairing...");
-      Method m = device.getClass().getMethod("removeBond", (Class[]) null);
-      m.invoke(device, (Object[]) null);
-      registerDevicePairingReceiver(device.getAddress(), BluetoothDevice.BOND_NONE);
-    } catch (Exception e) {
-      Log.e(TAG, "Cannot unpair device", e);
-      throw new DevicePairingException(e);
-    }
-  }
-
-  /**
    * Send event to javascript.
    * <p>
    * TODO pull this into it's own class incase the library gets extended
@@ -398,7 +357,7 @@ public class RNBluetoothClassicModule
    * @param promise
    */
   @ReactMethod
-  public void discoverUnpairedDevices(final Promise promise) {
+  public void discoverDevices(final Promise promise) {
     if (D) Log.d(TAG, "Discover unpaired called");
 
     mDeviceDiscoveryPromise = promise;
@@ -463,6 +422,30 @@ public class RNBluetoothClassicModule
   }
 
   /**
+   * Pair a specific device.  This will attempt to pair the device and register a single purpose
+   * listener for when the device is paired/failed.
+   * <p>
+   * This may need to be deprecated in the future, as this was only for kitkat (from the docs)
+   * and I don't particularly see a purpose for it now.  It would be better off having a general
+   * purpose listener that will let us know when any device has just bonded.
+   *
+   * @param device Device
+   *
+   */
+  private void pairDevice(BluetoothDevice device) throws DevicePairingException {
+    try {
+      if (D) Log.d(TAG, "Start Pairing...");
+      Method m = device.getClass().getMethod("createBond", (Class[]) null);
+      m.invoke(device, (Object[]) null);
+      registerDevicePairingReceiver(device.getAddress(), BluetoothDevice.BOND_BONDED);
+      if (D) Log.d(TAG, "Pairing finished.");
+    } catch (Exception e) {
+      Log.e(TAG, "Cannot pair device", e);
+      throw new DevicePairingException(e);
+    }
+  }
+
+  /**
    * Request that a device be unpaired.  The device Id is required - looked up using the
    * BluetoothAdapter and unpaired.
    */
@@ -489,6 +472,23 @@ public class RNBluetoothClassicModule
       }
     } else {
       promise.resolve(false);
+    }
+  }
+
+  /**
+   * Performs the unpairing of the requested device.
+   *
+   * @param device to be unpaired
+   */
+  private void unpairDevice(BluetoothDevice device) throws DevicePairingException {
+    try {
+      if (D) Log.d(TAG, "Start Unpairing...");
+      Method m = device.getClass().getMethod("removeBond", (Class[]) null);
+      m.invoke(device, (Object[]) null);
+      registerDevicePairingReceiver(device.getAddress(), BluetoothDevice.BOND_NONE);
+    } catch (Exception e) {
+      Log.e(TAG, "Cannot unpair device", e);
+      throw new DevicePairingException(e);
     }
   }
 
