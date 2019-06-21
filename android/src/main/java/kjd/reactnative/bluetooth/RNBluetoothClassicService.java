@@ -9,8 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-import kjd.reactnative.bluetooth.BuildConfig;
-
 /**
  * Provides the communication threads and message delivering/handling for a single connected
  * Bluetooth Classic device.  More information on the Serial Port Profile (SPP) can be found at
@@ -52,7 +50,7 @@ public class RNBluetoothClassicService {
     /**
      * Current connection state
      */
-    private BTState mState;
+    private DeviceState mState;
 
     /**
      * Character set used for communications.
@@ -68,7 +66,7 @@ public class RNBluetoothClassicService {
      */
     RNBluetoothClassicService(RNBluetoothClassicModule module, String charSet) {
         this.mAdapter = BluetoothAdapter.getDefaultAdapter();
-        this.mState = BTState.DISCONNECTED;
+        this.mState = DeviceState.DISCONNECTED;
         this.mModule = module;
         this.mCharSet = charSet;
         this.mDevice = null;
@@ -86,7 +84,7 @@ public class RNBluetoothClassicService {
     synchronized void connect(BluetoothDevice device) {
         if (D) Log.d(TAG, "Connect to: " + device);
 
-        if (BTState.CONNECTING.equals(mState)) {
+        if (DeviceState.CONNECTING.equals(mState)) {
             cancelConnectThread(); // Cancel any thread attempting to make a connection
         }
 
@@ -97,7 +95,7 @@ public class RNBluetoothClassicService {
         mConnectThread.start();
 
         // Unsure about whether to set device while just connecting
-        setState(BTState.CONNECTING, null);
+        setState(DeviceState.CONNECTING, null);
     }
 
     /**
@@ -106,7 +104,7 @@ public class RNBluetoothClassicService {
      * @return Is connected to device
      */
     boolean isConnected () {
-        return BTState.CONNECTED.equals(getState());
+        return DeviceState.CONNECTED.equals(getState());
     }
 
     /**
@@ -124,7 +122,7 @@ public class RNBluetoothClassicService {
      * @see ConnectedThread#write(byte[])
      */
     void write(byte[] out) {
-        if (D) Log.d(TAG, "Write in service, state is " + BTState.CONNECTED.name());
+        if (D) Log.d(TAG, "Write in service, state is " + DeviceState.CONNECTED.name());
         ConnectedThread r; // Create temporary object
 
         // Synchronize a copy of the ConnectedThread
@@ -145,13 +143,13 @@ public class RNBluetoothClassicService {
         cancelConnectThread();
         cancelConnectedThread();
 
-        setState(BTState.DISCONNECTED, null);
+        setState(DeviceState.DISCONNECTED, null);
     }
 
     /**
      * Return the current connection state.
      */
-    private synchronized BTState getState() {
+    private synchronized DeviceState getState() {
         return mState;
     }
 
@@ -160,7 +158,7 @@ public class RNBluetoothClassicService {
      *
      * @param state the updated state
      */
-    private synchronized void setState(BTState state, BluetoothDevice device) {
+    private synchronized void setState(DeviceState state, BluetoothDevice device) {
         if (D) Log.d(TAG, "setState() " + mState + " -> " + state);
         mState = state;
         mDevice = device;
@@ -183,7 +181,7 @@ public class RNBluetoothClassicService {
         mConnectedThread.start();
 
         mModule.onConnectionSuccess(device);
-        setState(BTState.CONNECTED, device);
+        setState(DeviceState.CONNECTED, device);
     }
 
 
@@ -224,7 +222,7 @@ public class RNBluetoothClassicService {
             mConnectedThread = null;
         }
 
-        setState(BTState.DISCONNECTED, null);
+        setState(DeviceState.DISCONNECTED, null);
     }
 
     /**
@@ -361,7 +359,7 @@ public class RNBluetoothClassicService {
                     if (mmInStream.available() > 0) {
                         bytes = mmInStream.read(buffer); // Read from the InputStream
                         String data = new String(buffer, 0, bytes, mCharSet);
-                        mModule.onData(data); // Send the new data String to the UI Activity
+                        mModule.onData(data); // Send new data to the module to handle
                     }
 
                     Thread.sleep(500);      // Pause
@@ -396,7 +394,7 @@ public class RNBluetoothClassicService {
             try {
                 String str = new String(buffer, "UTF-8");
                 if (D) Log.d(TAG, "Write in thread " + str);
-                mmOutStream.write(buffer);
+                mmOutStream.write(str.getBytes());
             } catch (Exception e) {
                 Log.e(TAG, "Exception during write", e);
                 mModule.onError(e);

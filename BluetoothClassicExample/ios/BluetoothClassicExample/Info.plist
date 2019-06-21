@@ -42,7 +42,6 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>external-accessory</string>
-		<string>bluetooth-central</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

@@ -4,7 +4,6 @@ package kjd.reactnative.bluetooth;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -84,11 +83,11 @@ public class RNBluetoothClassicModule
         switch (state) {
           case BluetoothAdapter.STATE_OFF:
             if (D) Log.d(TAG, "Bluetooth was disabled");
-            sendEvent(BTEvent.BLUETOOTH_DISABLED.code, null);
+            sendEvent(BluetoothEvent.BLUETOOTH_DISABLED.code, null);
             break;
           case BluetoothAdapter.STATE_ON:
             if (D) Log.d(TAG, "Bluetooth was enabled");
-            sendEvent(BTEvent.BLUETOOTH_ENABLED.code, null);
+            sendEvent(BluetoothEvent.BLUETOOTH_ENABLED.code, null);
             break;
         }
       }
@@ -109,7 +108,7 @@ public class RNBluetoothClassicModule
       if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
         final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         if (D) Log.d(TAG, "Device connected: " + device.toString());
-        sendEvent(BTEvent.BLUETOOTH_DISCONNECTED.code,  deviceToWritableMap(device));
+        sendEvent(BluetoothEvent.BLUETOOTH_DISCONNECTED.code,  deviceToWritableMap(device));
       }
     }
   };
@@ -175,9 +174,9 @@ public class RNBluetoothClassicModule
     }
 
     if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()) {
-      sendEvent(BTEvent.BLUETOOTH_ENABLED.code, null);
+      sendEvent(BluetoothEvent.BLUETOOTH_ENABLED.code, null);
     } else {
-      sendEvent(BTEvent.BLUETOOTH_DISABLED.code, null);
+      sendEvent(BluetoothEvent.BLUETOOTH_DISABLED.code, null);
     }
 
     mReactContext.addActivityEventListener(this);
@@ -199,7 +198,7 @@ public class RNBluetoothClassicModule
   public Map<String, Object> getConstants() {
     Map<String, Object> constants = super.getConstants();
     if (constants == null) constants = new HashMap<>();
-    constants.put("BTEvents", BTEvent.eventNames());
+    constants.put("BTEvents", BluetoothEvent.eventNames());
     return constants;
   }
 
@@ -219,7 +218,7 @@ public class RNBluetoothClassicModule
   public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
     if (D) Log.d(TAG, "On activity result request: " + requestCode + ", result: " + resultCode);
 
-    if (requestCode == BTRequest.ENABLE_BLUETOOTH.code) {
+    if (requestCode == BluetoothRequest.ENABLE_BLUETOOTH.code) {
       if (resultCode == Activity.RESULT_OK) {
         if (D) Log.d(TAG, "User enabled Bluetooth");
         if (mEnabledPromise != null) {
@@ -234,7 +233,7 @@ public class RNBluetoothClassicModule
       mEnabledPromise = null;
     }
 
-    if (requestCode == BTRequest.PAIR_DEVICE.code) {
+    if (requestCode == BluetoothRequest.PAIR_DEVICE.code) {
       if (resultCode == Activity.RESULT_OK) {
         if (D) Log.d(TAG, "Pairing ok");
         if (mEnabledPromise != null) {
@@ -348,7 +347,7 @@ public class RNBluetoothClassicModule
       mEnabledPromise = promise;
       Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
       if (activity != null) {
-        activity.startActivityForResult(intent, BTRequest.ENABLE_BLUETOOTH.code);
+        activity.startActivityForResult(intent, BluetoothRequest.ENABLE_BLUETOOTH.code);
       } else {
         Exception e = new Exception("Cannot start activity");
         Log.e(TAG, "Cannot start activity", e);
@@ -653,7 +652,7 @@ public class RNBluetoothClassicModule
     // now a module registration.  I don't see it making sense to return a module event as well
     // as a resolved promise, since this should only ever be called after a request to a specific
     // device.
-    //sendEvent(BTEvent.CONNECTION_SUCCESS.code, null);
+    //sendEvent(BluetoothEvent.CONNECTION_SUCCESS.code, null);
     if (mConnectedPromise != null) {
       mConnectedPromise.resolve(deviceToWritableMap(device));
     }
@@ -670,7 +669,7 @@ public class RNBluetoothClassicModule
     // now a module registration.  I don't see it making sense to return a module event as well
     // as a resolved promise, since this should only ever be called after a request to a specific
     // device.
-    //sendEvent(BTEvent.CONNECTION_FAILED.code, null);
+    //sendEvent(BluetoothEvent.CONNECTION_FAILED.code, null);
     if (mConnectedPromise != null) {
       mConnectedPromise.reject(new Exception("Connection unsuccessful"), deviceToWritableMap(device));
     }
@@ -688,7 +687,7 @@ public class RNBluetoothClassicModule
     WritableMap params = Arguments.createMap();
     params.putMap("device", deviceToWritableMap(device));
     params.putString("message", "Connection unsuccessful");
-    sendEvent(BTEvent.CONNECTION_LOST.code, params);
+    sendEvent(BluetoothEvent.CONNECTION_LOST.code, params);
   }
 
   /**
@@ -699,37 +698,49 @@ public class RNBluetoothClassicModule
   void onError (Exception e) {
     WritableMap params = Arguments.createMap();
     params.putString("message", e.getMessage());
-    sendEvent(BTEvent.ERROR.code, params);
+    sendEvent(BluetoothEvent.ERROR.code, params);
   }
 
   /**
-   * Handle read data.  Updates the buffer with the latest information, then sends the first
-   * available chunk of buffer to the BTEvent.READ event.
+   * Handles the data input from the device.  First it appends the new data to the buffer, then
+   * it attempts to get all the data segments (delimiter) based on what is available.  This is
+   * important as it may be possible that the device writes multiple lines to the buffer at one
+   * time and we don't want to miss any of the messages just because we only read to the first
+   * instance of the delimiter.
+   * <p>
+   * This became apparent when sending a "ri\r" or "help\r" and only getting back the first few
+   * lines with the test device.  The buffer still had content though.
+   * <p>
+   * We may need to take this a step further and customize how data is returned.  For example,
+   * should each of the items be returned separately, or all at once?
    *
    * @param data Message
    */
   void onData (String data) {
+    if (D) Log.d(TAG, String.format("Data received [%s]", data));
+
     mBuffer.append(data);
-    String completeData = readUntil(this.mDelimiter);
-    if (completeData != null && completeData.length() > 0) {
-      WritableMap params = Arguments.createMap();
-      params.putString("data", completeData);
-      sendEvent(BTEvent.READ.code, params);
+
+    String message = null;
+    while ((message = readUntil(this.mDelimiter)) != null) {
+      sendEvent(BluetoothEvent.READ.code, new BluetoothMessage<String>(message).asMap());
     }
   }
 
   /**
-   * Attempts to read from to the first (or if none end) delimiter.
+   * Attempts to read from to the first (or if none end) delimiter.  If the delimiter is found
+   * then the data is retreived and removed from the buffer.
    *
    * @param delimiter
    * @return
    */
   private String readUntil(String delimiter) {
-    String data = "";
+    String data = null;
     int index = mBuffer.indexOf(delimiter, 0);
     if (index > -1) {
-      data = mBuffer.substring(0, index + delimiter.length());
-      mBuffer.delete(0, index + delimiter.length());
+      int len = index + delimiter.length();
+      data = mBuffer.substring(0, len);
+      mBuffer.delete(0, len);
     }
     return data;
   }

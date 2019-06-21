@@ -1,6 +1,6 @@
 package kjd.reactnative.bluetooth;
 
-public enum BTState {
+public enum DeviceState {
     DISCONNECTED,
     CONNECTING,
     CONNECTED,

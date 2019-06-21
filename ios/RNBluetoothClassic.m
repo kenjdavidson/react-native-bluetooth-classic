@@ -12,6 +12,7 @@
 
 @interface RCT_EXTERN_MODULE(RNBluetoothClassic, RCTEventEmitter)
 
+// Connection related
 RCT_EXTERN_METHOD(requestEnable: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 
@@ -19,6 +20,39 @@ RCT_EXTERN_METHOD(isEnabled: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(list: (RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(connect: (NSString)deviceId
+                  resolver: (RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(disconnect: (RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(isConnected: (RCTPRomiseResolveBlock)resolve)
+
+RCT_EXTERN_METHOD(getConnectedDevice: (RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject)
+
+// Reading and writing
+RCT_EXTERN_METHOD(writeToDevice: (NSString)message
+                  resolver: (RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(readFromDevice: (NSString)until
+                  resolver: (RCTPromiseResolveBlock)resolve)
+
+RCT_EXTERN_METHOD(readFromDevice: (RCTPromiseResolveBlock)resolve)
+
+RCT_EXTERN_METHOD(isAvailable: (RCTPromiseResolveBlock)resolve)
+
+// Helpers
+RCT_EXTERN_METHOD(clear: (RCTPromiseResolveBlock)resolve)
+
+RCT_EXTERN_METHOD(setDelimiter: (NSString)delimiter)
+
+RCT_EXTERN_METHOD(setAdapterName: (NSString)name
+                  resolver: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 
 @end

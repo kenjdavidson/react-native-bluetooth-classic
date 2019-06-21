@@ -1,10 +1,19 @@
 
-import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, TextInput, View, ScrollView, TouchableOpacity, StatusBar} from 'react-native';
-import RNBluetoothClassic, {BTEvents} from '@kenjdavidson/react-native-bluetooth-classic';
-import Toast, {DURATION} from 'react-native-easy-toast'
-import Buffer from 'buffer';
-import { catchClause } from '@babel/types';
+import React from 'react';
+import { Platform, 
+  StyleSheet, 
+  Text, 
+  TextInput, 
+  View, 
+  ScrollView,
+  FlatList, 
+  TouchableOpacity, 
+  StatusBar,
+  KeyboardAvoidingView
+} from 'react-native';
+import RNBluetoothClassic, { BTEvents } from '@kenjdavidson/react-native-bluetooth-classic';
+import Toast, { DURATION } from 'react-native-easy-toast'
+import KeyboardSpacer from 'react-native-keyboard-spacer';
 
 const formatDate = (date) => {
   return date.getUTCFullYear() + "/" +
@@ -36,26 +45,86 @@ const DeviceList = ({devices, onPress, style}) =>
     })}
   </ScrollView>
 
-const DeviceConnection = ({device, scannedData}) => 
-  <View style={styles.container}>
-    <ScrollView style={{flex: 1}} contentContainerStyle={{justifyContent:'flex-end'}}>
-      {scannedData.map((data) => {
-        return (
-          <View key={data.timestamp.toISOString()} style={{flexDirection:'row', justifyContent:'flex-start'}}>
-            <Text>{formatDate(data.timestamp)}</Text>
-            <Text>{' > '}</Text>
-            <Text>{data.data}</Text>
-          </View>          
-        );
-      })}
-    </ScrollView>
-    <View style={[styles.horizontalContainer, {backgroundColor: '#ccc'}]}>
-      <TextInput style={{flex:1}} placeholder={'Send Data'}></TextInput>
-      <TouchableOpacity style={{justifyContent: 'center'}}>
-        <Text>Send</Text>
-      </TouchableOpacity>
-    </View>    
-  </View>
+class DeviceConnection extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { 
+      text: undefined,
+      scannedData: []
+    };
+  }
+
+  componentWillMount() {     
+    this.onRead = RNBluetoothClassic.addListener(BTEvents.READ, this.handleRead, this);
+  }
+
+  componentWillUnmount() {
+    this.onRead.remove();
+
+    RNBluetoothClassic.disconnect();    
+  }
+
+  handleRead = (data) => {
+    data.timestamp = new Date();   
+    let scannedData = this.state.scannedData;
+    scannedData.unshift(data); 
+    this.setState({scannedData});
+  }
+
+  sendData = async () => {
+    let message = this.state.text + '\r';   // For commands
+    await RNBluetoothClassic.write(message);
+  
+    let scannedData = this.state.scannedData;
+    scannedData.push({
+      timestamp: new Date(),
+      data: this.state.text,
+      type: 'sent'
+    });
+    this.setState({text: "", scannedData});    
+  }
+
+  render() {
+    const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
+    return (
+      <View style={styles.container}>
+        <View style={styles.toolbar}>
+          <Text style={styles.toolbarText}>{this.props.device.name}</Text>
+          <Text style={[styles.toolbarButton, {color:'#F00'}]} onPress={this.props.disconnect}>X</Text>       
+        </View>    
+        <View style={{flex: 1}}>
+          <FlatList style={{flex: 1}} contentContainerStyle={{justifyContent:'flex-end'}}
+            inverted
+            ref='scannedDataList'
+            data={this.state.scannedData}
+            keyExtractor={(item,index) => item.timestamp.toISOString()}
+            renderItem={({item}) => (
+              <View id={item.timestamp.toISOString()} style={{flexDirection:'row', justifyContent:'flex-start'}}>
+                <Text>{formatDate(item.timestamp)}</Text>
+                <Text>{item.type === 'sent' ? ' < ' : ' > '}</Text>
+                <Text>{item.data.trim()}</Text>
+              </View>)}>
+          </FlatList>
+          <View style={[styles.horizontalContainer, {backgroundColor: '#ccc'}]}>
+            <TextInput style={styles.textInput}             
+              placeholder={'Send Data'}
+              value={this.state.text}
+              onChangeText={(text) => this.setState({text})}
+              autoCapitalize='none'
+              autoCorrect={false}
+              onSubmitEditing={() => this.sendData()}
+              returnKeyType='send'></TextInput>
+            <TouchableOpacity style={{justifyContent: 'center'}} 
+              onPress={() => this.sendData()}>
+              <Text>Send</Text>
+            </TouchableOpacity>
+          </View>  
+          <KeyboardSpacer/>
+        </View>
+      </View>
+    )
+  }
+}
 
 export default class App extends React.Component {
   constructor(props){
@@ -70,30 +139,40 @@ export default class App extends React.Component {
   componentWillMount() {     
     this.initialize();
 
-    RNBluetoothClassic.addListener(BTEvents.READ, this.handleRead);
+    // Re-initialize whenever a Bluetooth event occurs
+    this.connectedSub = RNBluetoothClassic.addListener(BTEvents.BLUETOOTH_CONNECTED, 
+        (device) => this.onConnected(device), this);
+    this.disconnectedSun = RNBluetoothClassic.addListener(BTEvents.BLUETOOTH_DISCONNECTED, 
+        (device) => this.onDisconnected(device), this);
   }
 
   componentWillUnmount() {
-    RNBluetoothClassic.disconnect();
-    RNBluetoothClassic.removeAllListeners();
+    this.connectedSub.remove();
+    this.disconnectedSun.remove();
   }
 
-  handleRead = (data) => {
-    data.timestamp = new Date();   
-    let scannedData = this.state.scannedData;
-    scannedData.push(data); 
+  onConnected(device) {
+    this.initialize();
+  }
 
-    console.log(scannedData);
-    this.setState({scannedData});
+  onDisconnected(device) {
+    this.initialize();
   }
 
   async initialize() {
     let enabled = await RNBluetoothClassic.isEnabled();
-    let newState = { bluetoothEnabled: enabled, devices: []};
+    let newState = { 
+      bluetoothEnabled: enabled, 
+      devices: [], 
+      connectedDevice: undefined
+    };
 
     if (enabled) {
       try {
         let connectedDevice = await RNBluetoothClassic.getConnectedDevice();
+
+        console.log('initializeDevices::connectedDevice')
+        console.log(connectedDevice)
         newState.connectedDevice = connectedDevice;
       } catch(error) {
         try {
@@ -128,31 +207,32 @@ export default class App extends React.Component {
     this.setState({connectedDevice: undefined})
   }
 
+  async writeToDevice(msg) {
+    let result = await RNBluetoothClassic.write(msg);
+  }
+
   selectDevice = (device) => this.connectToDevice(device);
   unselectDevice = () => this.disconnectFromDevice();
+  onSend = (msg) => this.writeToDevice(msg);
 
   render() {
-    let title = !this.state.connectedDevice ? 'Connected Devices' : this.state.connectedDevice.name;    
     let connectedColor = !this.state.bluetoothEnabled ? styles.toolbarButton.color : 'green';
     return (
       <View style={styles.container}>
         <AppStatusBar backgroundColor={styles.statusbar.backgroundColor} barStyle="light-content"></AppStatusBar>
         <View style={styles.toolbar}>
-          <Text style={styles.toolbarText}>{title}</Text>
-          {this.state.bluetoothEnabled
-            ? (<Text style={[styles.toolbarButton, {color: connectedColor}]}>O</Text>)
-            : null
-          }
-          {this.state.connectedDevice != undefined
-            ? (<Text style={styles.toolbarButton} onPress={this.unselectDevice}>X</Text>) 
-            : null
-          }
+          <Text style={styles.toolbarText}>Bluetooth Devices</Text>
+          <Text style={[styles.toolbarButton, {color: connectedColor}]}>O</Text>
         </View>
         {!this.state.connectedDevice
           ? <DeviceList 
               devices={this.state.deviceList}
               onPress={this.selectDevice}></DeviceList> 
-          : <DeviceConnection device={this.state.device} scannedData={this.state.scannedData}></DeviceConnection>
+          : <DeviceConnection 
+              device={this.state.connectedDevice} 
+              scannedData={this.state.scannedData}
+              disconnect={this.unselectDevice}
+              onSend={this.onSend}></DeviceConnection>
         }    
         <Toast ref="toast"></Toast>
       </View>
@@ -224,5 +304,9 @@ const styles = StyleSheet.create({
     paddingRight: 16,
     paddingTop: 8,
     paddingBottom: 8
+  },
+  textInput: {
+    flex: 1,
+    height: 40
   }
 });

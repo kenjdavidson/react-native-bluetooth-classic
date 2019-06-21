@@ -9,17 +9,19 @@ When attempting to setup and configure the local project, there are a couple pos
 ### Android 
 The version of Android SDK which was created when using `react-native-library` and `react-native init` were different. 
 
-  - Firstly the module project was defaulting to 0.20.0 when attempting to build, this caused the app to throw errors stating that the Module didn't override the correct methods.  To resovle this, I had to install the peer-dependancies locally so that I could update the module project and use the correct version of React Native that I was expecting (0.59.9) (npm-install-peers#readme)[https://github.com/spatie/]
-  - Edit - since resolving the second issue I no longer needed peer dependencies as my project was linked locally and could therefore be run.  The only issue was that I had to do development through the BluetoothClassicExample imported library, instead of on it's project workspace (as the two react-native versions still conflicted so editing directly caused 0.20.0 to be used and caused errors.)
+1. Due to the way that `react-native-library` adds the peerDependencies (react-native) there are no versions downloaded for the Android project.  This means that when you're working on the project, it's using 0.20.0 (which is the latest version on Maven Central).  There are a few ways to get around this:
+- Download the peer dependencies, there are a number of NPM modules for this
+- Do development on the module within the BluetoothClassicExample project, since we know that it will have the correct version of React native. 
+
+I decided to do the latter, If you've got a way around this or some best practices on how to develop modules in this way, please let me know and feel free to contribute the changes.
 
 2. The second issue was that NPM 5+ performs symlinking of local projects, for that reason you'll see something that looks like this:
-  ```
-  $ ls -l node_modules/react-native-bluetooth-classic
-  lrwxr-xr-x  1 user  group  5 13 Jun 12:46 node_modules/react-native-bluetooth-classic -> ../..
-  ```
-  to correct this use the following (install-local)[https://www.npmjs.com/package/install-local].  Sadly after doing so I ran into some other issues, which caused some problems.  It made the build process intolerable since I had to continually `install-local` when changing the library code.
+```
+$ ls -l node_modules/react-native-bluetooth-classic
+lrwxr-xr-x  1 user  group  5 13 Jun 12:46 node_modules/react-native-bluetooth-classic -> ../..
+```
 
-3. When installing locally you may run into issues with NPM > 5 where symlink are created.  After googling a bunch it seems like this is a pretty well known 'issue'.  Thanks to a posting [by a smarter person than I](https://github.com/facebook/metro/issues/1#issuecomment-501143843) this has been resolved by updating the `metro.config.js` file in the application project to the following:
+When installing locally you may run into issues with NPM > 5 where symlink are created.  After googling a bunch it seems like this is a pretty well known 'issue'.  Thanks to a posting [by a smarter person than I](https://github.com/facebook/metro/issues/1#issuecomment-501143843) this has been resolved by updating the `metro.config.js` file in the application project to the following:
 
 ```
 let path = require('path');
@@ -74,7 +76,7 @@ IOS requires that UISupportedExternalAccessoryProtocols are configured within th
 Info.plist 
 ~/BluetoothClassicExample.plist
 
-You're responsible for creating this file:
+You're responsible for creating this file, without the file your plist will not be updated with supported protocols and the device will not be available within IOS.  You can forgo this and add the protocols directly to the development plist, but if pushed to git this goes against the terms of the Apple MFi program.
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
