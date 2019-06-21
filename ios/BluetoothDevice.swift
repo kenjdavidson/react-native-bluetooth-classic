@@ -10,12 +10,21 @@ import Foundation
 import ExternalAccessory
 
 /**
- Allows for the receiving of data to be handled externally.  The onReceivedData function
- is called providing the device and received data.  The delegate is responsible for
- parsing the data, determining what it wants to keep, and then returning the remaining
- string to which new data will be appended.
+ BluetoothReceiverDelegate is used for listening to incoming data and allowing a delegate
+ to manipulate data as it sees fit.  The delegate will be called with the current
+ inBuffer:Data - is responsible for using how it wishes - then returning the remaining
+ Data which will replace the current inBuffer.
  */
 protocol BluetoothRecievedDelegate {
+    
+    /**
+     Bluetooth data has been received, allow the delegate to manage that data in it's
+     own way.
+     
+     - parameter fromDevice: device which has just received data
+     - parameter receivedData: data which is to be processed
+     - returns: the remaining inBuffer:Data
+     */
     func onReceivedData(fromDevice:BluetoothDevice, receivedData:Data) -> Data
 }
 
@@ -43,11 +52,7 @@ class BluetoothDevice: NSObject, StreamDelegate {
     private var outBuffer:Data
     private var maxBytesPerSend:Int = MAX_BYTES_PER_SEND
     private var maxBytesPerReceive:Int = MAX_BYTES_PER_RECEIVE
-    
-    /**
-     Bluetooth received delegate used for handling the parsing of data during automation.  When
-     this does not exist, the receivedData is updated directly.
-     */
+
     var receivedDelegate:BluetoothRecievedDelegate?
     
     /**
@@ -65,6 +70,8 @@ class BluetoothDevice: NSObject, StreamDelegate {
      Provides a printable/parciable NSDictionary which can be sent to the React bridge.
      When attempting to send the EAAccessory directly, a null is recieved on the JS side
      as the bridge JSON parser doesn't allow for some of its content.
+     
+     - returns: the Dictionary available for React bridge serialization
      */
     func asDictionary() -> NSDictionary {
         let dict: NSDictionary = NSMutableDictionary()

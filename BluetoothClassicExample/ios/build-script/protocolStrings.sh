@@ -5,6 +5,12 @@
 #
 #  Created by Ken Davidson on 2019-06-18.
 #  Copyright © 2019 Facebook. All rights reserved.
+#
+#  IOS Supported MFi protocols cannot be stored in git/repositories - and should not be
+#  made available without authorization from the hardware manufacturer.  For that reason
+#  this script is required (along with the ~/BluetoothClassicExample.plist) file
+#  containing the protocol strings.  The strings are added to the target Info.plist
+#  
 
 TARGET_PLIST="$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH"
 PROTOCOL_PLIST="$HOME/BluetoothClassicExample.plist"

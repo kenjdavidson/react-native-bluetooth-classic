@@ -10,6 +10,25 @@ import Foundation
 import ExternalAccessory
 import CoreBluetooth
 
+/**
+ Implementation of the RNBluetoothClassic React Native module.  For information on how this
+ module was created and developed see the following:
+ 
+ - https://facebook.github.io/react-native/docs/native-modules-setup
+ - https://facebook.github.io/react-native/docs/native-modules-ios
+ 
+ or the README.md located in the parent (Javascript) project.
+ 
+ RNBluetoothClassic is responsible for interacting with the ExternalAccessory framework
+ and providing wrappers for listing, connecting, reading, writing, etc.  The actual
+ communication has been handed off to the BluetoothDevice class - allowing (in the future)
+ more that one BluetoothDevice to be connected at one time.
+ 
+ Currently the module communicates using Base64 .utf8 encoded strings.  This should
+ be updated in the future to use [UInt8] to match the communication on the
+ BluetoothDevice side.  This means that the responsiblity of converting and managing
+ data is done in Javascript/client rather than in the module.
+ */
 @objc(RNBluetoothClassic)
 class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
     
