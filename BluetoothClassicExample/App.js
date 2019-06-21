@@ -30,20 +30,24 @@ const AppStatusBar = ({backgroundColor, ...props}) => (
   </View> 
 ) 
 
-const DeviceList = ({devices, onPress, style}) => 
-  <ScrollView style={styles.listContainer} contentContainerStyle={styles.container}>
-    {devices.map((device,i) => {
-      return (
-        <TouchableOpacity key={device.id} style={[ styles.button, style ]} onPress={() => onPress(device)}>
-          <View style={styles.connectionStatus}></View>
-          <View style={{flex: 1}}>
-            <Text style={styles.deviceName}>{device.name}</Text>
-            <Text>{device.address}</Text>
-          </View>
-        </TouchableOpacity>
-      )
-    })}
-  </ScrollView>
+const DeviceList = ({devices, onPress, style}) => {
+  return (
+    <ScrollView style={styles.listContainer} contentContainerStyle={styles.container}>
+      {devices.map((device,i) => {
+        let bgColor = device.connected ? '#0f0' : styles.connectionStatus.backgroundColor
+        return (
+          <TouchableOpacity key={device.id} style={[ styles.button, style ]} onPress={() => onPress(device)}>
+            <View style={[styles.connectionStatus, {backgroundColor: bgColor}]}></View>
+            <View style={{flex: 1}}>
+              <Text style={styles.deviceName}>{device.name}</Text>
+              <Text>{device.address}</Text>
+            </View>
+          </TouchableOpacity>
+        )
+      })}
+    </ScrollView>
+  )
+}
 
 class DeviceConnection extends React.Component {
   constructor(props) {
