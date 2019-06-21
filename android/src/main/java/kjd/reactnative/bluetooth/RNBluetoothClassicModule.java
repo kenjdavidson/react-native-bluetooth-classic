@@ -723,7 +723,9 @@ public class RNBluetoothClassicModule
 
     String message = null;
     while ((message = readUntil(this.mDelimiter)) != null) {
-      sendEvent(BluetoothEvent.READ.code, new BluetoothMessage<String>(message).asMap());
+      BluetoothMessage bluetoothMessage
+              = new BluetoothMessage<String>(deviceToWritableMap(mBluetoothService.connectedDevice()), message);
+      sendEvent(BluetoothEvent.READ.code, bluetoothMessage.asMap());
     }
   }
 

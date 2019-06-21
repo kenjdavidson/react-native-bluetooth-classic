@@ -25,7 +25,7 @@ class BluetoothMessage<T> : NSObject {
     public private(set) var data:T
     public private(set) var timestamp:Date
     
-    init(_ data:T, fromDevice:BluetoothDevice) {
+    init(fromDevice:BluetoothDevice, data:T) {
         self.device = fromDevice
         self.data = data
         self.timestamp = Date()

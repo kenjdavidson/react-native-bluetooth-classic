@@ -164,7 +164,8 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
                 let message = String(data[startIndex..<index])
                 
                 NSLog("(RNBluetoothClassic:onReceiveData) Sending READ with data: %@", message)
-                sendEvent(withName: BTEvent.READ.rawValue, body: BluetoothMessage<String>(message).asDictionary())
+                let bluetoothMessage:BluetoothMessage = BluetoothMessage<String>(fromDevice: fromDevice, data: message)
+                sendEvent(withName: BTEvent.READ.rawValue, body: bluetoothMessage.asDictionary())
                 
                 startIndex = data.index(after: index)
             }

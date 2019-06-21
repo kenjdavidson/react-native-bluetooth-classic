@@ -8,10 +8,12 @@ import java.util.Date;
 
 public class BluetoothMessage<T> {
 
+    private WritableMap device;
     private Date timestamp;
     private T data;
 
-    public BluetoothMessage(T data) {
+    public BluetoothMessage(WritableMap device, T data) {
+        this.device = device;
         this.data = data;
         this.timestamp = Calendar.getInstance().getTime();
     }

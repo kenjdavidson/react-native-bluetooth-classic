@@ -90,7 +90,9 @@ class DeviceConnection extends React.Component {
       <View style={styles.container}>
         <View style={styles.toolbar}>
           <Text style={styles.toolbarText}>{this.props.device.name}</Text>
-          <Text style={[styles.toolbarButton, {color:'#F00'}]} onPress={this.props.disconnect}>X</Text>       
+          <TouchableOpacity  onPress={this.props.disconnect}>
+            <Text style={[styles.toolbarButton, {color:'#F00'}]}>X</Text>       
+          </TouchableOpacity>
         </View>    
         <View style={{flex: 1}}>
           <FlatList style={{flex: 1}} contentContainerStyle={{justifyContent:'flex-end'}}
