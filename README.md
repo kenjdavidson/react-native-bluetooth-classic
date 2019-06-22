@@ -132,7 +132,7 @@ import RNBluetoothClassic, { BTEvents } from 'react-native-bluetooth-classic';
 
 In all cases the following API/Events are available within Javascript for both Android and IOS (no code splitting) if there are any native calls that are not available on the native side, the promise will be rejected with an appropriate message (kind of like UnssupportedOperationException since I'm used to Java) - I found this important as I see no point in duplicating code as the whole purpose of React Native was for me not to.
 
-### API
+## API
 
 The following API is available on both Android and IOS (unless specifically stated not).  I've done my best to duplciate all the methods available on both, so there should be no need to use Platform or file switching.  For any API calls that aren't supported on a specific environment, they should reject the promise with an 'UnsupportedOperation' error.
 
