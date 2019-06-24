@@ -382,8 +382,14 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
      - parameter _: resolve the connection
      */
     @objc
-    func isConnected(_ resolve: RCTPromiseResolveBlock) -> Void {
-        resolve(peripheral?.accessory.isConnected ?? false)
+    func isConnected(_ resolve: RCTPromiseResolveBlock,
+                     rejecter reject: RCTPromiseRejectBlock) -> Void {
+        NSLog("(RNBluetoothClassic:isCOnnected) isConnected %@", peripheral?.accessory.name ?? "nil")
+        if let connected = peripheral {
+            resolve(connected.accessory.isConnected)
+        } else {
+            reject("error","There is no device currently connected", NSError())
+        }
     }
     
     /**
@@ -394,6 +400,7 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
     func getConnectedDevice(
         _ resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock) -> Void {
+        NSLog("(RNBluetoothClassic:getConnectedDevice) Determine whether %@ is connected", peripheral?.accessory.name ?? "nil")
         if peripheral != nil {
             resolve(peripheral?.asDictionary())
         }
@@ -412,6 +419,7 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
+        NSLog("(RNBluetoothClassic:writeToDevice) Writing %@ to device %@", message, peripheral?.accessory.name ?? "nil")
         if let currentDevice = peripheral, let decoded = Data(base64Encoded: message) {
             currentDevice.writeToDevice(String(data: decoded, encoding: .utf8)!)
             resolve(true)
@@ -427,7 +435,7 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
      */
     @objc
     func readFromDevice(_ resolve: RCTPromiseResolveBlock) -> Void {
-        resolve(readUntil(nil))
+        resolve(peripheral?.readFromDevice())
     }
     
     /**
@@ -437,8 +445,8 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
      - parameter resolve: resolve with the available data
      */
     @objc
-    func readFromDevice(
-        until delimiter: String,
+    func readUntilDelmiter(
+        _ delimiter: String,
         resolver resolve: RCTPromiseResolveBlock
     ) -> Void {
         resolve(readUntil(delimiter))
@@ -501,7 +509,7 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
      - parameter _: the delimiter to which we will read
      - returns: the read data String or nil
      */
-    private func readUntil(_ delimiter: String?) -> String? {
+    private func readUntil(_ delimiter: String) -> String? {
         if let currentDevice = peripheral {
             return currentDevice.readFromDevice(withDelimiter: delimiter)
         }

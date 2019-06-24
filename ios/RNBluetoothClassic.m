@@ -29,7 +29,8 @@ RCT_EXTERN_METHOD(connect: (NSString)deviceId
 RCT_EXTERN_METHOD(disconnect: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(isConnected: (RCTPRomiseResolveBlock)resolve)
+RCT_EXTERN_METHOD(isConnected: (RCTPRomiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(getConnectedDevice: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
@@ -39,7 +40,7 @@ RCT_EXTERN_METHOD(writeToDevice: (NSString)message
                   resolver: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(readFromDevice: (NSString)until
+RCT_EXTERN_METHOD(readUntilDelimiter: (NSString)until
                   resolver: (RCTPromiseResolveBlock)resolve)
 
 RCT_EXTERN_METHOD(readFromDevice: (RCTPromiseResolveBlock)resolve)

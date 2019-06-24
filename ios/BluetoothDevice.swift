@@ -95,7 +95,9 @@ class BluetoothDevice: NSObject, StreamDelegate {
      delegate and scheduler - then finally opeend.
      
      Note - when attempting to use .current/.default for schedule things were not working.  Only
-     after changing to .main/.common did the Stream events start firing.
+     after changing to .main/.common did the Stream events start firing.  I think in all the examples
+     the main runLoop is the current runLoop anyhow.  In this case (React) it is not, therefore we
+     have to specifically state .main 
      
      - parameter protocolString: in which use while connecting
      - parameter bytesPerSend: if overriding the default value of 512
@@ -106,6 +108,7 @@ class BluetoothDevice: NSObject, StreamDelegate {
         bytesPerSend: Int,
         bytesPerReceive: Int
     ) {
+        NSLog("(BluetoothDevice:connect) Attempting Bluetooth connection to %@", accessory.serialNumber)
         session = EASession(accessory: accessory, forProtocol: protocolString)
         
         if let currentSession = session {
@@ -138,6 +141,7 @@ class BluetoothDevice: NSObject, StreamDelegate {
      niling out the session.
      */
     func disconnect() {
+        NSLog("(BluetoothDevice:disconnect) Attempting disconnect from devices %@", accessory.serialNumber)
         if let currentSession = session {
             if let inStream = currentSession.inputStream {
                 inStream.close()
@@ -160,6 +164,7 @@ class BluetoothDevice: NSObject, StreamDelegate {
      */
     @objc
     func hasBytesAvailable() -> Bool {
+        NSLog("(BluetoothDevice:hasBytesAvailable) Checking for available bytes on devices %@", accessory.serialNumber)
         return session?.inputStream!.hasBytesAvailable ?? false
     }
     
@@ -170,6 +175,7 @@ class BluetoothDevice: NSObject, StreamDelegate {
      */
     @objc
     func writeToDevice(_ message:String) {
+        NSLog("(BluetoothDevice:writeToDevice) Writing %@ to device %@", message, accessory.serialNumber)
         if let sending = message.data(using: .utf8) {
             outBuffer.append(sending)
         }
@@ -188,7 +194,10 @@ class BluetoothDevice: NSObject, StreamDelegate {
      */
     @objc
     func readFromDevice() -> String? {
-        return readFromDevice(withDelimiter: nil)
+        NSLog("(BluetoothDevice:readFromDevice) Reading entire content from device %@", accessory.serialNumber)
+        let content = String(data: inBuffer, encoding: .utf8)!
+        inBuffer.removeAll()
+        return content
     }
     
     /**
@@ -198,11 +207,15 @@ class BluetoothDevice: NSObject, StreamDelegate {
      - parameter withDelimiter: the delimiter which we want to read until
      - returns: the available data up to the provided delimiter
      */
-    func readFromDevice(withDelimiter delimiter:String?) -> String? {
+    func readFromDevice(withDelimiter delimiter:String) -> String? {
+        NSLog("(BluetoothDevice:readFromDevice) Reading device %@ until delimiter %@", accessory.serialNumber, delimiter)
         let content = String(data: inBuffer, encoding: .utf8)!
-        let lookTo = delimiter != nil ? content.index(of: delimiter!) ?? content.endIndex : content.endIndex
-        let message = String(content[..<lookTo])
-        inBuffer = String(content[lookTo...]).data(using: .utf8) ?? Data()
+        var message:String?
+        
+        if let lookTo = content.index(of: delimiter) {
+            message = String(content[..<lookTo])
+            inBuffer = String(content[lookTo...]).data(using: .utf8) ?? Data()
+        }
         
         return message
     }
@@ -219,7 +232,7 @@ class BluetoothDevice: NSObject, StreamDelegate {
         switch(eventCode) {
         case .openCompleted:
             NSLog("Stream %@ has completed openning", aStream)
-            Thread.sleep(forTimeInterval: 1.0) // Pause for connection
+            Thread.sleep(forTimeInterval: 0.5) // Pause for connection
             break;
         case .hasBytesAvailable:
             NSLog("Stream %@ has bytes available", aStream)
