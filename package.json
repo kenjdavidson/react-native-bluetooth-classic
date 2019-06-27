@@ -1,5 +1,5 @@
 {
-  "name": "@kenjdavidson/react-native-bluetooth-classic",
+  "name": "react-native-bluetooth-classic",
   "version": "1.0.0",
   "description": "",
   "main": "src/index.js",
