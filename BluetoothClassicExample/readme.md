@@ -73,10 +73,10 @@ module.exports = {
 
 IOS requires that UISupportedExternalAccessoryProtocols are configured within the Info.plist file.  As per the MFi these values should not be made available or stored within git unless working with the specific vendor.  The IOS build has been updated to include a merging of during the Run Scripts phase:
 
-Info.plist 
-~/BluetoothClassicExample.plist
+    Info.plist 
+    ~/BluetoothClassicExample.plist
 
-You're responsible for creating this file, without the file your plist will not be updated with supported protocols and the device will not be available within IOS.  You can forgo this and add the protocols directly to the development plist, but if pushed to git this goes against the terms of the Apple MFi program.
+You're responsible for creating this file, without the file your plist will not be updated with supported protocols and the device will not be available within IOS.  You can forgo this and add the protocols directly to the development plist, but if pushed to git this goes against the terms of the Apple MFi program.  The following file can be copied to ~/BluetoothClassicExample.plist and then will be merged.  
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -90,6 +90,8 @@ You're responsible for creating this file, without the file your plist will not 
 </dict>
 </plist>
 ```
+
+Willing to take suggestions on doing this in a better way: environment variables, etc. 
 
 ## Running Application
 
@@ -124,6 +126,6 @@ Displays a list of devices currently connected.  Clicking on a device will bring
 
 ### Device Connection
 
-Displays a text area and text field allowing you to send and monitor communication.  Scanned data will be displayed on the screen with the timestamp.
+Displays a text area and text field allowing you to send and monitor communication.  Scanned data will be displayed on the screen with the timestamp.  Messages can be sent to the device by typing them in the text field and pressing SEND, responses will automatically be displayed.
 
-TODO - add support for sending data to a device
+TODO - Add the ability to save requests per device (memory)
