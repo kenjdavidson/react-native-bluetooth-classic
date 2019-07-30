@@ -85,7 +85,7 @@ You're responsible for creating this file, without the file your plist will not 
 <dict>
   <key>UISupportedExternalAccessoryProtocols</key>
   <array>
-    <string>com.allflex-europe.gprplus_110</string>
+    <string>com.apple.m1</string>
   </array>
 </dict>
 </plist>
