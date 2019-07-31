@@ -150,23 +150,21 @@ rejects automatically as this is not supported yet.
 
 ### Promise isEnabled(): Promise
 
-Resolves **true|false** based on whether the Platform Bluetooth is enabled.  
+Resolves **true|false** based on whether the Platform Bluetooth is enabled.  IOS uses the CoreBluetooth framework which might not be the best way to do things (mixing classic with BLE) but it seems to work. 
 
-#####
-
-IOS uses the CoreBluetooth framework which might not be the best way to do things (mixing classic with BLE) but it seems to work.
+```javascript
+let enabled = await RNBluetoothClassic.isEnabled();
+console.log(`Bluetooth enabled? ${enabled}`)
+```
 
 ### Promise list(): Promise
 
-Resolves with a list of
+Resolves with a list of the currently paired/connected (Android/IOS with MFi protocol respectively) devices.  Returns with an empty list if there are none available.
 
-##### Android
-
-the currently paired devices
-
-##### IOS
-
-the currently connected devices (with appropriate MFi protocols)
+```javascript
+let devices = await RNBluetoothClassic.list();
+console.log(`Available devices: ${devices.length});
+```
 
 ### Promise discoverDevices(): Promise
 
@@ -220,9 +218,23 @@ rejects automatically as this is not supported yet.
 
 Attempts to connect to the device with the provided Id.  Currently it will attempt to disconnect the currently connected device - will attempt to update to allow for multiple Bluetooth devices at a single time.   Resolves with the newly connected device information or rejects if a connection is not available.
 
+```javascript
+try {
+  let connectedDevice = await RNBluetoothClassic.connect(device.id);
+  this.setState({connectedDevice});
+} catch (error) {
+  console.log(error.message);
+} 
+```
+
 ### disconnect(): promise
 
 Attempts to disconnect from a device.  Resolves **true|false** based on whether disconnection was successful.  This will need to be updated to accept a deviceId when multiple devices can be connected
+
+```javascript
+await RNBluetoothClassic.disconnect();
+this.setState({connectedDevice: undefined})
+```
 
 ### isConnected(): Promise
 
@@ -232,9 +244,20 @@ Resolves **true|false** whether a device is currently connected.
 
 Resolves with the currently connected devices, or rejects if there is none.  
 
-### writeToDevice(message: String): Promise
+```javascript
+let connectedDevice = await RNBluetoothClassic.getConnectedDevice();
+if (connectedDevice) console.log(`Currently connected to ${connectedDevice.address}`);
+else console.log(`Not currently connected to a device`);
+```
+
+### write(message: String): Promise
 
 Writes the provided message to the device.  The String should be Base64 encoded.  Resovles true when the write completes.
+
+```javascript
+let message = this.state.text + '\r';   // Commands should end with \r
+await RNBluetoothClassic.write(message);
+```
 
 ### readFromDevice(): Promise
 
@@ -258,13 +281,25 @@ Resolves **true|false** based on whether data is available.  Use in conjunction 
 
 ## Events
   
-The following events are currently available:
+Attaching (and disconnecting) from events can be completed in the `componentWillMount` (`componentWillUnmount` respectively) using the following:
+
+```javascript
+componentWillMount() {     
+  this.onRead = RNBluetoothClassic.addListener(BTEvents.READ, this.handleRead, this);
+}
+
+componentWillUnmount() {
+  this.onRead.remove();
+}
+```
+
+All the listeners described below can be registered in the same way:
 
 ### BLUETOOTH_ENABLED
 
 `BTEvent.BLUETOOTH_ENABLED` is fired when the platform enables the bluetooth adapter.
 
-### BLUETOOTH_DISTABLED
+### BLUETOOTH_DISABLED
 
 `BTEvent.BLUETOOTH_DISABLED` is fired when the platform disables the bluetooth adapter.
 
