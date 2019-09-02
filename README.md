@@ -74,7 +74,7 @@ install-local ../react-native-bluetooth-classic
   - Add `using Bluetooth.Classic.RNBluetoothClassic;` to the usings at the top of the file
   - Add `new RNBluetoothClassicPackage()` to the `List<IReactPackage>` returned by the `Packages` method
 
-## Contribution
+## Contribute
 
 When setting up the project for contribution follow all the usual Git contribution best practices.
 
@@ -117,6 +117,10 @@ repositories {
 Much like Android, the IOS project was being edited through the BluetoothClassicExample project by opening files through the RNBluetoothClassic library folder.  Since React Native is a peer dependency (and annoying to download and install locally with the changes to NPM5) I just continued to do the development this way, it worked out since it allowed me to test the changes on the fly. 
 
 Again - if someone can point me on how to resolve these issues easily, I'd love to get it sorted.
+
+## License
+
+The MIT License (MIT) - see full [license file](LICENSE)
 
 ## Example
 

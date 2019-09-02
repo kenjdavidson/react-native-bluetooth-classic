@@ -1,24 +1,22 @@
 {
   "name": "react-native-bluetooth-classic",
-  "version": "1.0.0",
+  "version": "1.0.0-rc1",
   "description": "",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/kenjdavidson/react-native-bluetooth-classic.git"
-  },
+  "repository": "git://github.com/kenjdavidson/react-native-bluetooth-classic.git",
   "keywords": [
     "react-native",
-    "bluetooth-classic"
+    "bluetooth-classic",
+    "External Accessory"
   ],
   "author": "",
   "contributors": [
     "Kenneth Davidson <ken.j.davidson@live.ca> (https://github.com/kenjdavidson)"
   ],
-  "license": "",
+  "license": "MIT",
   "peerDependencies": {
     "react-native": ">=0.41.2",
     "react-native-windows": "0.41.0-rc.1"
