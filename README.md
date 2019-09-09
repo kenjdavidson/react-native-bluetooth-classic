@@ -136,6 +136,10 @@ In all cases the following API/Events are available within Javascript for both A
 
 The following API is available on both Android and IOS (unless specifically stated not).  I've done my best to duplciate all the methods available on both, so there should be no need to use Platform or file switching.  For any API calls that aren't supported on a specific environment, they should reject the promise with an 'UnsupportedOperation' error.
 
+| Function | Description | Android | IOS |
+| --- | --- | --- | --- |
+| requestEnabled() | Requests that the platform Bluetooth adapter be enabled. | :white_check_mark: | :no_entry: |
+
 ### requestEnabled(): Promise
 
 Requests that the platform Bluetooth adapter be enabled.
