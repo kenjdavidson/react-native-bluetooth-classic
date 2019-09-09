@@ -163,21 +163,21 @@ Function | Description | Android | IOS |
 
 TODO
 
-#### Promise isEnabled(): Promise
+#### isEnabled(): Promise
 
 ```javascript
 let enabled = await RNBluetoothClassic.isEnabled();
 console.log(`Bluetooth enabled? ${enabled}`)
 ```
 
-#### Promise list(): Promise
+#### list(): Promise
 
 ```javascript
 let devices = await RNBluetoothClassic.list();
 console.log(`Available devices: ${devices.length});
 ```
 
-#### Promise discoverDevices(): Promise
+#### discoverDevices(): Promise
 
 TODO
 
@@ -213,7 +213,11 @@ this.setState({connectedDevice: undefined})
 
 #### isConnected(): Promise
 
-TODO
+```javascript
+let connectedDevice = await RNBluetoothClassic.isConnected();
+if (connectedDevice) let device = RNBluetoothClassic.getConnectedDevice();
+else console.log(`Not currently connected to a device`);
+```
 
 #### getConnectedDevice(): Promise
 
@@ -232,23 +236,38 @@ await RNBluetoothClassic.write(message);
 
 #### readFromDevice(): Promise
 
-TODO
+```javascript
+// Reads all content in the buffer - regardless of delimiter
+let message = await RNBluetoothClassic.readFromDevice();
+```
 
 #### readUntilDelimiter(): Promise
 
-TODO
+```javascript
+// Delimiter defaults to '\n' without setting manually
+let message = await RNBluetoothClassic.readUntilDelimiter();
+```
 
 #### readUntilDelimiter(delimiter:String): Promise
 
-TODO
+```javascript
+let message = await RNBluetoothClassic.readUntilDelimiter('~');
+```
 
 #### setDelimiter(String delimiter): Promise
 
-TODO
+```javascript
+await RNBluetoothClassic.setDelimiter('~');
+let message = RNBluetoothClassic.readUntilDelimiter();
+```
 
 #### available(): Promise
 
-TODO
+```javascript
+let available = await RNBluetoothClassic.available();
+if (available)
+  let message = await RNBluetoothClassic.readFromDevice();  // All content or .readUntilDelimiter()
+```
 
 ## Events
   
