@@ -155,7 +155,7 @@ Function | Description | Android | IOS |
 | readUntilDelimiter() | Resovles with the content of the buffer up until the default delimiter.  To update the delimiter for the session use setDelimiter(delimiter:String).  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour. | :white_check_mark: | :white_check_mark: |
 | readUntilDelimiter(delimiter:String) | Resolves with the content of the buffer up until the provided delimiter.  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour. | :white_check_mark: | :white_check_mark: |
 | setDelimiter(delimiter:String) | Sets the new delimiter for future reads/read events and resolves true, resolves with the API to allow for fluent chaining | :white_check_mark: | :white_check_mark: |
-| available() | Resolves **true\|false** based on whether data is available.  Use in conjunction with the read[until|from] functions. | :white_check_mark: | :white_check_mark: |
+| available() | Resolves **true\|false** based on whether data is available.  Use in conjunction with the read[until\|from] functions. | :white_check_mark: | :white_check_mark: |
 
 ### Code Examples
 
@@ -276,8 +276,6 @@ componentWillUnmount() {
 | BTEvent.BLUETOOTH_ENABLED | `BTEvent.BLUETOOTH_ENABLED` is fired when the platform enables the bluetooth adapter. | :white_check_mark: | :white_check_mark: |
 |BTEvent.READ | When new data is available.  The current implementation is to publish any number of data in chunks based on the delimiter.  For exapmle, if the delimiter is '\n' (default) and data comes in with three messages (three delmited messages) then the client will get three READ events which it should handle.  In the future I hope I can move the reading logic from the `RNBluetoothModule` into an Interface/Protocol so that the client can call custom implementations. | :white_check_mark: | :white_check_mark: |
 |BTEvent.ERROR | Any time an error (which is not classified above) occurs. | :white_check_mark: | :white_check_mark: |
-
-All the listeners described below can be registered in the same way:
 
 ### Listener Examples
 
