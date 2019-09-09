@@ -136,18 +136,19 @@ In all cases the following API/Events are available within Javascript for both A
 
 The following API is available on both Android and IOS (unless specifically stated not).  I've done my best to duplciate all the methods available on both, so there should be no need to use Platform or file switching.  Each call will return a Promise - for any API calls that aren't supported on a specific environment, they should reject the promise with an 'UnsupportedOperation' error.
 
-| Function | Description | Android | IOS |
+
+Function | Description | Android | IOS |
 | --- | --- | :---: | :---: |
 | requestEnabled() | Requests that the environment enables the Bluetooth adapter. | :white_check_mark: | :no_entry: |
-| isEnabled() | Resolves **true|false** based on whether the Platform Bluetooth is enabled.  IOS uses the CoreBluetooth framework which might not be the best way to do things (mixing classic with BLE) but it seems to work. | :white_check_mark: | :white_check_mark: |
+| isEnabled() | Resolves **true\|false** based on whether the Platform Bluetooth is enabled.  IOS uses the CoreBluetooth framework which might not be the best way to do things (mixing classic with BLE) but it seems to work. | :white_check_mark: | :white_check_mark: |
 | list() | Resolves with a list of the currently paired/connected (Android/IOS with MFi protocol respectively) devices.  Returns with an empty list if there are none available. | :white_check_mark: | :white_check_mark: |
 | discoverDevices() | Resolves to a list of discovered devices. | :white_check_mark: | :no_entry: |
-| cancelDiscovery() | Resolves **true|false** based on whether discovery was cancelled. | :white_check_mark: | :no_entry: |
+| cancelDiscovery() | Resolves **true\|false** based on whether discovery was cancelled. | :white_check_mark: | :no_entry: |
 | pairDevice(deviceId:String) | Resolves with the status of the requested device if paired.  Rejects if unable to pair. | :white_check_mark: | :no_entry: |
 | unpairDevice(deviceId:String) | Resolves with a list of the unpaired devices. | :white_check_mark: | :no_entry: |
 | connect(deviceId:String) | Resolves with the device details if successfully paired.  Rejects if the connection is unsuccessful - if already connected the rejection will also disconnect the currently connected device. | :white_check_mark: | :white_check_mark: |
-| disconnect() | Resolves **true|false** based on whether disconnection was successful. | :white_check_mark: | :white_check_mark: |
-| isConnected() | Resolves **true|false** whether a device is currently connected. | :white_check_mark: | :white_check_mark: |
+| disconnect() | Resolves **true\|false** based on whether disconnection was successful. | :white_check_mark: | :white_check_mark: |
+| isConnected() | Resolves **true\|false** whether a device is currently connected. | :white_check_mark: | :white_check_mark: |
 | getConnectedDevice() | Resolves with the currently connected devices, or rejects if there is none. | :white_check_mark: | :white_check_mark: |
 | write(message: String) | Writes the provided message to the device.  The String should be Base64 encoded.  Resovles true when the write completes. | :white_check_mark: | :white_check_mark: |
 | readFromDevice() | Resolves with the entire content of the devices buffer, ignoring any delimiters and clearing the buffer when complete.  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour. | :white_check_mark: | :white_check_mark: |
