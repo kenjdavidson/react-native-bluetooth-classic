@@ -155,7 +155,7 @@ Function | Description | Android | IOS |
 | readUntilDelimiter() | Resovles with the content of the buffer up until the default delimiter.  To update the delimiter for the session use setDelimiter(delimiter:String).  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour. | :white_check_mark: | :white_check_mark: |
 | readUntilDelimiter(delimiter:String) | Resolves with the content of the buffer up until the provided delimiter.  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour. | :white_check_mark: | :white_check_mark: |
 | setDelimiter(delimiter:String) | Sets the new delimiter for future reads/read events and resolves true, resolves with the API to allow for fluent chaining | :white_check_mark: | :white_check_mark: |
-| available() | Resolves **true|false** based on whether data is available.  Use in conjunction with the read[until|from] functions. | :white_check_mark: | :white_check_mark: |
+| available() | Resolves **true\|false** based on whether data is available.  Use in conjunction with the read[until|from] functions. | :white_check_mark: | :white_check_mark: |
 
 ### Code Examples
 
@@ -268,10 +268,8 @@ componentWillUnmount() {
 | --- | --- | :---: | :---: |
 | BTEvent.BLUETOOTH_ENABLED | When the platform enables the bluetooth adapter. | :white_check_mark: | :white_check_mark: |
 | BTEvent.BLUETOOTH_DISABLED | When the platform disables the bluetooth adapter. | :white_check_mark: | :white_check_mark: |
-| BTEvent.BLUETOOTH_CONNECTED | When a bluetooth device is connected.  The event data contains information regarding the Device which was just connected.  Generally a new `RNBluetoothModule.list()` should be completed at this time.
- | :white_check_mark: | :white_check_mark: |
-| BTEvent.BLUETOOTH_DISCONNECTED |  When a bluetooth device is connected.  The event data contains information regarding the Device which was just disconnected.  Generally a new `RNBluetoothModule.list()` should be completed at this time.
- | :white_check_mark: | :white_check_mark: |
+| BTEvent.BLUETOOTH_CONNECTED | When a bluetooth device is connected.  The event data contains information regarding the Device which was just connected.  Generally a new `RNBluetoothModule.list()` should be completed at this time. | :white_check_mark: | :white_check_mark: |
+| BTEvent.BLUETOOTH_DISCONNECTED |  When a bluetooth device is connected.  The event data contains information regarding the Device which was just disconnected.  Generally a new `RNBluetoothModule.list()` should be completed at this time. | :white_check_mark: | :white_check_mark: |
 | BTEvent.CONNECTION_SUCCESS | When a connection request has been completed.  Generally if you're calling `RNBluetoothModule.connect()` you shouldn't really need to subscribe to these, but if you want to there is not stopping it. | :white_check_mark: | :white_check_mark: |
 | BTEvent.CONNECTION_FAILED | When connect() is called but fails.  Again it generally isn't required if you're using the Promise version of `RNBluetoothModule.connect()` | :white_check_mark: | :white_check_mark: |
 | BTEvent.CONNECTION_LOST | When an open connection is lost.  This occurs when a BluetoothDevice which may have an open connection/stream turns itself off.  On Android this will signify an error, but on IOS this could possibly happen if there is no activity.  In most cases a `BTEvent.BLUETOOTH_DISCONNECTED` is also fired, in which case it may be easier to listen to that in order to change status. | :white_check_mark: | :white_check_mark: |
