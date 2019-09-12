@@ -1,6 +1,6 @@
 {
   "name": "react-native-bluetooth-classic",
-  "version": "1.0.0-rc1",
+  "version": "0.9.0",
   "description": "",
   "main": "src/index.js",
   "scripts": {
@@ -12,11 +12,15 @@
     "bluetooth-classic",
     "External Accessory"
   ],
-  "author": "",
+  "author": "Jakub Martyčák <martycakjakub@gmail.com>",
   "contributors": [
     "Kenneth Davidson <ken.j.davidson@live.ca> (https://github.com/kenjdavidson)"
   ],
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kenjdavidson/react-native-bluetooth-classic/issues"
+  },
+  "homepage": "https://github.com/kenjdavidson/react-native-bluetooth-classic#readme",
   "peerDependencies": {
     "react-native": ">=0.41.2",
     "react-native-windows": "0.41.0-rc.1"
@@ -28,5 +32,8 @@
     "/src",
     "/android",
     "/ios"
-  ]
+  ],
+  "devDependencies": {
+    "npm-version": "^1.1.0"
+  }
 }

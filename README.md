@@ -1,20 +1,13 @@
 
 # react-native-bluetooth-classic
 
-React Native Bluetooth Classic functionality for both Android and IOS.  
+React Native Bluetooth Classic is meand to bridge the gap found with regards to IOS Bluetooth Classic using the External Accessory framework. 
 
 Based off the [react-native-bluetooth-serial](https://github.com/rusel1989/react-native-bluetooth-serial) port, and updated to replace [CoreBluetooth](https://developer.apple.com/documentation/corebluetooth) (BLE) on IOS with [External Accessory](https://developer.apple.com/documentation/externalaccessory/eaaccessory).
-
-The purpose of this was three fold:
-- Take a run at learning how to work with React Native modules, I find the best way to learn is to take an established project and deconstruct/construct.
-- The project I was working on required that both Android and IOS supported a Bluetooth Classic serial scanner.
-- Seemed like a good idea.
 
 ## Getting started
 
 ### Install from NPM
-
-Currently unavailable until v1.0.0 is released.
 
 ```
 $ npm install react-native-bluetooth-classic --save
@@ -22,7 +15,7 @@ $ npm install react-native-bluetooth-classic --save
 
 ### Install from NPM (local)
 
-Currently the project is not posted on NPM, it may in the future.  In order to install locally the following steps are required:
+If making or testing custom changes to react-native-bluetooth-classic you'll want to Install locally.   
 
 ```
 $ git clone https://github.com/kenjdavidson/react-native-bluetooth-classic
@@ -39,6 +32,8 @@ install-local ../react-native-bluetooth-classic
 ```
 
 ### Automatic installation
+
+If installing locally, you'll need to perform the local install after each subsequent react-native link.  Just be aware of that, if you run react-native link on any future packages, you'll find that the Android project becomes uncompilable (just run the install local command again).
 
 `$ react-native link react-native-bluetooth-classic`
 
@@ -67,6 +62,9 @@ install-local ../react-native-bluetooth-classic
   	```
 
 #### Windows
+
+TODO - but leaving the section here.
+
 [Read it! :D](https://github.com/ReactWindows/react-native)
 
 1. In Visual Studio add the `RNBluetoothClassic.sln` in `node_modules/react-native-bluetooth-classic/windows/RNBluetoothClassic.sln` folder to their solution, reference from their app.
@@ -77,10 +75,6 @@ install-local ../react-native-bluetooth-classic
 ## Contribute
 
 When setting up the project for contribution follow all the usual Git contribution best practices.
-
-### Annoyances
-
-When setting up the project I rant into a couple of issues - this section describes those.
 
 #### Android
 
@@ -124,7 +118,7 @@ The MIT License (MIT) - see full [license file](LICENSE)
 
 ## Example
 
-The BluetoothClassicExample is included within the ./BluetoothClassicExample React Native project.   Please see ./BluetoothClassicExample for details.
+The BluetoothClassicExample is included within the ./BluetoothClassicExample React Native project.
 
 ## Usage
 
