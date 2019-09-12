@@ -138,89 +138,66 @@ In all cases the following API/Events are available within Javascript for both A
 
 ## API
 
-The following API is available on both Android and IOS (unless specifically stated not).  I've done my best to duplciate all the methods available on both, so there should be no need to use Platform or file switching.  For any API calls that aren't supported on a specific environment, they should reject the promise with an 'UnsupportedOperation' error.
+The following API is available on both Android and IOS (unless specifically stated not).  I've done my best to duplciate all the methods available on both, so there should be no need to use Platform or file switching.  Each call will return a Promise - for any API calls that aren't supported on a specific environment, they should reject the promise with an 'UnsupportedOperation' error.
 
-### requestEnabled(): Promise
 
-Requests that the platform Bluetooth adapter be enabled.
+Function | Description | Android | IOS |
+| --- | --- | :---: | :---: |
+| requestEnabled() | Requests that the environment enables the Bluetooth adapter. | :white_check_mark: | :no_entry: |
+| isEnabled() | Resolves **true\|false** based on whether the Platform Bluetooth is enabled.  IOS uses the CoreBluetooth framework which might not be the best way to do things (mixing classic with BLE) but it seems to work. | :white_check_mark: | :white_check_mark: |
+| list() | Resolves with a list of the currently paired/connected (Android/IOS with MFi protocol respectively) devices.  Returns with an empty list if there are none available. | :white_check_mark: | :white_check_mark: |
+| discoverDevices() | Resolves to a list of discovered devices. | :white_check_mark: | :no_entry: |
+| cancelDiscovery() | Resolves **true\|false** based on whether discovery was cancelled. | :white_check_mark: | :no_entry: |
+| pairDevice(deviceId:String) | Resolves with the status of the requested device if paired.  Rejects if unable to pair. | :white_check_mark: | :no_entry: |
+| unpairDevice(deviceId:String) | Resolves with a list of the unpaired devices. | :white_check_mark: | :no_entry: |
+| connect(deviceId:String) | Resolves with the device details if successfully paired.  Rejects if the connection is unsuccessful - if already connected the rejection will also disconnect the currently connected device. | :white_check_mark: | :white_check_mark: |
+| disconnect() | Resolves **true\|false** based on whether disconnection was successful. | :white_check_mark: | :white_check_mark: |
+| isConnected() | Resolves **true\|false** whether a device is currently connected. | :white_check_mark: | :white_check_mark: |
+| getConnectedDevice() | Resolves with the currently connected devices, or rejects if there is none. | :white_check_mark: | :white_check_mark: |
+| write(message: String) | Writes the provided message to the device.  The String should be Base64 encoded.  Resovles true when the write completes. | :white_check_mark: | :white_check_mark: |
+| readFromDevice() | Resolves with the entire content of the devices buffer, ignoring any delimiters and clearing the buffer when complete.  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour. | :white_check_mark: | :white_check_mark: |
+| readUntilDelimiter() | Resovles with the content of the buffer up until the default delimiter.  To update the delimiter for the session use setDelimiter(delimiter:String).  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour. | :white_check_mark: | :white_check_mark: |
+| readUntilDelimiter(delimiter:String) | Resolves with the content of the buffer up until the provided delimiter.  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour. | :white_check_mark: | :white_check_mark: |
+| setDelimiter(delimiter:String) | Sets the new delimiter for future reads/read events and resolves true, resolves with the API to allow for fluent chaining | :white_check_mark: | :white_check_mark: |
+| available() | Resolves **true\|false** based on whether data is available.  Use in conjunction with the read[until\|from] functions. | :white_check_mark: | :white_check_mark: |
 
-##### Android 
+### Code Examples
 
-Starts the ACTION_REQUEST_ENABLED Intent on Anroid.  Resolves **true** if the user enables Bluetooth, and rejects if they do not.  Debating update to just resolve **true|false** instead of reject.
+#### requestEnabled(): Promise
 
-##### IOS
+TODO
 
-rejects automatically as this is not supported yet.
-
-### Promise isEnabled(): Promise
-
-Resolves **true|false** based on whether the Platform Bluetooth is enabled.  IOS uses the CoreBluetooth framework which might not be the best way to do things (mixing classic with BLE) but it seems to work. 
+#### isEnabled(): Promise
 
 ```javascript
 let enabled = await RNBluetoothClassic.isEnabled();
 console.log(`Bluetooth enabled? ${enabled}`)
 ```
 
-### Promise list(): Promise
-
-Resolves with a list of the currently paired/connected (Android/IOS with MFi protocol respectively) devices.  Returns with an empty list if there are none available.
+#### list(): Promise
 
 ```javascript
 let devices = await RNBluetoothClassic.list();
 console.log(`Available devices: ${devices.length});
 ```
 
-### Promise discoverDevices(): Promise
+#### discoverDevices(): Promise
 
-Attempts to start Bluetooth device discovery and
+TODO
 
-##### Android
+#### cancelDiscovery(): Promise
 
-resolves with a list [possibly empty] of nearby devices
+TODO
 
-##### IOS
+#### pairDevice(deviceId:String): Promise
 
-rejects automatically as this is not supported yet.
+TODO
 
-### cancelDiscovery(deviceId:String): Promise
+#### unpairDevice(deviceId:String): Promise
 
-Cancels the currently running device discovery, if no discovery is running then it
+TODO
 
-##### Android
-
-Resolves **true|false** based on whether discovery was cancelled
-
-##### IOS
-
-rejects automatically as this is not supported yet.
-
-### pairDevice(deviceId:String): Promise
-
-Attempts to pair the device with the provided Id
-
-##### Android
-
-Resovles with the Device when paired, rejects if the pairing fails or is not possible.
-
-##### IOS
-
-rejects automatically as this is not supported yet.
-
-### unpairDevice(deviceId:String): Promise
-
-Attempts to un-pair the device with the provided Id
-
-##### Android
-
-Resovles with the Device when unpaired, rejects if the pairing fails or is not possible.
-
-##### IOS
-
-rejects automatically as this is not supported yet.
-
-### connect(deviceId:String): Promise
-
-Attempts to connect to the device with the provided Id.  Currently it will attempt to disconnect the currently connected device - will attempt to update to allow for multiple Bluetooth devices at a single time.   Resolves with the newly connected device information or rejects if a connection is not available.
+#### connect(deviceId:String): Promise
 
 ```javascript
 try {
@@ -231,22 +208,22 @@ try {
 } 
 ```
 
-### disconnect(): promise
-
-Attempts to disconnect from a device.  Resolves **true|false** based on whether disconnection was successful.  This will need to be updated to accept a deviceId when multiple devices can be connected
+#### disconnect(): promise
 
 ```javascript
 await RNBluetoothClassic.disconnect();
 this.setState({connectedDevice: undefined})
 ```
 
-### isConnected(): Promise
+#### isConnected(): Promise
 
-Resolves **true|false** whether a device is currently connected.
+```javascript
+let connectedDevice = await RNBluetoothClassic.isConnected();
+if (connectedDevice) let device = RNBluetoothClassic.getConnectedDevice();
+else console.log(`Not currently connected to a device`);
+```
 
-### getConnectedDevice(): Promise
-
-Resolves with the currently connected devices, or rejects if there is none.  
+#### getConnectedDevice(): Promise
 
 ```javascript
 let connectedDevice = await RNBluetoothClassic.getConnectedDevice();
@@ -254,34 +231,47 @@ if (connectedDevice) console.log(`Currently connected to ${connectedDevice.addre
 else console.log(`Not currently connected to a device`);
 ```
 
-### write(message: String): Promise
-
-Writes the provided message to the device.  The String should be Base64 encoded.  Resovles true when the write completes.
+#### write(message: String): Promise
 
 ```javascript
 let message = this.state.text + '\r';   // Commands should end with \r
 await RNBluetoothClassic.write(message);
 ```
 
-### readFromDevice(): Promise
+#### readFromDevice(): Promise
 
-Resolves with the entire content of the devices buffer, ignoring any delimiters and clearing the buffer when complete.  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour.
+```javascript
+// Reads all content in the buffer - regardless of delimiter
+let message = await RNBluetoothClassic.readFromDevice();
+```
 
-### readUntilDelimiter(): Promise
+#### readUntilDelimiter(): Promise
 
-Resovles with the content of the buffer up until the default delimiter.  To update the delimiter for the session use setDelimiter(delimiter:String).  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour.
+```javascript
+// Delimiter defaults to '\n' without setting manually
+let message = await RNBluetoothClassic.readUntilDelimiter();
+```
 
-### readUntilDelimiter(delimiter:String): Promise
+#### readUntilDelimiter(delimiter:String): Promise
 
-Resolves with the content of the buffer up until the provided delimiter.  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour.
+```javascript
+let message = await RNBluetoothClassic.readUntilDelimiter('~');
+```
 
-### setDelimiter(String delimiter): Promise
+#### setDelimiter(String delimiter): Promise
 
-Sets the new delimiter for future reads/read events and resolves true.
+```javascript
+await RNBluetoothClassic.setDelimiter('~');
+let message = RNBluetoothClassic.readUntilDelimiter();
+```
 
-### available(): Promise
+#### available(): Promise
 
-Resolves **true|false** based on whether data is available.  Use in conjunction with the read[until|from] functions.
+```javascript
+let available = await RNBluetoothClassic.available();
+if (available)
+  let message = await RNBluetoothClassic.readFromDevice();  // All content or .readUntilDelimiter()
+```
 
 ## Events
   
@@ -297,40 +287,53 @@ componentWillUnmount() {
 }
 ```
 
-All the listeners described below can be registered in the same way:
+| Event | Description | Android | IOS
+| --- | --- | :---: | :---: |
+| BTEvent.BLUETOOTH_ENABLED | When the platform enables the bluetooth adapter. | :white_check_mark: | :white_check_mark: |
+| BTEvent.BLUETOOTH_DISABLED | When the platform disables the bluetooth adapter. | :white_check_mark: | :white_check_mark: |
+| BTEvent.BLUETOOTH_CONNECTED | When a bluetooth device is connected.  The event data contains information regarding the Device which was just connected.  Generally a new `RNBluetoothModule.list()` should be completed at this time. | :white_check_mark: | :white_check_mark: |
+| BTEvent.BLUETOOTH_DISCONNECTED |  When a bluetooth device is connected.  The event data contains information regarding the Device which was just disconnected.  Generally a new `RNBluetoothModule.list()` should be completed at this time. | :white_check_mark: | :white_check_mark: |
+| BTEvent.CONNECTION_SUCCESS | When a connection request has been completed.  Generally if you're calling `RNBluetoothModule.connect()` you shouldn't really need to subscribe to these, but if you want to there is not stopping it. | :white_check_mark: | :white_check_mark: |
+| BTEvent.CONNECTION_FAILED | When connect() is called but fails.  Again it generally isn't required if you're using the Promise version of `RNBluetoothModule.connect()` | :white_check_mark: | :white_check_mark: |
+| BTEvent.CONNECTION_LOST | When an open connection is lost.  This occurs when a BluetoothDevice which may have an open connection/stream turns itself off.  On Android this will signify an error, but on IOS this could possibly happen if there is no activity.  In most cases a `BTEvent.BLUETOOTH_DISCONNECTED` is also fired, in which case it may be easier to listen to that in order to change status. | :white_check_mark: | :white_check_mark: |
+| BTEvent.BLUETOOTH_ENABLED | `BTEvent.BLUETOOTH_ENABLED` is fired when the platform enables the bluetooth adapter. | :white_check_mark: | :white_check_mark: |
+|BTEvent.READ | When new data is available.  The current implementation is to publish any number of data in chunks based on the delimiter.  For exapmle, if the delimiter is '\n' (default) and data comes in with three messages (three delmited messages) then the client will get three READ events which it should handle.  In the future I hope I can move the reading logic from the `RNBluetoothModule` into an Interface/Protocol so that the client can call custom implementations. | :white_check_mark: | :white_check_mark: |
+|BTEvent.ERROR | Any time an error (which is not classified above) occurs. | :white_check_mark: | :white_check_mark: |
 
-### BLUETOOTH_ENABLED
+### Listener Examples
 
-`BTEvent.BLUETOOTH_ENABLED` is fired when the platform enables the bluetooth adapter.
+#### BLUETOOTH_ENABLED
 
-### BLUETOOTH_DISABLED
+TODO
 
-`BTEvent.BLUETOOTH_DISABLED` is fired when the platform disables the bluetooth adapter.
+#### BLUETOOTH_DISABLED
 
-### BLUETOOTH_CONNECTED
+TODO
 
-`BTEvent.BLUETOOTH_CONNECTED` is fired when a bluetooth device is connected.  The event data contains information regarding the Device which was just connected.  Generally a new `RNBluetoothModule.list()` should be completed at this time.
+#### BLUETOOTH_CONNECTED
 
-### BLUETOOTH_DISCONNECTED
+TODO 
 
-`BTEvent.BLUETOOTH_DISCONNECTED` is fired when a bluetooth device is connected.  The event data contains information regarding the Device which was just disconnected.  Generally a new `RNBluetoothModule.list()` should be completed at this time.
+#### BLUETOOTH_DISCONNECTED
 
-### CONNECTION_SUCCESS
+TODO
 
-`BTEvent.CONNECTION_SUCCESS` is fired when a connection request has been completed.  Generally if you're calling `RNBluetoothModule.connect()` you shouldn't really need to subscribe to these, but if you want to there is not stopping it.
+#### CONNECTION_SUCCESS
 
-### CONNECTION_FAILED
+TODO
 
-`BTEvent.CONNECTION_FAILED` is fired when connect() is called but fails.  Again it generally isn't required if you're using the Promise version of `RNBluetoothModule.connect()`
+#### CONNECTION_FAILED
 
-### CONNECTION_LOST
+TODO
 
-`BTEvent.CONNECTION_LOST` is fired when an open connection is lost.  This occurs when a BluetoothDevice which may have an open connection/stream turns itself off.  On Android this will signify an error, but on IOS this could possibly happen if there is no activity.  In most cases a `BTEvent.BLUETOOTH_DISCONNECTED` is also fired, in which case it may be easier to listen to that in order to change status.
+#### CONNECTION_LOST
 
-### READ
+TODO
 
-`BTEvent.READ` is fired whenever new data is available.  The current implementation is to publish any number of data in chunks based on the delimiter.  For exapmle, if the delimiter is '\n' (default) and data comes in with three messages (three delmited messages) then the client will get three READ events which it should handle.  In the future I hope I can move the reading logic from the `RNBluetoothModule` into an Interface/Protocol so that the client can call custom implementations.
+#### READ
 
-### ERROR
+TODO
 
-`BTEvent.ERROR` is fired any time an error (which is not classified above) occurs.
+#### ERROR
+
+TODO
