@@ -1,6 +1,6 @@
 # BluetoothClassicExample
 
-Testing application for react-native-bluetooth-classic module.
+Bluetooth classic sample application - works as a serial reader/writer with Bluetooth classic devices.
 
 ## Setup
 
@@ -96,15 +96,17 @@ Willing to take suggestions on doing this in a better way: environment variables
 ## Running Application
 
 ### Android
-Once configured, the application can be run from a number of methods:
 
-1. Through VSCode using the commands 
+When running the application on a live device, make sure you use the `adb reverse tcp:8081 tcp:8081` command documented on the [React Native Docs](https://facebook.github.io/react-native/docs/running-on-device#method-1-using-adb-reverse-recommended).
+
+#### Visual Studio Code
 ```
-Apple/Shift/P 
-React-Native: Run Android on Emulator
+<Command Palette> React-Native: Run Android on Emulator
 ```
 
-2. Through Android Studio clicking the `run` button
+#### Android Studio
+
+`run` or `debug` button
 
 ### IOS
 
@@ -122,10 +124,13 @@ The application contains two screens:
 
 ### Device List
 
-Displays a list of devices currently connected.  Clicking on a device will bring you to the device connection screen where messages can be sent and received.
+Displays a list of devices currently connected.  Clicking on a device will bring you to the device connection screen where messages can be sent and received.  A terrible looking green `O` in the top-right shows that the Bluetooth is enabled.
+
+![Device List](/docs/images/devicelist.jpg)
 
 ### Device Connection
 
-Displays a text area and text field allowing you to send and monitor communication.  Scanned data will be displayed on the screen with the timestamp.  Messages can be sent to the device by typing them in the text field and pressing SEND, responses will automatically be displayed.
+Displays a text area and text field allowing you to send and monitor communication.  Scanned data will be displayed on the screen with the timestamp.  Messages can be sent to the device by typing them in the text field and pressing SEND, responses will automatically be displayed.  Disconnect by pressing the equally terrible looking red `X` in the top-right to disconnect.
 
-TODO - Add the ability to save requests per device (memory)
+![Received Data](/docs/images/connected.jpg)
+![Received Data](/docs/images/messages.jpg)
