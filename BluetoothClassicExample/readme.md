@@ -126,11 +126,11 @@ The application contains two screens:
 
 Displays a list of devices currently connected.  Clicking on a device will bring you to the device connection screen where messages can be sent and received.  A terrible looking green `O` in the top-right shows that the Bluetooth is enabled.
 
-![Device List](/docs/images/devicelist.jpg)
+![Device List](./docs/images/devicelist.jpg)
 
 ### Device Connection
 
 Displays a text area and text field allowing you to send and monitor communication.  Scanned data will be displayed on the screen with the timestamp.  Messages can be sent to the device by typing them in the text field and pressing SEND, responses will automatically be displayed.  Disconnect by pressing the equally terrible looking red `X` in the top-right to disconnect.
 
-![Received Data](/docs/images/connected.jpg)
-![Received Data](/docs/images/messages.jpg)
+![Received Data](./docs/images/connected.jpg)
+![Received Data](./docs/images/messages.jpg)
