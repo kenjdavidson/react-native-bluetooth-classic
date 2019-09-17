@@ -807,7 +807,7 @@ public class RNBluetoothClassicModule
         String action = intent.getAction();
 
         BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-        if (deviceId.equals(device.getAddress())) {
+        if (!deviceId.equals(device.getAddress())) {
             if (D) Log.d(TAG, String.format("Bonding device [%s] does not match expected [%s]",
                     device.getAddress(), deviceId));
             return;
