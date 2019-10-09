@@ -51,6 +51,7 @@ class RNBluetoothClassic extends NativeEventEmitter {
     this.cancelDiscovery = nativeModule.cancelDiscovery;
     this.pairDevice = nativeModule.pairDevice;
     this.unpairDevice = nativeModule.unpairDevice;
+    this.getConnectedDevice = nativeModule.getConnectedDevice;
     
   }
 
