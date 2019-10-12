@@ -27,7 +27,7 @@ With NPM lower than version 5 just running the command `npm install file://../` 
 2. Use the following, which will package and install the local project into node_modules.  For more information on install-local please see (Install Local)[https://www.npmjs.com/package/install-local].
 
 ```
-npm install install-local
+npm install -g install-local
 install-local ../react-native-bluetooth-classic
 ```
 
@@ -48,8 +48,8 @@ If installing locally, you'll need to perform the local install after each subse
 
 #### Android
 
-1. Open up `android/app/src/main/java/[...]/MainActivity.java`
-  - Add `import com.reactlibrary.RNBluetoothClassicPackage;` to the imports at the top of the file
+1. Open up `android/app/src/main/java/[...]/MainApplication.java`
+  - Add `import kjd.reactnative.bluetooth.RNBluetoothClassicPackage;` to the imports at the top of the file
   - Add `new RNBluetoothClassicPackage()` to the list returned by the `getPackages()` method
 2. Append the following lines to `android/settings.gradle`:
   	```
