@@ -28,7 +28,7 @@ With NPM lower than version 5 just running the command `npm install file://../` 
 
 ```
 npm install -g install-local
-install-local ../react-native-bluetooth-classic
+install-local -S ../react-native-bluetooth-classic
 ```
 
 ### Automatic installation
