@@ -38,21 +38,28 @@ class RNBluetoothClassic extends NativeEventEmitter {
 
     if (Platform.OS === 'android') this._nativeModule = nativeModule;
 
+    this.setAdapterName = nativeModule.setAdapterName;
     this.requestEnable = nativeModule.requestEnable;
     this.isEnabled = nativeModule.isEnabled;
     this.list = nativeModule.list;
-    this.connect = nativeModule.connect;
-    this.disconnect = nativeModule.disconnect;
-    this.writeToDevice = nativeModule.writeToDevice;
-
-    // Some/very untested functionality
-    this.discoverUnpairedDevices = nativeModule.discoverUnpairedDevices;
     this.discoverDevices = nativeModule.discoverDevices;
     this.cancelDiscovery = nativeModule.cancelDiscovery;
     this.pairDevice = nativeModule.pairDevice;
     this.unpairDevice = nativeModule.unpairDevice;
+
+    this.connect = nativeModule.connect;
+    this.disconnect = nativeModule.disconnect;
+    this.isConnected = nativeModule.isConnected;
     this.getConnectedDevice = nativeModule.getConnectedDevice;
-    
+
+    this.writeToDevice = nativeModule.writeToDevice;
+    this.available = nativeModule.available;
+    this.readFromDevice = nativeModule.readFromDevice;
+    this.readUntilDelimiter = nativeModule.readUntilDelimiter;
+    this.clear = nativeModule.clear;
+
+    this.setDelimiter = nativeModule.setDelimiter;
+    this.setEncoding = nativeModule.setEncoding;    
   }
 
   /**
