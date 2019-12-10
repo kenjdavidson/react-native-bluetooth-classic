@@ -502,11 +502,17 @@ public class RNBluetoothClassicModule
   public void connect(String id, Promise promise) {
     mConnectedPromise = promise;
     if (mBluetoothAdapter != null) {
-      BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(id);
-      if (device != null) {
-        mBluetoothService.connect(device);
-      } else {
-        promise.reject(new Exception("No device found with id " + id));
+      try {
+        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(id);
+        if (device != null) {
+          mBluetoothService.connect(device);
+        } else {
+          promise.reject(new Exception("No device found with id " + id));
+        }
+      } catch (Exception e) {
+        promise.reject(new Exception("Unable to connect to device"));
+        Log.e(TAG, "Unable to connect to device", e);
+        onError(e);
       }
     } else {
       promise.reject(new Exception("BluetoothAdapter is not enabled"));
