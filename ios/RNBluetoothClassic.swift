@@ -189,7 +189,7 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
         let msg: String = "requestEnabled is not implemented on IOS"
-        reject("error", msg, NSError())
+        reject("error", msg, nil)
     }
     
     /**
@@ -248,7 +248,7 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
         let msg: String = "discoverDevices is not implemented on IOS"
-        reject("error", msg, NSError())
+        reject("error", msg, nil)
     }
     
     /**
@@ -264,7 +264,7 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
         let msg: String = "cancelDiscovery is not implemented on IOS"
-        reject("error", msg, NSError())
+        reject("error", msg, nil)
     }
     
     /**
@@ -283,7 +283,7 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
         let msg: String = "pairDevice is not implemented on IOS"
-        reject("error", msg, NSError())
+        reject("error", msg, nil)
     }
     
     /**
@@ -301,7 +301,7 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
         let msg: String = "unpairDevice is not implemented on IOS"
-        reject("error", msg, NSError())
+        reject("error", msg, nil)
     }
     
     /**
@@ -346,7 +346,7 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
                 resolve(peripheral?.asDictionary())
             }
         } else {
-            reject("error", "Unable to connect to device ${deviceId}", NSError())
+            reject("error", "Unable to connect to device", nil)
         }
     }
     
@@ -384,11 +384,11 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
     @objc
     func isConnected(_ resolve: RCTPromiseResolveBlock,
                      rejecter reject: RCTPromiseRejectBlock) -> Void {
-        NSLog("(RNBluetoothClassic:isCOnnected) isConnected %@", peripheral?.accessory.name ?? "nil")
+        NSLog("(RNBluetoothClassic:isConnected) isConnected %@", peripheral?.accessory.name ?? "nil")
         if let connected = peripheral {
             resolve(connected.accessory.isConnected)
         } else {
-            reject("error","There is no device currently connected", NSError())
+            resolve(false)
         }
     }
     
@@ -403,8 +403,9 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
         NSLog("(RNBluetoothClassic:getConnectedDevice) Determine whether %@ is connected", peripheral?.accessory.name ?? "nil")
         if peripheral != nil {
             resolve(peripheral?.asDictionary())
+        } else {
+            reject("error", "No bluetooth device connected", nil)
         }
-        reject("error", "No bluetooth device connected", NSError())
     }
     
     /**
@@ -424,7 +425,7 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
             currentDevice.writeToDevice(String(data: decoded, encoding: .utf8)!)
             resolve(true)
         } else {
-            reject("error", "Not currently connected to a device", NSError())
+            reject("error", "Not currently connected to a device", nil)
         }
     }
     
@@ -500,7 +501,7 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
         let msg: String = "setAdapterName is not implemented on IOS"
-        reject("error", msg, NSError())
+        reject("error", msg, nil)
     }
     
     /**
