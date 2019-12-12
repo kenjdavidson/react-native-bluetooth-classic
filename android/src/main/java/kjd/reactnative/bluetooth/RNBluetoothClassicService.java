@@ -3,8 +3,10 @@ package kjd.reactnative.bluetooth;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.bluetooth.BluetoothServerSocket;
 import android.util.Log;
 
+import java.io.*;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
@@ -36,6 +38,11 @@ public class RNBluetoothClassicService {
      * Thread responsible for connecting to a new device
      */
     private ConnectThread mConnectThread;
+
+    /**
+     * Thread responsible for acepting connection
+     */
+    private AcceptThread mAcceptThread;
 
     /**
      * Communication thread takes over once ConnectThread has successfully handed off.
@@ -97,6 +104,23 @@ public class RNBluetoothClassicService {
         // Unsure about whether to set device while just connecting
         setState(DeviceState.CONNECTING, null);
     }
+
+
+    /**
+     * Start the AcceptThread to wait for a connection from a remote device.
+     *
+     *
+     */
+
+    synchronized void listen() {
+        if (D) Log.d(TAG, "Start listening:");
+
+        // Start the thread to listen for connection attempts
+        mAcceptThread = new AcceptThread();
+        mAcceptThread.start();
+    }
+
+
 
     /**
      * Check whether service is connected to device
@@ -307,6 +331,70 @@ public class RNBluetoothClassicService {
             }
         }
     }
+
+    /**
+         * CUSTOM Accept THREAD
+         *
+         * 
+         */
+
+    private class AcceptThread extends Thread {
+    private final BluetoothServerSocket mmServerSocket;
+
+    public AcceptThread() {
+        // Use a temporary object that is later assigned to mmServerSocket
+        // because mmServerSocket is final.
+        BluetoothServerSocket tmp = null;
+        try {
+            // MY_UUID is the app's UUID string, also used by the client code.
+            tmp = mAdapter.listenUsingRfcommWithServiceRecord("Test", UUID_SPP);
+        } catch (IOException e) {
+            Log.e(TAG, "Socket's listen() method failed", e);
+            mModule.onError(e);
+        }
+        mmServerSocket = tmp;
+    }
+
+    public void run() {
+        BluetoothSocket socket = null;
+        BluetoothDevice device = null;
+        // Keep listening until exception occurs or a socket is returned.
+        while (true) {
+            try {
+                socket = mmServerSocket.accept();
+            } catch (IOException e) {
+                Log.e(TAG, "Socket's accept() method failed", e);
+                mModule.onError(e);
+                break;
+            }
+
+            if (socket != null) {
+                // A connection was accepted. Perform work associated with
+                // the connection in a separate thread.
+                device = socket.getRemoteDevice();
+                connectionSuccess(socket, device);
+                try {
+                    mmServerSocket.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "Could not close the connect socket", e);
+                    mModule.onError(e);
+                    }
+                break;
+            }
+        }
+    }
+
+    // Closes the connect socket and causes the thread to finish.
+    public void cancel() {
+        try {
+            mmServerSocket.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Could not close the connect socket", e);
+            mModule.onError(e);
+        }
+    }
+}
+
 
     /**
      * ConnectedThread runs throughout a device connection/registration.  It's responsible for
