@@ -4,14 +4,14 @@ Pod::Spec.new do |s|
   s.version      = "1.0.0"
   s.summary      = "RNBluetoothClassic"
   s.description  = <<-DESC
-                  RNBluetoothClassic
+                  Bluetooth classic support for React Native iOS through the External Accessory library.
                    DESC
   s.homepage     = ""
   s.license      = "MIT"
-  # s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
-  s.author             = { "author" => "author@domain.cn" }
+  s.license      = { :type => "MIT", :file => "LICENSE" }
+  s.author       = { "author" => "ken.j.davidson@live.ca" }
   s.platform     = :ios, "7.0"
-  s.source       = { :git => "https://github.com/author/RNBluetoothClassic.git", :tag => "master" }
+  s.source       = { :git => "https://github.com/kenjdavidson/react-native-bluetooth-classic.git", :tag => "master" }
   s.source_files  = "RNBluetoothClassic/**/*.{h,m}"
   s.requires_arc = true
 

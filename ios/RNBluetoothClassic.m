@@ -29,7 +29,7 @@ RCT_EXTERN_METHOD(connect: (NSString)deviceId
 RCT_EXTERN_METHOD(disconnect: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(isConnected: (RCTPRomiseResolveBlock)resolve
+RCT_EXTERN_METHOD(isConnected: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(getConnectedDevice: (RCTPromiseResolveBlock)resolve
