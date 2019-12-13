@@ -684,7 +684,11 @@ public class RNBluetoothClassicModule
     if (mConnectedPromise != null) {
       mConnectedPromise.resolve(deviceToWritableMap(device));
     }
+    if (mListeningPromise != null) {
+      mListeningPromise.resolve(deviceToWritableMap(device));
+    }
     mConnectedPromise = null;
+    mListeningPromise = null;
   }
 
   /**
@@ -701,7 +705,11 @@ public class RNBluetoothClassicModule
     if (mConnectedPromise != null) {
       mConnectedPromise.reject(new Exception("Connection unsuccessful"), deviceToWritableMap(device));
     }
+    if (mListeningPromise != null) {
+      mListeningPromise.reject(new Exception("Error while listening for connections"));
+    }
     mConnectedPromise = null;
+    mListeningPromise = null;
   }
 
   /**
