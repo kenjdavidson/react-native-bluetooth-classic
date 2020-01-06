@@ -12,6 +12,7 @@ Since there seem to be some breaking changes introduced within React Native 0.60
 | Version | React Native | Confirmed | Known Issues |
 | --- | --- | --- | --- |
 | 0.9.x | 0.41.2 | :white_check_mark: | N/A |
+| 0.10.x | 0.60.0 | N/A | N/A |
 
 ## Getting started
 
@@ -44,6 +45,10 @@ install-local -S ../react-native-bluetooth-classic
 If installing locally, you'll need to perform the local install after each subsequent react-native link.  Just be aware of that, if you run react-native link on any future packages, you'll find that the Android project becomes uncompilable (just run the install local command again).
 
 `$ react-native link react-native-bluetooth-classic`
+
+#### IOS 
+
+Library has been updated to support 0.60.0 Podspec standard install, thanks to [iamandiradu](https://github.com/iamandiradu)
 
 ### Manual installation
 
