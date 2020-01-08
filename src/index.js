@@ -1,25 +1,11 @@
 
-import { Platform, NativeModules, DeviceEventEmitter, NativeEventEmitter } from 'react-native';
+import {
+  Platform,
+  NativeModules,
+  DeviceEventEmitter,
+  NativeEventEmitter
+} from 'react-native';
 import { Buffer } from 'buffer';
-
-/**
- * Simulates the EmitterSubscription for Android, allowing the same functionality to be used without
- * worrying about Platform.  I need to review a little more, and see if Android actually does this
- * by default now, but it seems to be working.  In both cases, the usage is:
- * 
- * this.subscription = RNBluetoothClassic.addListener(eventName, handler, this);
- * this.subscription.remove();  // when complete
- */
-class DeviceEventSubscription {
-  constructor(eventName, handler) {
-    this.eventName = eventName;
-    this.handler = handler;
-
-    DeviceEventEmitter.addListener(eventName, handler);
-  }
-
-  remove = () => DeviceEventEmitter.removeListener(this.eventName, this.handler);
-}
 
 /**
  * Combines some common functionality between NativeEventEmitter and DeviceEventEmitter for
@@ -59,7 +45,7 @@ class RNBluetoothClassic extends NativeEventEmitter {
     this.clear = nativeModule.clear;
 
     this.setDelimiter = nativeModule.setDelimiter;
-    this.setEncoding = nativeModule.setEncoding;    
+    this.setEncoding = nativeModule.setEncoding;
   }
 
   /**
@@ -72,11 +58,7 @@ class RNBluetoothClassic extends NativeEventEmitter {
    * @param {object} context optional context object of the listener
    */
   addListener = (eventName, handler, context) => {
-    if (Platform.OS === 'ios') {
-      return super.addListener(eventName, handler, context);
-    } else {      
-      return new DeviceEventSubscription(eventName, handler);
-    }
+    return super.addListener(eventName, handler, context);
   }
 
   /**
@@ -85,12 +67,8 @@ class RNBluetoothClassic extends NativeEventEmitter {
    * @param {string} eventName which will have all it's listeners removed
    */
   removeAllListeners = (eventName) => {
-    if (Platform.OS === 'ios') {
-      super.removeAllListeners(eventName);
-    } else {      
-      DeviceEventEmitter.removeAllListeners(eventName);      
-    }
-  } 
+    super.removeAllListeners(eventName);
+  }
 
   /**
    * Write data to the device.  Eventually this will be updated to accept data and type, 
@@ -110,8 +88,22 @@ class RNBluetoothClassic extends NativeEventEmitter {
   }
 }
 
-export const BTEvents = Platform.OS === 'ios' 
-    ? NativeModules.RNBluetoothClassic.BTEvents // .getConstants() should actually work here
-    : NativeModules.RNBluetoothClassic.getConstants().BTEvents;   
- 
+/**
+ * BTEvents were previously provided by the RNBluetoothClassic getConstants().  They've been
+ * moved here to allow for intellisense to pick them up.  This way there is no difference
+ * between IOS and Android with regards to the available events (React Native side) as they
+ * still need to be managed on the Native side using RCTEventEmitter#supportedEvents()
+ */
+export const BTEvents = {
+  BLUETOOTH_ENABLED: "bluetoothEnabled",
+  BLUETOOTH_DISABLED: "bluetoothDisabled",
+  BLUETOOTH_CONNECTED: "bluetoothConnected",
+  BLUETOOTH_DISCONNECTED: "bluetoothDisconnected",
+  CONNECTION_SUCCESS: "connectionSuccess",
+  CONNECTION_FAILED: "connectionFailed",
+  CONNECTION_LOST: "connectionLost",
+  READ: "read",
+  ERROR: "error"
+};
+
 export default new RNBluetoothClassic(NativeModules.RNBluetoothClassic);

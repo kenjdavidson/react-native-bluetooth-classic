@@ -11,7 +11,7 @@ Since there seem to be some breaking changes introduced within React Native 0.60
 
 | Version | React Native | Confirmed | Known Issues |
 | --- | --- | --- | --- |
-| 0.9.x | 0.41.2 | :white_check_mark: | N/A |
+| 0.9.x | 0.59.9 | :white_check_mark: | N/A |
 
 ## Getting started
 
