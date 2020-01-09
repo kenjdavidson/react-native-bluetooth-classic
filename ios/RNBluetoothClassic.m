@@ -45,7 +45,10 @@ RCT_EXTERN_METHOD(readUntilDelimiter: (NSString)until
 
 RCT_EXTERN_METHOD(readFromDevice: (RCTPromiseResolveBlock)resolve)
 
-RCT_EXTERN_METHOD(isAvailable: (RCTPromiseResolveBlock)resolve)
+RCT_EXTERN_METHOD(available: (RCTPromiseResolveBlock)resolve)
+
+RCT_EXTERN_METHOD(setReadObserving: (Bool)readObserving
+                  resolver: (RCTPromiseResolveBlock)resolve)
 
 // Helpers
 RCT_EXTERN_METHOD(clear: (RCTPromiseResolveBlock)resolve)

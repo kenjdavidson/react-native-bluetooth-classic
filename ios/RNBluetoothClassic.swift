@@ -30,7 +30,7 @@ import CoreBluetooth
  data is done in Javascript/client rather than in the module.
  */
 @objc(RNBluetoothClassic)
-class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
+class RNBluetoothClassic : RCTEventEmitter {
     
     let eaManager: EAAccessoryManager
     let cbCentral: CBCentralManager
@@ -39,6 +39,7 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
     
     var peripheral:BluetoothDevice?
     var delimiter:String
+    var readObserving:Bool
     
     /**
      Initialize the RNBluetoothClassic.
@@ -49,7 +50,9 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
         self.notificationCenter = NotificationCenter.default
         self.supportedProtocols = Bundle.main
             .object(forInfoDictionaryKey: "UISupportedExternalAccessoryProtocols") as! [String]
+        
         self.delimiter = "\n"
+        self.readObserving = false;
         
         super.init()
         
@@ -148,32 +151,6 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
      */
     override func supportedEvents() -> [String] {
         return BTEvent.asArray()
-    }
-    
-    /**
-     BluetoothReceivedDelegate -
-     Loop through the received data looking for all instances of the provided delimiter and firing an
-     onRead event for each one.
-     */
-    func onReceivedData(fromDevice: BluetoothDevice, receivedData: Data) -> Data {
-        if let data = String(data: receivedData, encoding: .utf8) {
-            let indexes = data.indexes(of: delimiter)
-            var startIndex = data.startIndex
-            
-            for index in indexes {
-                let message = String(data[startIndex..<index])
-                
-                NSLog("(RNBluetoothClassic:onReceiveData) Sending READ with data: %@", message)
-                let bluetoothMessage:BluetoothMessage = BluetoothMessage<String>(fromDevice: fromDevice, data: message)
-                sendEvent(withName: BTEvent.READ.rawValue, body: bluetoothMessage.asDictionary())
-                
-                startIndex = data.index(after: index)
-            }
-            
-            return data[startIndex...].data(using: .utf8) ?? Data()
-        }
-        
-        return receivedData
     }
     
     /**
@@ -486,8 +463,19 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
      - parameter _: resolve with the availabel data size
      */
     @objc
-    func isAvailable(_ resolve: RCTPromiseResolveBlock) {
+    func available(_ resolve: RCTPromiseResolveBlock) {
         resolve(peripheral?.hasBytesAvailable() ?? false)
+    }
+    
+    /**
+     Allows React Native to inform RNBluetoothClassic whether there are active READ listeners.  The current implementation
+     of RCTEventEmitter only allows for basic actions to be taken when a listener is added (by name) but sadly not when it's
+     removed.  It only keeps track of the number of listeners, with no regard for types.   It would be better to extend
+     RCTEventEmitter and add the applicable functions, but this will work for now.
+     */
+    @objc
+    func setReadObserving(_ readObserving: Bool, resolver resolve: RCTPromiseResolveBlock) {
+        self.readObserving = readObserving
     }
     
     /**
@@ -520,3 +508,37 @@ class RNBluetoothClassic : RCTEventEmitter, BluetoothRecievedDelegate {
     
 }
 
+// MARK: BluetoothReceivedDelegate implementation
+
+extension RNBluetoothClassic : BluetoothDataReceivedDelegate {
+    
+    /**
+     Determine whether React Native is observing read events, if so created the appropriate object and send the event
+     to React Native.
+     */
+    func onReceivedData(fromDevice: BluetoothDevice, receivedData: Data) -> Data {
+        guard readObserving else {
+            return receivedData;
+        }
+        
+        // There are Read Listeners, we can send the request.
+        if let data = String(data: receivedData, encoding: .utf8) {
+            let indexes = data.indexes(of: delimiter)
+            var startIndex = data.startIndex
+            
+            for index in indexes {
+                let message = String(data[startIndex..<index])
+                
+                NSLog("(RNBluetoothClassic:onReceiveData) Sending READ with data: %@", message)
+                let bluetoothMessage:BluetoothMessage = BluetoothMessage<String>(fromDevice: fromDevice, data: message)
+                sendEvent(withName: BTEvent.READ.rawValue, body: bluetoothMessage.asDictionary())
+                
+                startIndex = data.index(after: index)
+            }
+            
+            return data[startIndex...].data(using: .utf8) ?? Data()
+        }
+        
+        return receivedData
+    }
+}
