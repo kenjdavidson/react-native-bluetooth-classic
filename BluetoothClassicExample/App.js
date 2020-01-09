@@ -60,12 +60,32 @@ class DeviceConnection extends React.Component {
 
   componentWillMount() {     
     this.onRead = RNBluetoothClassic.addListener(BTEvents.READ, this.handleRead, this);
+    //this.poll = setInterval(() => this.pollForData(), 3000);
   }
 
   componentWillUnmount() {
     this.onRead.remove();
+    //clearInterval(this.poll);
 
     RNBluetoothClassic.disconnect();    
+  }
+
+  pollForData = async () => {
+    var available = 0;
+
+    do {
+      console.log('Checking for available data');
+      available = await RNBluetoothClassic.available();
+      console.log(`There are ${available} bytes of data available`);
+
+      if (available > 0) {
+        console.log(`Attempting to read the next message from the device`);
+        const data = await RNBluetoothClassic.readFromDevice();
+
+        console.log(data);
+        this.handleRead({data});
+      }
+    } while (available > 0);
   }
 
   handleRead = (data) => {

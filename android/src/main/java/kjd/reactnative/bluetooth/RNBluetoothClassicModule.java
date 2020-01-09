@@ -24,6 +24,7 @@ import com.facebook.react.bridge.WritableMap;
 
 import java.lang.reflect.Method;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import kjd.reactnative.RCTEventEmitter;
 
@@ -82,7 +83,7 @@ public class RNBluetoothClassicModule
   private final BroadcastReceiver mBluetoothConnectionReceiver = new BluetoothConnectionReceiver(this);
 
   /**
-   * Delimeter used while reading.  It's possible the buffer may contain more than a single message
+   * Delimiter used while reading.  It's possible the buffer may contain more than a single message
    * when this occurs, the specified mDelimiter will be used to split, and cause multiple read
    * events.  With manual reading, the last instance of the mDelimiter will be used.  For example
    * if sending the command {@code ri} to retrieve the Reader Information, then a number of lines
@@ -91,6 +92,12 @@ public class RNBluetoothClassicModule
    * Defaults to "\n"
    */
   private String mDelimiter;
+
+  /**
+   * Whether there are BTEvent.READ listeners on the NativeEventEmitter.js side of things.  This
+   * will control whether the onData method passes through to NativeEventEmitter.js
+   */
+  private AtomicBoolean mReadObserving = new AtomicBoolean(false);
 
   /**
    * Used to read/write data from the Connected bluetooth device.
@@ -549,6 +556,19 @@ public class RNBluetoothClassicModule
   }
 
   /**
+   * Configures whether or not we are Observing read events.  Would have liked to use start/stop
+   * Observing, but that would require overriding both Android and IOS, as well as possibly
+   * affecting future functionality.
+   *
+   * @param
+   */
+  @ReactMethod
+  public void setReadObserving(boolean readObserving, Promise promise) {
+    this.mReadObserving.set(readObserving);
+    promise.resolve(true);
+  }
+
+  /**
    * Sets a new delimiter.
    *
    * @param delimiter the new delimiter to be used for parsing buffer
@@ -572,7 +592,9 @@ public class RNBluetoothClassicModule
   }
 
   /**
-   * Gets the available information within the buffer.
+   * Gets the available information within the buffer.  There is no concept of the delimiter in
+   * this request - which may need to be changed - since in most cases I can see a full message
+   * needing to be available.
    *
    * @param promise resolves with length of buffer, could be 0
    */
@@ -580,7 +602,6 @@ public class RNBluetoothClassicModule
   public void available(Promise promise) {
     promise.resolve(mBuffer.length());
   }
-
 
   /**
    * Attempts to set the BluetoothAdapter name.
@@ -671,9 +692,13 @@ public class RNBluetoothClassicModule
    * @param data Message
    */
   void onData (String data) {
-    if (D) Log.d(TAG, String.format("Data received [%s]", data));
-
+    Log.d(TAG, String.format("Data received from device [%s]", data));
     mBuffer.append(data);
+
+    if (!mReadObserving.get()) {
+      Log.d(TAG, "No BTEvent.READ listeners are registered, skipping handling of the event");
+      return;
+    }
 
     String message = null;
     while ((message = readUntil(this.mDelimiter)) != null) {

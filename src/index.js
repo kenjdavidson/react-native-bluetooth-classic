@@ -22,7 +22,9 @@ class RNBluetoothClassic extends NativeEventEmitter {
   constructor(nativeModule) {
     super(nativeModule)
 
-    if (Platform.OS === 'android') this._nativeModule = nativeModule;
+    // Set the _nativeModule for Android, which isn't actually done in NativeEventEmitter
+    if (Platform.OS === 'android') 
+      this._nativeModule = nativeModule;
 
     this.setAdapterName = nativeModule.setAdapterName;
     this.requestEnable = nativeModule.requestEnable;
@@ -58,7 +60,9 @@ class RNBluetoothClassic extends NativeEventEmitter {
    * @param {object} context optional context object of the listener
    */
   addListener = (eventName, handler, context) => {
-    return super.addListener(eventName, handler, context);
+    let subscriber = super.addListener(eventName, handler, context);
+    this.applyReadListeners();
+    return subscriber;
   }
 
   /**
@@ -68,6 +72,27 @@ class RNBluetoothClassic extends NativeEventEmitter {
    */
   removeAllListeners = (eventName) => {
     super.removeAllListeners(eventName);
+    this.applyReadListeners();
+  }
+
+  /**
+   * Remove the subscription - this is actually called from subscription.remove()
+   * and provides a way for determining if we have any BTEvents.READ event still.
+   * 
+   * @param {Subscription} subscription the subscription to be removed
+   */
+  removeSubscription = (subscription) => {
+    super.removeSubscription(subscription);
+    this.applyReadListeners();
+  }
+
+  /**
+   * Determines if there are any READ Listeners.  If there are any listeners, then 
+   * the RNBluetoothClassicModule needs to know that it should continue to send data.
+   */
+  applyReadListeners = () => {
+    let count = this.listeners(BTEvents.READ).length;
+    this._nativeModule.setReadObserving(0 < count);  
   }
 
   /**
