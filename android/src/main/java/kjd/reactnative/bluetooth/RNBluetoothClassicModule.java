@@ -546,13 +546,15 @@ public class RNBluetoothClassicModule
   }
 
   /**
-   * Attempts to read from the device buffer - using the registered delimiter.
+   * Sets a new delimiter.
    *
-   * @param promise resolves with data, could be null or 0 length
+   * @param delimiter the new delimiter to be used for parsing buffer
+   * @param promise resolves true
    */
   @ReactMethod
-  public void readUntilDelimiter(Promise promise) {
-    promise.resolve(readUntil(mDelimiter));
+  public void setDelimiter(String delimiter, Promise promise) {
+    this.mDelimiter = delimiter;
+    promise.resolve(true);
   }
 
   /**
@@ -565,18 +567,6 @@ public class RNBluetoothClassicModule
   @ReactMethod
   public void setReadObserving(boolean readObserving, Promise promise) {
     this.mReadObserving.set(readObserving);
-    promise.resolve(true);
-  }
-
-  /**
-   * Sets a new delimiter.
-   *
-   * @param delimiter the new delimiter to be used for parsing buffer
-   * @param promise resolves true
-   */
-  @ReactMethod
-  public void setDelimiter(String delimiter, Promise promise) {
-    this.mDelimiter = delimiter;
     promise.resolve(true);
   }
 

@@ -50,3 +50,5 @@ buck-out/
 .vscode/
 .project
 .classpath
+android/.classpath
+android/.project

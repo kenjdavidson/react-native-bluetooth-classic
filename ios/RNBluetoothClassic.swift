@@ -409,23 +409,27 @@ class RNBluetoothClassic : RCTEventEmitter {
     /**
      Attempts to read all of the data from the buffer, ignoring the delimiter.  If no
      data is in the buffer, an empty String will be returned.
-     - parameter _: resolve with the available data
+     - parameter _: resolve with the available data, data can be empty if there is nothing there.
+     - parameter rejecter: reject if there are any issues
      */
     @objc
-    func readFromDevice(_ resolve: RCTPromiseResolveBlock) -> Void {
-        resolve(peripheral?.readFromDevice())
+    func readFromDevice(_ resolve: RCTPromiseResolveBlock,
+            rejecter reject: RCTPromiseRejectBlock) -> Void {
+        resolve(peripheral?.readFromDevice() ?? "")
     }
     
     /**
      Attempts to read the buffer any/all data up to the delimiter.  If the delimiter is
      not found then then this simulates readFromDevice.
      - parameter until: the delimiter in which to read up to
-     - parameter resolve: resolve with the available data
+     - parameter resolver: resolve with the available data
+     - parameter rejecter: reject the read if no available data
      */
     @objc
     func readUntilDelmiter(
         _ delimiter: String,
-        resolver resolve: RCTPromiseResolveBlock
+        resolver resolve: RCTPromiseResolveBlock,
+        rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
         resolve(readUntil(delimiter))
     }
@@ -434,11 +438,13 @@ class RNBluetoothClassic : RCTEventEmitter {
      Sets a new delimiter used for default reading
      - parameter _: the delimiter
      - parameter resolver: resolves the set delmiter
+     - parameter rejecter: delimiter cannot be set for whatever reason
      */
     @objc
     func setDelimiter(
         _ delimiter: String,
-        resolver resolve: RCTPromiseResolveBlock
+        resolver resolve: RCTPromiseResolveBlock,
+        rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
         self.delimiter = delimiter
         resolve(true)
@@ -449,7 +455,8 @@ class RNBluetoothClassic : RCTEventEmitter {
      - parameter _: resolves when clear is complete
      */
     @objc
-    func clear(_ resolve: RCTPromiseResolveBlock) {
+    func clear(_ resolve: RCTPromiseResolveBlock,
+               rejecter reject: RCTPromiseRejectBlock) {
         if let currentDevice = peripheral {
             currentDevice.clear()
         }
@@ -461,10 +468,18 @@ class RNBluetoothClassic : RCTEventEmitter {
      buffer length, with no regard for the delimiter.  Should possibly add in
      a delimiter value.
      - parameter _: resolve with the availabel data size
+     - parameter rejecter: reject if there there is no data available
      */
     @objc
-    func available(_ resolve: RCTPromiseResolveBlock) {
-        resolve(peripheral?.hasBytesAvailable() ?? false)
+    func available(_ resolve: RCTPromiseResolveBlock,
+                rejecter reject: RCTPromiseRejectBlock) {
+        guard let p = peripheral else {
+            let msg: String = "There is no currently connected devices from which to read data"
+            reject("error", msg, nil)
+            return
+        }
+        
+        resolve(p.bytesAvailable())
     }
     
     /**
@@ -472,10 +487,16 @@ class RNBluetoothClassic : RCTEventEmitter {
      of RCTEventEmitter only allows for basic actions to be taken when a listener is added (by name) but sadly not when it's
      removed.  It only keeps track of the number of listeners, with no regard for types.   It would be better to extend
      RCTEventEmitter and add the applicable functions, but this will work for now.
+     - parameter readObserving: whether React Native is observing READ
+     - parameter resolver: resolve when set
+     - parameter rejecter: reject incase something happens
      */
     @objc
-    func setReadObserving(_ readObserving: Bool, resolver resolve: RCTPromiseResolveBlock) {
+    func setReadObserving(_ readObserving: Bool,
+                          resolver resolve: RCTPromiseResolveBlock,
+                          rejecter reject: RCTPromiseRejectBlock) {
         self.readObserving = readObserving
+        resolve(self.readObserving)
     }
     
     /**

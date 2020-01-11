@@ -157,15 +157,16 @@ class BluetoothDevice: NSObject, StreamDelegate {
     }
     
     /**
-     Delegate for EASession.InputStream.hasBytesAvailable - although generally won't be
-     used while the StreamDelegate is running.
+     Determine the number of Bytes currently available on the inBuffer.  This data is available for reading - the initial
+     delegate for the input stream made no sense, as the input data was always moved to the inBuffer regardless
+     of whether there was a reading.
      
      - returns: true when bytes are available
      */
     @objc
-    func hasBytesAvailable() -> Bool {
+    func bytesAvailable() -> Int {
         NSLog("(BluetoothDevice:hasBytesAvailable) Checking for available bytes on devices %@", accessory.serialNumber)
-        return session?.inputStream!.hasBytesAvailable ?? false
+        return inBuffer.count
     }
     
     /**
