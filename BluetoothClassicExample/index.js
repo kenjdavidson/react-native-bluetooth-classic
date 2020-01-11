@@ -1,5 +1,5 @@
 /**
- * @format
+ * Bootstrap the React Native application.
  */
 
 import {AppRegistry} from 'react-native';

@@ -12,7 +12,9 @@ import com.facebook.react.uimanager.ViewManager;
 import com.facebook.react.bridge.JavaScriptModule;
 
 /**
- * Registers the RNBluetoothClassicModule with ReactNative.
+ * Registers the RNBluetoothClassicModule with ReactNative.  The package is used to configure the
+ * module, currently it takes no input and passes through the
+ * {@link com.facebook.react.bridge.ReactContext}.
  * <p>
  * There are no ViewManagers provided with this Module.
  *

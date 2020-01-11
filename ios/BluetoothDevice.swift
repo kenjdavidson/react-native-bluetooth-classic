@@ -15,7 +15,7 @@ import ExternalAccessory
  inBuffer:Data - is responsible for using how it wishes - then returning the remaining
  Data which will replace the current inBuffer.
  */
-protocol BluetoothRecievedDelegate {
+protocol BluetoothDataReceivedDelegate {
     
     /**
      Bluetooth data has been received, allow the delegate to manage that data in it's
@@ -53,7 +53,7 @@ class BluetoothDevice: NSObject, StreamDelegate {
     private var maxBytesPerSend:Int = MAX_BYTES_PER_SEND
     private var maxBytesPerReceive:Int = MAX_BYTES_PER_RECEIVE
 
-    var receivedDelegate:BluetoothRecievedDelegate?
+    var receivedDelegate:BluetoothDataReceivedDelegate?
     
     /**
      Initialize the BluetoothDevice with an EAAccessory.
@@ -157,15 +157,16 @@ class BluetoothDevice: NSObject, StreamDelegate {
     }
     
     /**
-     Delegate for EASession.InputStream.hasBytesAvailable - although generally won't be
-     used while the StreamDelegate is running.
+     Determine the number of Bytes currently available on the inBuffer.  This data is available for reading - the initial
+     delegate for the input stream made no sense, as the input data was always moved to the inBuffer regardless
+     of whether there was a reading.
      
      - returns: true when bytes are available
      */
     @objc
-    func hasBytesAvailable() -> Bool {
+    func bytesAvailable() -> Int {
         NSLog("(BluetoothDevice:hasBytesAvailable) Checking for available bytes on devices %@", accessory.serialNumber)
-        return session?.inputStream!.hasBytesAvailable ?? false
+        return inBuffer.count
     }
     
     /**
