@@ -11,7 +11,7 @@ import { Platform,
   StatusBar,
   KeyboardAvoidingView
 } from 'react-native';
-import RNBluetoothClassic, { BTEvents } from '@kenjdavidson/react-native-bluetooth-classic';
+import RNBluetoothClassic, { BTEvents, BTCharsets } from '@kenjdavidson/react-native-bluetooth-classic';
 import Toast, { DURATION } from 'react-native-easy-toast'
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 
@@ -128,7 +128,7 @@ class DeviceConnection extends React.Component {
               <View id={item.timestamp.toISOString()} style={{flexDirection:'row', justifyContent:'flex-start'}}>
                 <Text>{formatDate(item.timestamp)}</Text>
                 <Text>{item.type === 'sent' ? ' < ' : ' > '}</Text>
-                <Text>{item.data.trim()}</Text>
+                <Text style={{ flexShrink: 1 }}>{item.data.trim()}</Text>
               </View>)}>
           </FlatList>
           <View style={[styles.horizontalContainer, {backgroundColor: '#ccc'}]}>
@@ -165,24 +165,40 @@ export default class App extends React.Component {
   componentWillMount() {     
     this.initialize();
 
+    this.subs = [];
+
     // Re-initialize whenever a Bluetooth event occurs
-    this.connectedSub = RNBluetoothClassic.addListener(BTEvents.BLUETOOTH_CONNECTED, 
-        (device) => this.onConnected(device), this);
-    this.disconnectedSun = RNBluetoothClassic.addListener(BTEvents.BLUETOOTH_DISCONNECTED, 
-        (device) => this.onDisconnected(device), this);
+    this.subs.push(RNBluetoothClassic.addListener(BTEvents.BLUETOOTH_CONNECTED, 
+        (device) => this.onConnected(device), this));
+    this.subs.push(RNBluetoothClassic.addListener(BTEvents.BLUETOOTH_DISCONNECTED, 
+        (device) => this.onDisconnected(device), this));
+    this.subs.push(RNBluetoothClassic.addListener(BTEvents.CONNECTION_LOST,
+        (error) => this.onConnectionLost(error), this));
+    this.subs.push(RNBluetoothClassic.addListener(BTEvents.ERROR,
+        (error) => this.onError(error), this))
   }
 
   componentWillUnmount() {
-    this.connectedSub.remove();
-    this.disconnectedSun.remove();
+    this.subs.forEach( sub => sub.remove() );
   }
 
   onConnected(device) {
+    this.refs.toast.show(`Connected to ${device.name}`, DURATION.LENGTH_SHORT);
     this.initialize();
   }
 
   onDisconnected(device) {
+    this.refs.toast.show(`Connection to ${device.name} was disconnected`, DURATION.LENGTH_SHORT);
     this.initialize();
+  }
+
+  onConnectionLost(error) {
+    this.refs.toast.show(`Connection to ${error.device.name} was lost`, DURATION.LENGTH_SHORT);
+    this.initialize();
+  }
+
+  onError(error) {
+    this.refs.toast.show(`${error.message}`, DURATION.LENGTH_SHORT);
   }
 
   async initialize() {
@@ -219,6 +235,7 @@ export default class App extends React.Component {
   async connectToDevice(device) {
     console.log(`Attempting connection to device ${device.id}`);
     try {
+      await RNBluetoothClassic.setEncoding(BTCharsets.ASCII);
       let connectedDevice = await RNBluetoothClassic.connect(device.id);
       this.setState({connectedDevice});
       this.refs.toast.close();

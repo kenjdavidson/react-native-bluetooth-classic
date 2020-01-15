@@ -7,7 +7,12 @@ import android.util.Log;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.UUID;
+
+import kjd.reactnative.CommonCharsets;
 
 /**
  * Provides the communication threads and message delivering/handling for a single connected
@@ -45,7 +50,7 @@ public class RNBluetoothClassicService {
     /**
      * Allows for communication of incoming data
      */
-    private RNBluetoothClassicModule mModule;
+    private BluetoothEventListener listener;
 
     /**
      * Current connection state
@@ -53,36 +58,29 @@ public class RNBluetoothClassicService {
     private DeviceState mState;
 
     /**
-     * Character set used for communications.
+     * The Android {@link BluetoothDevice} to which this service is communicating.
      */
-    private final String mCharSet;
-
     private BluetoothDevice mDevice;
 
     /**
      * Constructor. Prepares a new RNBluetoothClassicService session.
      *
-     * @param module which is responsible for handling communication
+     * @param listener data received listener
      */
-    RNBluetoothClassicService(RNBluetoothClassicModule module, String charSet) {
+    RNBluetoothClassicService(BluetoothEventListener listener) {
         this.mAdapter = BluetoothAdapter.getDefaultAdapter();
         this.mState = DeviceState.DISCONNECTED;
-        this.mModule = module;
-        this.mCharSet = charSet;
+        this.listener = listener;
         this.mDevice = null;
-    }
-
-    RNBluetoothClassicService(RNBluetoothClassicModule module) {
-        this(module, "ISO-8859-1");
     }
 
     /**
      * Start the ConnectThread to initiate a connection to a remote device.
      *
-     * @param device the Bluetooth device to which the connection will be made
+     * @param device {@link BluetoothDevice} to which we are connecting.
      */
     synchronized void connect(BluetoothDevice device) {
-        if (D) Log.d(TAG, "Connect to: " + device);
+        if (D) Log.d(TAG, String.format("Connecting to %s", device.getName()));
 
         if (DeviceState.CONNECTING.equals(mState)) {
             cancelConnectThread(); // Cancel any thread attempting to make a connection
@@ -180,7 +178,7 @@ public class RNBluetoothClassicService {
         mConnectedThread = new ConnectedThread(device, socket);
         mConnectedThread.start();
 
-        mModule.onConnectionSuccess(device);
+        listener.onConnectionSuccess(device);
         setState(DeviceState.CONNECTED, device);
     }
 
@@ -190,16 +188,16 @@ public class RNBluetoothClassicService {
      *
      * @param device to which the connection was attempted
      */
-    private void connectionFailed(BluetoothDevice device) {
-        mModule.onConnectionFailed(device); // Send a failure message
+    private void connectionFailed(BluetoothDevice device, Throwable e) {
+        listener.onConnectionFailed(device, e); // Send a failure message
         RNBluetoothClassicService.this.stop(); // Start the service over to restart listening mode
     }
 
     /**
      * Indicate that the connection was lost and notify the UI Activity.
      */
-    private void connectionLost(BluetoothDevice device) {
-        mModule.onConnectionLost(device);  // Send a failure message
+    private void connectionLost(BluetoothDevice device, Throwable e) {
+        listener.onConnectionLost(device, e);  // Send a failure message
         RNBluetoothClassicService.this.stop(); // Start the service over to restart listening mode
     }
 
@@ -239,22 +237,22 @@ public class RNBluetoothClassicService {
         private final BluetoothDevice mmDevice;
 
         ConnectThread(BluetoothDevice device) {
-            mmDevice = device;
+            setName("ConnectThread");
+
+            this.mmDevice = device;
             BluetoothSocket tmp = null;
 
             // Get a BluetoothSocket for a connection with the given BluetoothDevice
             try {
                 tmp = device.createRfcommSocketToServiceRecord(UUID_SPP);
             } catch (Exception e) {
-                mModule.onError(e);
-                Log.e(TAG, "Socket create() failed", e);
+                listener.onConnectionFailed(device, e);
             }
             mmSocket = tmp;
         }
 
         public void run() {
-            if (D) Log.d(TAG, "BEGIN mConnectThread");
-            setName("ConnectThread");
+            Log.d(TAG, "BEGIN mConnectThread");
 
             // Always cancel discovery because it will slow down a connection
             mAdapter.cancelDiscovery();
@@ -262,25 +260,26 @@ public class RNBluetoothClassicService {
             // Make a connection to the BluetoothSocket
             try {
                 // This is a blocking call and will only return on a successful connection or an exception
-                if (D) Log.d(TAG,String.format("Connecting to socket %s", mmDevice.getAddress()));
+                Log.d(TAG,String.format("Connecting to socket %s", mmDevice.getAddress()));
+
                 mmSocket.connect();
-            } catch (Exception e) {
+            } catch (Exception connectException) {
                 // Some 4.1 devices have problems, try an alternative way to connect
                 // See https://github.com/don/RCTBluetoothSerialModule/issues/89
                 try {
                     Log.i(TAG,"Trying fallback...");
-                    mmSocket = (BluetoothSocket) mmDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class}).invoke(mmDevice,1);
+                    mmSocket = (BluetoothSocket)
+                            mmDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class})
+                                    .invoke(mmDevice,1);
                     mmSocket.connect();
-                } catch (Exception e2) {
-                    Log.e(TAG, "Couldn't establish a Bluetooth connection.");
+                } catch (Exception socketException) {
                     try {
                         mmSocket.close();
-                    } catch (Exception e3) {
-                        Log.e(TAG, "Unable to close() socket during connection failure", e3);
-                        mModule.onError(e3);
+                    } catch (Exception e1) {
+                        // Ignore and handle below
                     }
 
-                    connectionFailed(mmDevice);
+                    connectionFailed(mmDevice, socketException);
                     return;
                 }
             } finally {
@@ -303,7 +302,7 @@ public class RNBluetoothClassicService {
                 mmSocket.close();
             } catch (Exception e) {
                 Log.e(TAG, "close() of connect socket failed", e);
-                mModule.onError(e);
+                listener.onError(e);
             }
         }
     }
@@ -338,7 +337,7 @@ public class RNBluetoothClassicService {
                 tmpOut = socket.getOutputStream();
             } catch (Exception e) {
                 Log.e(TAG, "temp sockets not created", e);
-                mModule.onError(e);
+                listener.onError(e);
             }
 
             mmInStream = tmpIn;
@@ -357,9 +356,8 @@ public class RNBluetoothClassicService {
             while (!mmCancelled) {
                 try {
                     if (mmInStream.available() > 0) {
-                        bytes = mmInStream.read(buffer); // Read from the InputStream
-                        String data = new String(buffer, 0, bytes, mCharSet);
-                        mModule.onData(data); // Send new data to the module to handle
+                        bytes = mmInStream.read(buffer);
+                        listener.onReceivedData(mmDevice, Arrays.copyOf(buffer, bytes));
                     }
 
                     Thread.sleep(500);      // Pause
@@ -367,9 +365,7 @@ public class RNBluetoothClassicService {
                     Log.e(TAG, "Disconnected", e);
 
                     if (!mmCancelled) {
-                        // We didn't cancel the Thread so something else happened
-                        mModule.onError(e);
-                        connectionLost(mmDevice);
+                        connectionLost(mmDevice, e);
                         RNBluetoothClassicService.this.stop(); // Start the service over to restart listening mode
                     }
 
@@ -397,7 +393,7 @@ public class RNBluetoothClassicService {
                 mmOutStream.write(str.getBytes());
             } catch (Exception e) {
                 Log.e(TAG, "Exception during write", e);
-                mModule.onError(e);
+                listener.onError(e);
             }
         }
 
