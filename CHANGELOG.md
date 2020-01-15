@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.6] - 2020-01-14
+- Added `RNBluetoothClassic.setEncoding(BTCharsets)` to allow configuration of parsing prior to connection.
+- Brought a number of `sendEvent(BTEvents.ERROR, data)` into alignment between Android and IOS.  Errors should always contain the following: `error` (Dictionary | String), `message` (String) and `device` (Dictionary | WritableMap).
+
 ## [0.9.5] - 2020-01-10
 - Resolved read issues on Android and IOS to allow for both polling and READ events [22](https://github.com/kenjdavidson/react-native-bluetooth-classic/issues/24)
 - Refactored a number of IOS functions to include reject (which is required and wasn't done previously)

@@ -3,6 +3,8 @@ package com.bluetoothclassicexample;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+
+import kjd.reactnative.CommonCharsets;
 import kjd.reactnative.bluetooth.RNBluetoothClassicPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -24,7 +26,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNBluetoothClassicPackage()
+            new RNBluetoothClassicPackage("\n", CommonCharsets.ASCII.charset())
       );
     }
 

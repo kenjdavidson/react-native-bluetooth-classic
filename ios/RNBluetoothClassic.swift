@@ -39,10 +39,11 @@ class RNBluetoothClassic : RCTEventEmitter {
     
     var peripheral:BluetoothDevice?
     var delimiter:String
+    var encoding:String.Encoding
     var readObserving:Bool
     
     /**
-     Initialize the RNBluetoothClassic.
+     Initialize the RNBluetoothClassic using the default delimiter and charset.
      */
     override init() {
         self.eaManager = EAAccessoryManager.shared()
@@ -52,11 +53,22 @@ class RNBluetoothClassic : RCTEventEmitter {
             .object(forInfoDictionaryKey: "UISupportedExternalAccessoryProtocols") as! [String]
         
         self.delimiter = "\n"
+        self.encoding = .utf8
         self.readObserving = false;
         
         super.init()
         
-        registerForLocalNotifications()
+        self.registerForLocalNotifications()
+    }
+    
+    /**
+     Initialize the RNBluetoothClassic module with a custom default delimiter and character set.
+     */
+    convenience init(delimiter:String, encoding:String.Encoding) {
+        self.init()
+        
+        self.delimiter = delimiter
+        self.encoding = encoding
     }
     
     /**
@@ -78,8 +90,14 @@ class RNBluetoothClassic : RCTEventEmitter {
      */
     private func registerForLocalNotifications() {
         eaManager.registerForLocalNotifications()
-        notificationCenter.addObserver(self, selector: #selector(accessoryDidConnect), name: .EAAccessoryDidConnect, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(accessoryDidDisconnect), name: .EAAccessoryDidDisconnect, object: nil)
+        notificationCenter.addObserver(self,
+                                       selector: #selector(accessoryDidConnect),
+                                       name: .EAAccessoryDidConnect,
+                                       object: nil)
+        notificationCenter.addObserver(self,
+                                       selector: #selector(accessoryDidDisconnect),
+                                       name: .EAAccessoryDidDisconnect,
+                                       object: nil)
     }
     
     @objc
@@ -109,9 +127,9 @@ class RNBluetoothClassic : RCTEventEmitter {
                     currentDevice.disconnect()
                     peripheral = nil
                 }
+                
+                sendEvent(withName: BTEvent.BLUETOOTH_DISCONNECTED.rawValue, body: currentDevice.asDictionary())
             }
-            
-            sendEvent(withName: BTEvent.BLUETOOTH_DISCONNECTED.rawValue, body: notification.object)
         }
     }
     
@@ -135,13 +153,17 @@ class RNBluetoothClassic : RCTEventEmitter {
     
     /**
      RCTEventEmitter -
-     Match the getConstants() method on Android.  The difference being that
-     in index.js we need to pull from different locations RNBluetoothClassic.BTEvents
-     rather than RNBluetoothClassic.getConstants().BTEvents.
+     Return the constants for BTEvents and BTCharsets specific to IOS.
      */
     override func constantsToExport() -> [AnyHashable : Any]! {
         return [
-            "BTEvents": BTEvent.asDictionary()
+            "BTEvents": BTEvent.asDictionary(),
+            "BTCharsets": [
+                "LATIN": String.Encoding.isoLatin1.rawValue,
+                "ASCII": String.Encoding.ascii.rawValue,
+                "UTF8": String.Encoding.utf8.rawValue,
+                "UTF16": String.Encoding.utf16.rawValue
+            ]
         ];
     }
     
@@ -450,6 +472,16 @@ class RNBluetoothClassic : RCTEventEmitter {
         resolve(true)
     }
     
+    @objc
+    func setEncoding(
+        _ code: UInt,
+        resolver resolve: RCTPromiseResolveBlock,
+        rejecter reject: RCTPromiseRejectBlock
+    ) -> Void {
+        self.encoding = String.Encoding(rawValue: code)
+        resolve(true)
+    }
+    
     /**
      Clear the buffer.
      - parameter _: resolves when clear is complete
@@ -543,7 +575,7 @@ extension RNBluetoothClassic : BluetoothDataReceivedDelegate {
         }
         
         // There are Read Listeners, we can send the request.
-        if let data = String(data: receivedData, encoding: .utf8) {
+        if let data = String(data: receivedData, encoding: encoding) {
             let indexes = data.indexes(of: delimiter)
             var startIndex = data.startIndex
             
@@ -558,6 +590,14 @@ extension RNBluetoothClassic : BluetoothDataReceivedDelegate {
             }
             
             return data[startIndex...].data(using: .utf8) ?? Data()
+        } else {
+            // Attempting to parse data using current encoding failed
+            let userInfo:[String:Any] = [
+                "device": peripheral?.asDictionary() as Any,
+                "error": "Failed to parse data with encoding \(encoding.description)",
+                "message": "Failed to parse data with encoding \(encoding.description)"
+            ]
+            sendEvent(withName: BTEvent.ERROR.rawValue, body: userInfo)
         }
         
         return receivedData

@@ -27,13 +27,14 @@ public class RNUtils {
      * @param device BluetoothDevice
      */
     public static WritableMap deviceToWritableMap(BluetoothDevice device) {
+        if (device == null)
+            return null;
+
         WritableMap params = Arguments.createMap();
 
         params.putString("name", device.getName());
         params.putString("address", device.getAddress());
         params.putString("id", device.getAddress());
-
-        // Extra Android specific details
         params.putInt("class", device.getBluetoothClass() != null
                 ? device.getBluetoothClass().getDeviceClass() : -1);
         return params;
