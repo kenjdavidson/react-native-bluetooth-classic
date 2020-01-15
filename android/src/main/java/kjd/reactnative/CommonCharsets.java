@@ -25,7 +25,7 @@ public enum CommonCharsets {
     public static WritableMap asMap() {
         WritableMap map = Arguments.createMap();
         for (CommonCharsets charset : CommonCharsets.values()) {
-            map.putString(charset.name(), charset.code());
+            map.putString(charset.name(), charset.name());
         }
         return map;
     }

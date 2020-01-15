@@ -235,7 +235,7 @@ export default class App extends React.Component {
   async connectToDevice(device) {
     console.log(`Attempting connection to device ${device.id}`);
     try {
-      await RNBluetoothClassic.setEncoding(BTCharsets.ASCII);
+      await RNBluetoothClassic.setEncoding(BTCharsets.LATIN);
       let connectedDevice = await RNBluetoothClassic.connect(device.id);
       this.setState({connectedDevice});
       this.refs.toast.close();
