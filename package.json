@@ -1,6 +1,6 @@
 {
   "name": "react-native-bluetooth-classic",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "description": "Implement bluetooth classic (serial) on Android (Bluetooth Adapter) and IOS (External Accessory)",
   "main": "src/index.js",
   "scripts": {
