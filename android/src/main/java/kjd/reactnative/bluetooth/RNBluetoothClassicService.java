@@ -444,13 +444,13 @@ public class RNBluetoothClassicService {
             // flag.
             while (!mmCancelled) {
                 try {
-                    if (mmInStream.available() > 0) {
+                    //if (mmInStream.available() > 0) {
                         bytes = mmInStream.read(buffer); // Read from the InputStream
                         String data = new String(buffer, 0, bytes, mCharSet);
                         mModule.onData(data); // Send new data to the module to handle
-                    }
+                    //}
 
-                    Thread.sleep(500);      // Pause
+                    //Thread.sleep(500);      // Pause
                 } catch (Exception e) {
                     Log.e(TAG, "Disconnected", e);
 
