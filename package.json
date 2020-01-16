@@ -17,10 +17,11 @@
   ],
   "author": "Kenneth Davidson <ken.j.davidson@live.ca> (https://github.com/kenjdavidson)",
   "contributors": [
-    "Jakub Martyčák <martycakjakub@gmail.com>",
-    "Tony Lara <tony.lara.p@gmail.com>",
-    "redloro@gmail.com",
-    "iamandiradustefan@gmail.com"
+    "Jakub Martyčák <martycakjakub@gmail.com> (https://github.com/rusel1989)",
+    "Tony Lara <tony.lara.p@gmail.com> (https://github.com/tonyl)",
+    "redloro@gmail.com (https://github.com/redloro)",
+    "iamandiradustefan@gmail.com (https://github.com/iamandiradu)",
+    "Andrew Krugliak (https://github.com/andreykrugliak)"
   ],
   "license": "MIT",
   "bugs": {
@@ -32,12 +33,13 @@
     "react-native-windows": "0.41.0-rc.1"
   },
   "dependencies": {
-    "buffer": "^5.2.1"
+    "buffer": "^5.4.3"
   },
   "files": [
-    "/src",
-    "/android",
-    "/ios"
+    "src",
+    "android",
+    "ios",
+    "react-native-bluetooth-classic.podspec"
   ],
   "devDependencies": {
     "npm-version": "^1.1.0"

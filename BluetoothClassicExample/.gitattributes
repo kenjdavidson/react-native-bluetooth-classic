@@ -1,4 +1,1 @@
 *.pbxproj -text
-*.java linquist-detectable=true
-*.swift linquist-detectable=true
-*.js linquist-detectable=true
