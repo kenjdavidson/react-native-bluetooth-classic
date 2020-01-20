@@ -19,12 +19,17 @@ import {
   Container,
   Toast,
   Header,
+  Title,
   Button,
   Right,
   Left,
   Icon,
   Body,
+  StyleProvider,
 } from 'native-base';
+import getTheme from './native-base-theme/components';
+import material from './native-base-theme/variables/material';
+import platform from './native-base-theme/variables/platform';
 
 const DeviceList = ({devices, onPress, style}) => {
   console.log('DeviceList.render()');
@@ -128,7 +133,7 @@ class ConnectionScreen extends React.Component {
       <Container>
         <Header>
           <Left>
-            <Text>{this.props.device.name}</Text>
+            <Title>{this.props.device.name}</Title>
           </Left>
           <Right>
             <TouchableOpacity onPress={this.props.disconnect}>
@@ -321,31 +326,33 @@ export default class App extends React.Component {
       : 'green';
 
     return (
-      <Root>
-        {this.state.connectedDevice ? (
-          <ConnectionScreen
-            device={this.state.connectedDevice}
-            scannedData={this.state.scannedData}
-            disconnect={this.unselectDevice}
-            onSend={this.onSend}
-          />
-        ) : (
-          <Container>
-            <Header>
-              <Left>
-                <Text>Available Devices</Text>
-              </Left>
-              <Right>
-                <Text style={{color: connectedColor}}>O</Text>
-              </Right>
-            </Header>
-            <DeviceList
-              devices={this.state.deviceList}
-              onPress={this.selectDevice}
+      <StyleProvider style={getTheme(platform)}>
+        <Root>
+          {this.state.connectedDevice ? (
+            <ConnectionScreen
+              device={this.state.connectedDevice}
+              scannedData={this.state.scannedData}
+              disconnect={this.unselectDevice}
+              onSend={this.onSend}
             />
-          </Container>
-        )}
-      </Root>
+          ) : (
+            <Container>
+              <Header>
+                <Left>
+                  <Title>Devices</Title>
+                </Left>
+                <Right>
+                  <Text style={{color: connectedColor}}>O</Text>
+                </Right>
+              </Header>
+              <DeviceList
+                devices={this.state.deviceList}
+                onPress={this.selectDevice}
+              />
+            </Container>
+          )}
+        </Root>
+      </StyleProvider>
     );
   }
 }
