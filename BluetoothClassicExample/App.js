@@ -1,114 +1,428 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React from 'react';
 import {
-  SafeAreaView,
+  Platform,
   StyleSheet,
-  ScrollView,
-  View,
   Text,
-  StatusBar,
+  TextInput,
+  View,
+  ScrollView,
+  FlatList,
+  TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
-
+import RNBluetoothClassic, {
+  BTEvents,
+  BTCharsets,
+} from 'react-native-bluetooth-classic';
 import {
+  Root,
+  Container,
+  Toast,
   Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+  Button,
+  Right,
+  Left,
+  Icon,
+  Body,
+} from 'native-base';
 
-const App: () => React$Node = () => {
+const DeviceList = ({devices, onPress, style}) => {
+  console.log('DeviceList.render()');
+  console.log(devices);
+
   return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
+    <ScrollView
+      style={styles.listContainer}
+      contentContainerStyle={styles.container}>
+      {devices.map((device, i) => {
+        let bgColor = device.connected
+          ? '#0f0'
+          : styles.connectionStatus.backgroundColor;
+        return (
+          <TouchableOpacity
+            key={device.id}
+            style={[styles.button, style]}
+            onPress={() => onPress(device)}>
+            <View
+              style={[styles.connectionStatus, {backgroundColor: bgColor}]}
+            />
+            <View style={{flex: 1}}>
+              <Text style={styles.deviceName}>{device.name}</Text>
+              <Text>{device.address}</Text>
             </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </>
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
   );
 };
 
+class ConnectionScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      text: undefined,
+      scannedData: [],
+    };
+  }
+
+  componentDidMount() {
+    this.onRead = RNBluetoothClassic.addListener(
+      BTEvents.READ,
+      this.handleRead,
+      this,
+    );
+    //this.poll = setInterval(() => this.pollForData(), 3000);
+  }
+
+  componentWillUnmount() {
+    this.onRead.remove();
+    //clearInterval(this.poll);
+
+    RNBluetoothClassic.disconnect();
+  }
+
+  pollForData = async () => {
+    var available = 0;
+
+    do {
+      console.log('Checking for available data');
+      available = await RNBluetoothClassic.available();
+      console.log(`There are ${available} bytes of data available`);
+
+      if (available > 0) {
+        console.log('Attempting to read the next message from the device');
+        const data = await RNBluetoothClassic.readFromDevice();
+
+        console.log(data);
+        this.handleRead({data});
+      }
+    } while (available > 0);
+  };
+
+  handleRead = data => {
+    data.timestamp = new Date();
+    let scannedData = this.state.scannedData;
+    scannedData.unshift(data);
+    this.setState({scannedData});
+  };
+
+  sendData = async () => {
+    let message = this.state.text + '\r'; // For commands
+    await RNBluetoothClassic.write(message);
+
+    let scannedData = this.state.scannedData;
+    scannedData.push({
+      timestamp: new Date(),
+      data: this.state.text,
+      type: 'sent',
+    });
+    this.setState({text: '', scannedData});
+  };
+
+  render() {
+    console.log('DeviceConnection.render()');
+    console.log(this.state);
+
+    return (
+      <Container>
+        <Header>
+          <Left>
+            <Text>{this.props.device.name}</Text>
+          </Left>
+          <Right>
+            <TouchableOpacity onPress={this.props.disconnect}>
+              <Text style={[styles.toolbarButton, {color: '#F00'}]}>X</Text>
+            </TouchableOpacity>
+          </Right>
+        </Header>
+        <View style={{flex: 1}}>
+          <FlatList
+            style={{flex: 1}}
+            contentContainerStyle={{justifyContent: 'flex-end'}}
+            inverted
+            ref="scannedDataList"
+            data={this.state.scannedData}
+            keyExtractor={(item, index) => item.timestamp.toISOString()}
+            renderItem={({item}) => (
+              <View
+                id={item.timestamp.toISOString()}
+                style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
+                <Text>{item.timestamp.toLocaleDateString()}</Text>
+                <Text>{item.type === 'sent' ? ' < ' : ' > '}</Text>
+                <Text style={{flexShrink: 1}}>{item.data.trim()}</Text>
+              </View>
+            )}
+          />
+          <View style={[styles.horizontalContainer, {backgroundColor: '#ccc'}]}>
+            <TextInput
+              style={styles.textInput}
+              placeholder={'Send Data'}
+              value={this.state.text}
+              onChangeText={text => this.setState({text})}
+              autoCapitalize="none"
+              autoCorrect={false}
+              onSubmitEditing={() => this.sendData()}
+              returnKeyType="send"
+            />
+            <TouchableOpacity
+              style={{justifyContent: 'center'}}
+              onPress={() => this.sendData()}>
+              <Text>Send</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Container>
+    );
+  }
+}
+
+export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      deviceList: [],
+      connectedDevice: undefined,
+      scannedData: [],
+    };
+  }
+
+  componentDidMount() {
+    this.initialize();
+    this.subs = [];
+
+    // Re-initialize whenever a Bluetooth event occurs
+    this.subs.push(
+      RNBluetoothClassic.addListener(
+        BTEvents.BLUETOOTH_CONNECTED,
+        device => this.onConnected(device),
+        this,
+      ),
+    );
+    this.subs.push(
+      RNBluetoothClassic.addListener(
+        BTEvents.BLUETOOTH_DISCONNECTED,
+        device => this.onDisconnected(device),
+        this,
+      ),
+    );
+    this.subs.push(
+      RNBluetoothClassic.addListener(
+        BTEvents.CONNECTION_LOST,
+        error => this.onConnectionLost(error),
+        this,
+      ),
+    );
+    this.subs.push(
+      RNBluetoothClassic.addListener(
+        BTEvents.ERROR,
+        error => this.onError(error),
+        this,
+      ),
+    );
+  }
+
+  componentWillUnmount() {
+    this.subs.forEach(sub => sub.remove());
+  }
+
+  onConnected(device) {
+    Toast.show({
+      text: `Connected to ${device.name}`,
+      duration: 3000,
+    });
+    this.initialize();
+  }
+
+  onDisconnected(device) {
+    Toast.show({
+      text: `Connection to ${device.name} was disconnected`,
+      duration: 3000,
+    });
+    this.initialize();
+  }
+
+  onConnectionLost(error) {
+    Toast.show({
+      text: `Connection to ${error.device.name} was lost`,
+      duration: 3000,
+    });
+    this.initialize();
+  }
+
+  onError(error) {
+    Toast.show({
+      text: `${error.message}`,
+      duration: 3000,
+    });
+    this.initialize();
+  }
+
+  async initialize() {
+    let enabled = await RNBluetoothClassic.isEnabled();
+    let newState = {
+      bluetoothEnabled: enabled,
+      devices: [],
+      connectedDevice: undefined,
+    };
+
+    if (enabled) {
+      try {
+        let connectedDevice = await RNBluetoothClassic.getConnectedDevice();
+
+        console.log('initializeDevices::connectedDevice');
+        console.log(connectedDevice);
+        newState.connectedDevice = connectedDevice;
+      } catch (error) {
+        try {
+          let devices = await RNBluetoothClassic.list();
+
+          console.log('initializeDevices::list');
+          console.log(devices);
+          newState.deviceList = devices;
+        } catch (error) {
+          console.error(error.message);
+        }
+      }
+    }
+
+    this.setState(newState);
+  }
+
+  async connectToDevice(device) {
+    console.log(`Attempting connection to device ${device.id}`);
+    try {
+      await RNBluetoothClassic.setEncoding(BTCharsets.ASCII);
+      let connectedDevice = await RNBluetoothClassic.connect(device.id);
+      this.setState({connectedDevice});
+    } catch (error) {
+      console.log(error.message);
+      Toast.show({
+        text: `Connection to ${device.name} unsuccessful`,
+        duration: 3000,
+      });
+    }
+  }
+
+  async disconnectFromDevice() {
+    await RNBluetoothClassic.disconnect();
+    this.setState({connectedDevice: undefined});
+  }
+
+  selectDevice = device => this.connectToDevice(device);
+  unselectDevice = () => this.disconnectFromDevice();
+
+  render() {
+    console.log('App.render()');
+    console.log(this.state);
+
+    let connectedColor = !this.state.bluetoothEnabled
+      ? styles.toolbarButton.color
+      : 'green';
+
+    return (
+      <Root>
+        {this.state.connectedDevice ? (
+          <ConnectionScreen
+            device={this.state.connectedDevice}
+            scannedData={this.state.scannedData}
+            disconnect={this.unselectDevice}
+            onSend={this.onSend}
+          />
+        ) : (
+          <Container>
+            <Header>
+              <Left>
+                <Text>Available Devices</Text>
+              </Left>
+              <Right>
+                <Text style={{color: connectedColor}}>O</Text>
+              </Right>
+            </Header>
+            <DeviceList
+              devices={this.state.deviceList}
+              onPress={this.selectDevice}
+            />
+          </Container>
+        )}
+      </Root>
+    );
+  }
+}
+
+/**
+ * The statusbar height goes wonky on Huawei with a notch - not sure if its the notch or the
+ * Huawei but the fact that the notch is different than the status bar makes the statusbar
+ * go below the notch (even when the notch is on).
+ */
+const APPBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
+
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
+  statusbar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#222',
   },
-  engine: {
-    position: 'absolute',
-    right: 0,
+  toolbar: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    backgroundColor: '#222',
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingLeft: 16,
+    paddingRight: 16,
+    height: APPBAR_HEIGHT,
   },
-  body: {
-    backgroundColor: Colors.white,
+  toolbarText: {
+    flex: 1,
+    fontSize: 20,
+    color: '#fff',
   },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  toolbarButton: {
+    fontSize: 20,
+    color: '#fff',
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
+  container: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
+    backgroundColor: '#fff',
   },
-  sectionDescription: {
+  listContainer: {
+    flex: 1,
+  },
+  button: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingLeft: 16,
+    paddingRight: 16,
+  },
+  deviceName: {
+    fontSize: 16,
+  },
+  connectionStatus: {
+    width: 8,
+    backgroundColor: '#ccc',
+    marginRight: 16,
     marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
+    marginBottom: 8,
   },
-  highlight: {
-    fontWeight: '700',
+  horizontalContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingTop: 8,
+    paddingBottom: 8,
   },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
+  textInput: {
+    flex: 1,
+    height: 40,
   },
 });
-
-export default App;

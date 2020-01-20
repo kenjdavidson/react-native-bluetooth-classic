@@ -121,15 +121,22 @@ class RNBluetoothClassic : RCTEventEmitter {
     
     @objc
     func accessoryDidDisconnect(_ notification:Notification) {
+        var device: BluetoothDevice
+        
         if let disconnected: EAAccessory = notification.userInfo!["EAAccessoryKey"] as? EAAccessory {
+            device = BluetoothDevice(disconnected)
+            
+            // If we are currently connected to this, then we need to
+            // disconnected it and remove the current peripheral
             if let currentDevice = peripheral {
                 if currentDevice.accessory.serialNumber == disconnected.serialNumber {
                     currentDevice.disconnect()
                     peripheral = nil
                 }
-                
-                sendEvent(withName: BTEvent.BLUETOOTH_DISCONNECTED.rawValue, body: currentDevice.asDictionary())
             }
+            
+            // Finally send the notification
+            sendEvent(withName: BTEvent.BLUETOOTH_DISCONNECTED.rawValue, body: device.asDictionary())
         }
     }
     

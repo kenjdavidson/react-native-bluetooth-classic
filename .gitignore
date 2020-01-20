@@ -52,3 +52,4 @@ buck-out/
 .classpath
 android/.classpath
 android/.project
+BluetoothClassicExample/ios/protocol-strings.plist

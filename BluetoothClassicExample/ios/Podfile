@@ -35,6 +35,7 @@ target 'BluetoothClassicExample' do
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
   pod 'react-native-bluetooth-classic', :path => '../../'
+  pod 'RNVectorIcons', :podspec => '../node_modules/react-native-vector-icons/RNVectorIcons.podspec'
   
   target 'BluetoothClassicExampleTests' do
     inherit! :search_paths

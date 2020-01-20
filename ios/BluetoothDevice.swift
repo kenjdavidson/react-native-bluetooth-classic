@@ -115,8 +115,8 @@ class BluetoothDevice: NSObject, StreamDelegate {
             if let inStream = currentSession.inputStream, let outStream = currentSession.outputStream {
                 inStream.delegate = self
                 outStream.delegate = self
-                inStream.schedule(in: .main, forMode: .common)
-                outStream.schedule(in: .main, forMode: .common)
+                inStream.schedule(in: .main, forMode: .commonModes)
+                outStream.schedule(in: .main, forMode: .commonModes)
                 inStream.open()
                 outStream.open()
             }
@@ -145,11 +145,11 @@ class BluetoothDevice: NSObject, StreamDelegate {
         if let currentSession = session {
             if let inStream = currentSession.inputStream {
                 inStream.close()
-                inStream.remove(from: .main, forMode: .common)
+                inStream.remove(from: .main, forMode: .commonModes)
             }
             if let outStream = currentSession.outputStream{
                 outStream.close()
-                outStream.remove(from: .main, forMode: .common)
+                outStream.remove(from: .main, forMode: .commonModes)
             }
         }
         
