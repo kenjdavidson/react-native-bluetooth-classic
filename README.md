@@ -22,11 +22,11 @@ Since there seem to be some breaking changes introduced within React Native 0.60
 $ npm install react-native-bluetooth-classic --save
 ```
 
-React Native 0.60.0 (autolinking)[https://github.com/react-native-community/cli/blob/master/docs/autolinking.md].
+React Native 0.60.0 [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md).
 
 #### Local Install
 
-Local installation can be used for contribution or customization using the instructions in (BluetoothClassicExample)[./BluetoothClassicExample/README.md].
+Local installation can be used for contribution or customization using the instructions in [BluetoothClassicExample](./BluetoothClassicExample/README.md).
 
 ### Manual installation
 
