@@ -127,9 +127,9 @@ class RNBluetoothClassic : RCTEventEmitter {
                     currentDevice.disconnect()
                     peripheral = nil
                 }
-                
-                sendEvent(withName: BTEvent.BLUETOOTH_DISCONNECTED.rawValue, body: currentDevice.asDictionary())
             }
+            
+            sendEvent(withName: BTEvent.BLUETOOTH_DISCONNECTED.rawValue, body: BluetoothDevice(disconnected).asDictionary())
         }
     }
     
