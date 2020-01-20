@@ -153,7 +153,8 @@ Function | Description | Android | IOS |
 | readFromDevice() | Resolves with the entire content of the devices buffer, ignoring any delimiters and clearing the buffer when complete.  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour. | :white_check_mark: | :white_check_mark: |
 | readUntilDelimiter() | Resovles with the content of the buffer up until the default delimiter.  To update the delimiter for the session use setDelimiter(delimiter:String).  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour. | :white_check_mark: | :white_check_mark: |
 | readUntilDelimiter(delimiter:String) | Resolves with the content of the buffer up until the provided delimiter.  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour. | :white_check_mark: | :white_check_mark: |
-| setDelimiter(delimiter:String) | Sets the new delimiter for future reads/read events and resolves true, resolves with the API to allow for fluent chaining | :white_check_mark: | :white_check_mark: |
+| setDelimiter(delimiter:String) | Sets the new delimiter for future reads/read events and resolves true. | :white_check_mark: | :white_check_mark: |
+| setEncoding(delimiter:BTCharsets) | Sets the character encoding for parsing Bluetooth data.  Android uses String encoding values while IOS uses Encoding UInt8 values, which are correctly mapped to `BTCharsets`. | :white_check_mark: | :white_check_mark: |
 | available() | Resolves **true\|false** based on whether data is available.  Use in conjunction with the read[until\|from] functions. | :white_check_mark: | :white_check_mark: |
 
 ### Code Examples
