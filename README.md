@@ -9,10 +9,10 @@ Based off the [react-native-bluetooth-serial](https://github.com/rusel1989/react
 
 Since there seem to be some breaking changes introduced within React Native 0.60 and I'm not entirely sure how or if these changes will affect this projec; or that reason I feel it's important to start running with a number of release branches (for the time being) just in case things go down.  In the following table, the React Native version is the lowest version (from package.json).
 
-| Version | React Native | Confirmed | Known Issues |
+| Version | React Native | Android | IOS | Confirmed | 
 | --- | --- | --- | --- |
-| 0.9.x | 0.59.9 | :white_check_mark: | N/A |
-| 0.10.x | 0.60.0 | N/A | N/A |
+| 0.9.x | 0.59.9 |  |  | :white_check_mark: |
+| 0.10.x | 0.60.0 |  |  | N/A |
 
 
 ## Getting started
@@ -23,42 +23,30 @@ Since there seem to be some breaking changes introduced within React Native 0.60
 $ npm install react-native-bluetooth-classic --save
 ```
 
-### Install from NPM (local)
+React Native 0.60.0 (autolinking)[https://github.com/react-native-community/cli/blob/master/docs/autolinking.md].
 
-If making or testing custom changes to react-native-bluetooth-classic you'll want to Install locally.   
+#### Local Install
 
-```
-$ git clone https://github.com/kenjdavidson/react-native-bluetooth-classic
-```
-
-With NPM lower than version 5 just running the command `npm install file://../` will install correctly.  In NPM 5+ this creates a symlink which will stop React Native / Metro from working.  In order to resolve this there are two options:
-
-1. Manually install the react-native-bluetooth-classic project into node_modules
-2. Use the following, which will package and install the local project into node_modules.  For more information on install-local please see (Install Local)[https://www.npmjs.com/package/install-local].
-
-```
-npm install -g install-local
-install-local -S ../react-native-bluetooth-classic
-```
-
-### Automatic installation
-
-If installing locally, you'll need to perform the local install after each subsequent react-native link.  Just be aware of that, if you run react-native link on any future packages, you'll find that the Android project becomes uncompilable (just run the install local command again).
-
-`$ react-native link react-native-bluetooth-classic`
-
-#### IOS 
-
-Library has been updated to support 0.60.0 Podspec standard install, thanks to [iamandiradu](https://github.com/iamandiradu)
+Local installation can be used for contribution or customization using the instructions in (BluetoothClassicExample)[./BluetoothClassicExample/README.md].
 
 ### Manual installation
 
-#### iOS
+Manual installation should really only need to be used for contribution, or if there are issues with autolinking that I'm not aware of.  Follow the old steps for manually linking.
+
+#### IOS Manual
 
 1. In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
 2. Go to `node_modules` ➜ `react-native-bluetooth-classic` and add `RNBluetoothClassic.xcodeproj`
 3. In XCode, in the project navigator, select your project. Add `libRNBluetoothClassic.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
 4. Run your project (`Cmd+R`)<
+
+#### IOS Pods
+
+The development pod can be added updating the `Podfile` with the appropriate line:
+
+```
+pod 'react-native-bluetooth-classic', :path => '<PATH TO RNBluetoothClassic>'
+```
 
 #### Android
 
@@ -77,7 +65,7 @@ Library has been updated to support 0.60.0 Podspec standard install, thanks to [
 
 #### Windows
 
-TODO - but leaving the section here.
+Windows isn't added yet - it looks like with the latest `react-native init` there is no Windows by default.  I'm assuming this is due to the React Native windows project (future Ken's problem).
 
 [Read it! :D](https://github.com/ReactWindows/react-native)
 
