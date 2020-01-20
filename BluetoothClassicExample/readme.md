@@ -24,54 +24,17 @@ XCode was installed and updated already, but `pods` was required:
 Since I wanted to start from scratch to ensure nothing was broken during a bad update, the old *BluetoothClassicExample* was deleted and a new project was created:
 
     rm -rf BluetoothClassicExample
-    npx react-native init AwesomeProject
+    npx react-native init BluetoothClassicExample
 
 Things seemed to go smoothly, there were no errors and the project structure was created as I'd expect.
 
-
-#### Running the Application
-
-This is where things got shady, in most cases you'd expect that the application would just start (following the docs) but this was not the case.  When attempting to run the application first:
-
-    cd BluetoothClassicExample
-    npx react-native run-ios
-
-I received an error stating that `podfile.log` was not found, which mean that `pod install` was most likely not run.  This is pretty spot on, since it wasn't a step, continuing on I followed the directions:
-
-    cd ios
-    pod install
-
-Things looked to be going along smoothly when nopes, I received the error:
-
-> xcrun:_ error: SDK "iphoneos" cannot be located
-
-After a quick Google someone smarter than I posted the solution (https://github.com/facebook/react-native/issues/18408#issuecomment-386696744)[https://github.com/facebook/react-native/issues/18408https://github.com/facebook/react-native/issues/18408#issuecomment-386696744] which after doing was successful:
-
-    sudo xcode-select --switch /Applications/Xcode.app
-    pod install
-
-Once this completed, things looked like we were good to go, going back to running the application:
-
-    cd BluetoothClassicExample
-    npx react-native run-ios
-
-> info Found Xcode workspace "BluetoothClassicExample.xcworkspace" <br/>
-> info Launching iPhone 11 (iOS 13.3) <br />
-> info Building (using "xcodebuild -workspace BluetoothClassicExample.xcworkspace -configuration Debug -scheme BluetoothClassicExample -destination id=B4B3007B-D416-4922-B7C3-8677A29B7B94 -derivedDataPath build/BluetoothClassicExample")
-................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................<br/>
-> info Installing "build/BluetoothClassicExample/Build/Products/Debug-iphonesimulator/BluetoothClassicExample.app"<br/>
-> info Launching "org.reactjs.native.example.BluetoothClassicExample"<br/>
-> success Successfully launched the app on the simulator
-
-which again looks like everything is great.  Switching over the the simulator we see what we're supposed to see (at least what's shown on the React Native docs) for an initial application.  Making a quick jump over to Android Studio and firing up an emulator confirms that:
-
-    npx react-native run-android
-
-is also successful!
-
 ## Install RNBluetoothClassic Library
 
-Now we need to setup the library within the example application for development.  From what I can tell by looking around, nothing has really been done in terms of being able to do easy development, so it looks like the local installation method will continue to work well in terms of this.  This means that for development, we need to continue using the manual methods of library setup:
+Now we need to setup the library within the example application for development.  With the addition of (autolinking)[https://github.com/react-native-community/cli/blob/master/docs/autolinking.md] in v0.60.0 there are two options:
+
+1. Adding the local library to the `react-native.config` file, information found (here)[https://github.com/react-native-community/cli/blob/master/docs/autolinking.md#user-content-how-can-i-autolink-a-local-library].  With that said, I have zero idea how this links the projects, and I'm not sure whether they are available for development afterwards (future Ken can sort that out).
+
+2. Manually link the project, which is the choice I made, since it is still straight forwarda and allows for deveopment pods on IOS.
 
 #### Javascript / Metro Config
 
@@ -151,3 +114,67 @@ Development can now be completed within XCode and the `BluetoothClassicExample` 
 
 #### Android 
 
+Without running `react-native link` since pretty much all the documentation says not to do it, I've manually added the project in all the places that it's expected in Android:
+
+*settings.gradle*
+```
+rootProject.name = 'BluetoothClassicExample'
+include ':react-native-bluetooth-classic'
+project(':react-native-bluetooth-classic').projectDir = new File(rootProject.projectDir, '../../android')
+```
+
+*app/build.gradle*
+```
+dependencies {
+    implementation project(':react-native-bluetooth-classic')
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "com.facebook.react:react-native:+"  // From node_modules
+```
+
+*MainApplication.java*
+```
+List<ReactPackage> packages = new PackageList(this).getPackages();
+packages.add(new RNBluetoothClassicPackage());
+// Packages that cannot be autolinked yet can be added manually here, for example:
+// packages.add(new MyReactNativePackage());
+```
+
+#### Running the Application
+
+This is where things got shady, in most cases you'd expect that the application would just start (following the docs) but this was not the case.  When attempting to run the application first:
+
+    cd BluetoothClassicExample
+    npx react-native run-ios
+
+I received an error stating that `podfile.log` was not found, which mean that `pod install` was most likely not run.  This is pretty spot on, since it wasn't a step, continuing on I followed the directions:
+
+    cd ios
+    pod install
+
+Things looked to be going along smoothly when nopes, I received the error:
+
+> xcrun:_ error: SDK "iphoneos" cannot be located
+
+After a quick Google someone smarter than I posted the solution (https://github.com/facebook/react-native/issues/18408#issuecomment-386696744)[https://github.com/facebook/react-native/issues/18408https://github.com/facebook/react-native/issues/18408#issuecomment-386696744] which after doing was successful:
+
+    sudo xcode-select --switch /Applications/Xcode.app
+    pod install
+
+Once this completed, things looked like we were good to go, going back to running the application:
+
+    cd BluetoothClassicExample
+    npx react-native run-ios
+
+> info Found Xcode workspace "BluetoothClassicExample.xcworkspace" <br/>
+> info Launching iPhone 11 (iOS 13.3) <br />
+> info Building (using "xcodebuild -workspace BluetoothClassicExample.xcworkspace -configuration Debug -scheme BluetoothClassicExample -destination id=B4B3007B-D416-4922-B7C3-8677A29B7B94 -derivedDataPath build/BluetoothClassicExample")
+................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................<br/>
+> info Installing "build/BluetoothClassicExample/Build/Products/Debug-iphonesimulator/BluetoothClassicExample.app"<br/>
+> info Launching "org.reactjs.native.example.BluetoothClassicExample"<br/>
+> success Successfully launched the app on the simulator
+
+which again looks like everything is great.  Switching over the the simulator we see what we're supposed to see (at least what's shown on the React Native docs) for an initial application.  Making a quick jump over to Android Studio and firing up an emulator confirms that:
+
+    npx react-native run-android
+
+is also successful!
