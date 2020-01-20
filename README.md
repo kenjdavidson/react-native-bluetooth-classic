@@ -9,11 +9,10 @@ Based off the [react-native-bluetooth-serial](https://github.com/rusel1989/react
 
 Since there seem to be some breaking changes introduced within React Native 0.60 and I'm not entirely sure how or if these changes will affect this projec; or that reason I feel it's important to start running with a number of release branches (for the time being) just in case things go down.  In the following table, the React Native version is the lowest version (from package.json).
 
-| Version | React Native | Android | IOS | Confirmed | 
-| --- | --- | --- | --- |
-| 0.9.x | 0.59.9 |  |  | :white_check_mark: |
-| 0.10.x | 0.60.0 |  |  | N/A |
-
+| Version | React Native | Android | IOS | Confirmed |
+| --- | --- | --- | --- | --- |
+| 0.9.x | 0.59.9 | > 4.1 (16) | > IOS 9 | :white_check_mark: |
+| 0.10.x | 0.60.0 | > 4.1 (16) | > IOS 9 | N/A |
 
 ## Getting started
 
