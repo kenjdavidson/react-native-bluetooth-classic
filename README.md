@@ -9,11 +9,10 @@ Based off the [react-native-bluetooth-serial](https://github.com/rusel1989/react
 
 Since there seem to be some breaking changes introduced within React Native 0.60 and I'm not entirely sure how or if these changes will affect this projec; or that reason I feel it's important to start running with a number of release branches (for the time being) just in case things go down.  In the following table, the React Native version is the lowest version (from package.json).
 
-| Version | React Native | Android | IOS | Confirmed | 
-| --- | --- | --- | --- |
-| 0.9.x | 0.59.9 |  |  | :white_check_mark: |
-| 0.10.x | 0.60.0 |  |  | N/A |
-
+| Version | React Native | Android | IOS | Confirmed |
+| --- | --- | --- | --- | --- |
+| 0.9.x | 0.59.9 | > 4.1 (16) | > IOS 9 | :white_check_mark: |
+| 0.10.x | 0.60.0 | > 4.1 (16) | > IOS 9 | N/A |
 
 ## Getting started
 
@@ -23,11 +22,11 @@ Since there seem to be some breaking changes introduced within React Native 0.60
 $ npm install react-native-bluetooth-classic --save
 ```
 
-React Native 0.60.0 (autolinking)[https://github.com/react-native-community/cli/blob/master/docs/autolinking.md].
+React Native 0.60.0 [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md).
 
 #### Local Install
 
-Local installation can be used for contribution or customization using the instructions in (BluetoothClassicExample)[./BluetoothClassicExample/README.md].
+Local installation can be used for contribution or customization using the instructions in [BluetoothClassicExample](./BluetoothClassicExample/README.md).
 
 ### Manual installation
 
@@ -154,7 +153,8 @@ Function | Description | Android | IOS |
 | readFromDevice() | Resolves with the entire content of the devices buffer, ignoring any delimiters and clearing the buffer when complete.  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour. | :white_check_mark: | :white_check_mark: |
 | readUntilDelimiter() | Resovles with the content of the buffer up until the default delimiter.  To update the delimiter for the session use setDelimiter(delimiter:String).  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour. | :white_check_mark: | :white_check_mark: |
 | readUntilDelimiter(delimiter:String) | Resolves with the content of the buffer up until the provided delimiter.  This method should not be used in conjunction with the BTEvent.READ event as it could cause some unexpected behaviour. | :white_check_mark: | :white_check_mark: |
-| setDelimiter(delimiter:String) | Sets the new delimiter for future reads/read events and resolves true, resolves with the API to allow for fluent chaining | :white_check_mark: | :white_check_mark: |
+| setDelimiter(delimiter:String) | Sets the new delimiter for future reads/read events and resolves true. | :white_check_mark: | :white_check_mark: |
+| setEncoding(delimiter:BTCharsets) | Sets the character encoding for parsing Bluetooth data.  Android uses String encoding values while IOS uses Encoding UInt8 values, which are correctly mapped to `BTCharsets`. | :white_check_mark: | :white_check_mark: |
 | available() | Resolves **true\|false** based on whether data is available.  Use in conjunction with the read[until\|from] functions. | :white_check_mark: | :white_check_mark: |
 
 ### Code Examples

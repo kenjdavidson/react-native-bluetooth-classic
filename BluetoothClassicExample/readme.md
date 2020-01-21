@@ -1,10 +1,10 @@
 # BluetoothClassicExample
 
-Example application built to test the installation and functionality of (react-native-bluetooth-classic)[https://github.com/kenjdavidson/react-native-blutooth-classic] with (React Native 0.60.0)[https://facebook.github.io/react-native/blog/2019/07/03/version-60].  There were a number of breaking changes and the standardization of Pod installs for IOS, this exmaple is to make sure that things go smoothly when using this functionality.
+Example application built to test the installation and functionality of [react-native-bluetooth-classic](https://github.com/kenjdavidson/react-native-blutooth-classic) with [React Native 0.60.0](https://facebook.github.io/react-native/blog/2019/07/03/version-60).  There were a number of breaking changes and the standardization of Pod installs for IOS, this exmaple is to make sure that things go smoothly when using this functionality.
 
 ## Creation Process
 
-The *BluetoothClassicExample* application was created following the example on the (Getting Started)[https://facebook.github.io/react-native/docs/getting-started.html] documentation (react-native-cli on MacOS path).
+The *BluetoothClassicExample* application was created following the example on the [Getting Started](https://facebook.github.io/react-native/docs/getting-started.html) documentation (react-native-cli on MacOS path).
 
 #### Node & Watchman
 
@@ -30,9 +30,9 @@ Things seemed to go smoothly, there were no errors and the project structure was
 
 ## Install RNBluetoothClassic Library
 
-Now we need to setup the library within the example application for development.  With the addition of (autolinking)[https://github.com/react-native-community/cli/blob/master/docs/autolinking.md] in v0.60.0 there are two options:
+Now we need to setup the library within the example application for development.  With the addition of [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) in v0.60.0 there are two options:
 
-1. Adding the local library to the `react-native.config` file, information found (here)[https://github.com/react-native-community/cli/blob/master/docs/autolinking.md#user-content-how-can-i-autolink-a-local-library].  With that said, I have zero idea how this links the projects, and I'm not sure whether they are available for development afterwards (future Ken can sort that out).
+1. Adding the local library to the `react-native.config` file, information found [here](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md#user-content-how-can-i-autolink-a-local-library).  With that said, I have zero idea how this links the projects, and I'm not sure whether they are available for development afterwards (future Ken can sort that out).
 
 2. Manually link the project, which is the choice I made, since it is still straight forwarda and allows for deveopment pods on IOS.
 
@@ -155,7 +155,7 @@ Things looked to be going along smoothly when nopes, I received the error:
 
 > xcrun:_ error: SDK "iphoneos" cannot be located
 
-After a quick Google someone smarter than I posted the solution (https://github.com/facebook/react-native/issues/18408#issuecomment-386696744)[https://github.com/facebook/react-native/issues/18408https://github.com/facebook/react-native/issues/18408#issuecomment-386696744] which after doing was successful:
+After a quick Google someone smarter than I posted the solution [https://github.com/facebook/react-native/issues/18408#issuecomment-386696744](https://github.com/facebook/react-native/issues/18408https://github.com/facebook/react-native/issues/18408#issuecomment-386696744) which after doing was successful:
 
     sudo xcode-select --switch /Applications/Xcode.app
     pod install
