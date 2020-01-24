@@ -1,0 +1,31 @@
+## THEME
+# Theme related configuration, allowing for live updates during development.  Options which have 
+# been found to need refresh without reserving have been moved into the theme.yml.
+bootswatch: 
+  theme: yeti # Bootswatch theme, matches _sass/bootswatch/yeti
+  navbar: navbar-dark bg-dark # Applied to class="navbar ..."
+
+shortcut-icon:  # Override /assets/img/favicon.ico
+navbar-icon:  /assets/img/sitelogo.svg # Override /assets/img/sitelogo.png
+previous_text: Previous   # Text applied to previous link
+next_text: Next # Text applied to next link
+
+# Date format used across the application.
+date_format: "%-d %b %Y"   
+
+# Toggle link/icon to view atom feed (/atom.xml) in sidebar
+show_atom_feed: true
+
+# Google Analytics key, leave blank to ignore UA-xxxx-x
+google_analytics_key: 
+
+# Configure Disqus comments
+# Site name is configured on your Disqus settings screen.
+disqus:
+  site_name: 
+  title: 
+
+# Enable the privacy / terms and conditions pages.  Also requires a page to contain the matching
+# privacy: true or terms: true
+privacy: false
+terms: false

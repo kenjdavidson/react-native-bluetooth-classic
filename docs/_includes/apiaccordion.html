@@ -1,0 +1,23 @@
+
+<div id="{{include.id}}" class="accordion api-accordion">
+  {% assign apis = site.apis | where:"categories",include.categories | sort:chapter.index %}
+  {% for api in apis %}
+  <div class="card">
+    <div class="card-header" id="headingOne">
+      <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#api-{{api.title}}" aria-expanded="true" aria-controls="collapseOne">
+        <span class="api-title">{{api.title}}</span>
+        <span class="api-platforms">
+          {% for platform in api.platforms %}
+          <i class="fab fa-{{ platform }}"></i>
+          {% endfor %}
+        </span>
+      </button>
+    </div>
+    <div id="api-{{api.title}}" class="collapse" aria-labelledby="api-{{api.title}}" data-parent="#{{include.id}}">
+      <div class="card-body">
+        {{ api.content | markdownify }}
+      </div>
+    </div>   
+  </div>     
+  {% endfor %}
+</div>

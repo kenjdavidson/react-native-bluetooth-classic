@@ -1,0 +1,86 @@
+---
+# Only the main Sass file needs front matter (the dashes are enough)
+---
+@charset "utf-8";
+
+// Import the rouge-base to make them available for bootstrap variables
+@import "base16scss/schemes/base16";
+@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap');
+
+$base16schemes: ( 
+  ':root': $base16-dark
+); 
+
+$scrollbar-thumb-color: rgba(0,0,0,0.4);
+
+$navigation-width: 300px !default;
+$fa-font-path:        "../webfonts";
+
+$enable-shadows:              true;
+$enable-responsive-font-size: true;
+
+$navbar-title-size: 1.5em !default;
+$navbar-title-weight: bold !default;
+
+@import
+  {% if site.data.theme.bootswatch %}"bootswatch/{{ site.data.theme.bootswatch.theme | downcase }}/variables",{% endif %}
+  "bootstrap/bootstrap",
+  {% if site.data.theme.bootswatch %}"bootswatch/{{ site.data.theme.bootswatch.theme | downcase }}/bootswatch",{% endif %}
+  "fontawesome/fontawesome",
+  "fontawesome/brands",
+  "fontawesome/regular",
+  "fontawesome/solid",
+  "theme",
+  "base16scss/base16scss"
+;
+
+.highlight,
+.highlighter-rouge {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.9em;
+}
+
+// h1s are used for the primary header and should have a bottom borde and padding to match.
+h1 {
+  padding-bottom: 0.75em;
+  margin-bottom: 0.75em;
+  border-bottom: 1px solid $gray-400;
+}
+
+// h2s are sections that should also be blocked off
+h2, h3 {
+  margin-top: 1em;
+  padding: 1em 0em 0.5em 0em;
+  border-top: 1px solid $gray-300;
+}
+
+h4, 
+h5,
+h6 {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+blockquote {
+  margin: 3em 0em;
+}
+
+.api-accordion {
+  .card-header {
+    button {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: none;
+      }
+
+      i {
+        font-size: 1.2em;
+        padding-left: 0.5em;
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+- title: API
+  links:
+  - doc: initialization.md
+  - doc: adapter.md
+  - doc: device.md  
+  - doc: events.md
+
+- title: Examples
+  links:
+  - doc: examples/bluetoothclassicexample.md
+  
+- title: External Links
+  links:
+  - title: React Native
+    href: https://facebook.github.io/react-native/
+  - title: Android Bluetooth
+    href: https://developer.android.com/guide/topics/connectivity/bluetooth
+  - title: External Accessory
+    href: https://developer.apple.com/documentation/externalaccessory

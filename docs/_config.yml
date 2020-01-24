@@ -1,0 +1,90 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely edit after that. If you find
+# yourself editing this file very often, consider using Jekyll's data files
+# feature for the data you need to update frequently.
+#
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+
+# Site settings
+# These are used to personalize your new site. If you look in the HTML files,
+# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
+# You can create any custom variable you would like, and they will be accessible
+# in the templates via {{ site.myvariable }}.
+# 
+# The majority of these settings are used from Jekyll SEO
+# https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
+title: RN Bluetooth Classic
+author: Ken Davidson
+email: ken.j.davidson@live.ca
+tagline: Bluetooth communication on Android and IOS
+description: |
+  Communicate with Bluetooth devices within your React Native apps using 
+  Bluetooth Adapter (Android) and External Accessory Framework (IOS/Mfi)
+url: https://kenjdavidson.github.com/react-native-bluetooth-classic
+logo: /assets/img/sitelogo.png
+social:
+  name: Ken Davidson
+  links:
+    - https://www.linkedin.com/in/kenjdavidson 
+    - https://github.com/kenjdavidson
+# google_site_verification:
+lang: en_CA
+github_username: kenjdavidson
+github_url: https://github.com/kenjdavidson/react-native-bluetooth-classic
+github_edit_url: https://github.com/kenjdavidson/react-native-bluetooth-classic/blob/master/docs
+
+search: false
+
+# Jekyll related configuration items.
+# https://jekyllrb.com/docs/configuration/
+baseurl: /react-native-bluetooth-classic
+
+# Build settings
+remote_theme: kenjdavidson/jekyll-kb
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+plugins:
+  - jekyll-feed
+  - jekyll-redirect-from
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jemoji
+
+# Exclude from processing.
+exclude: ['Gemfile','Gemfile.log','node_modules']
+
+# Timezone
+timezone: America/Toronto
+
+defaults:
+  - scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "page"
+  - scope:
+      path: ""
+      type: "apis"
+    values:
+      layout: "default"      
+
+collections:
+  docs:
+    permalink: /:path/
+    output: true
+  posts:
+    permalink: /blog/:year/:month/:day/:title/
+    output: true
+  apis:
+    permalink: /:categories/:path
+    output: true
