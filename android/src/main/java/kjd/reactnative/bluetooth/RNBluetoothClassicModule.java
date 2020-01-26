@@ -142,10 +142,10 @@ public class RNBluetoothClassicModule
   private Promise mConnectedPromise;
 
   /**
-   * Resolve or reject listening request.  Due to the request needing to start a new Intent
+   * Resolve or reject accept request.  Due to the request needing to start a new Intent
    * and wait for the Activity result, the Promise must be maintained.
    */
-  private Promise mListeningPromise;
+  private Promise mAcceptPromise;
 
   /**
    * Resolve or reject requested discovery.  Due to the request needing to start a new Intent
@@ -532,10 +532,10 @@ public class RNBluetoothClassicModule
    * @param promise resolve or reject the requested listening
    */
   @ReactMethod
-  public void listen(Promise promise) {
-    mListeningPromise = promise;
+  public void accept(Promise promise) {
+    mAcceptPromise = promise;
     if (mBluetoothAdapter != null) {
-        mBluetoothService.listen();
+        mBluetoothService.accept();
     } else {
       promise.reject(new Exception("BluetoothAdapter is not enabled"));
     }   

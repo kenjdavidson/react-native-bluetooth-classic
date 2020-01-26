@@ -112,10 +112,9 @@ public class RNBluetoothClassicService {
      *
      */
 
-    synchronized void listen() {
-        if (D) Log.d(TAG, "Start listening:");
-
-        // Start the thread to listen for connection attempts
+    synchronized void accept() {
+        if (D) Log.d(TAG, "Start accept:");
+        // Start the thread to accept connection attempts
         mAcceptThread = new AcceptThread();
         mAcceptThread.start();
     }
@@ -333,10 +332,10 @@ public class RNBluetoothClassicService {
     }
 
     /**
-         * CUSTOM Accept THREAD
-         *
-         * 
-         */
+     * Accept thread waiting for a device to perform connect request
+     *
+     * 
+     */
 
     private class AcceptThread extends Thread {
     private final BluetoothServerSocket mmServerSocket;
@@ -347,9 +346,9 @@ public class RNBluetoothClassicService {
         BluetoothServerSocket tmp = null;
         try {
             // MY_UUID is the app's UUID string, also used by the client code.
-            tmp = mAdapter.listenUsingRfcommWithServiceRecord("Test", UUID_SPP);
+            tmp = mAdapter.listenUsingRfcommWithServiceRecord("RNBluetoothClassic", UUID_SPP);
         } catch (IOException e) {
-            Log.e(TAG, "Socket's listen() method failed", e);
+            Log.e(TAG, "Socket's accept() method failed", e);
             mModule.onError(e);
         }
         mmServerSocket = tmp;
