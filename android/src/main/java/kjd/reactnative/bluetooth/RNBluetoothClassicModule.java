@@ -144,6 +144,12 @@ public class RNBluetoothClassicModule
   private Promise mConnectedPromise;
 
   /**
+   * Resolve or reject accept request.  Due to the request needing to start a new Intent
+   * and wait for the Activity result, the Promise must be maintained.
+   */
+  private Promise mAcceptPromise;
+
+  /**
    * Resolve or reject requested discovery.  Due to the request needing to start a new Intent
    * and wait for the Activity result, the Promise must be maintained.
    */
@@ -497,6 +503,39 @@ public class RNBluetoothClassicModule
   }
 
   /**
+   * Start listening for connections
+   *
+   * @param promise resolve or reject the requested listening
+   */
+  @ReactMethod
+  public void accept(Promise promise) {
+    mAcceptPromise = promise;
+    if (mBluetoothAdapter != null) {
+      mBluetoothService.accept();
+    } else {
+      promise.reject(new Exception("BluetoothAdapter is not enabled"));
+    }
+  }
+
+  /**
+   * Cancel the listening request.  Returns gracefully with a null {@link BluetoothDevice} to be
+   * managed, once the error handling gets a little bit of love, there will be a difference
+   * between a BluetoothAcceptCancelException and an actual error.
+   * @param promise
+   */
+  @ReactMethod
+  public void cancelAccept(Promise promise) {
+    if (mAcceptPromise != null) {
+      mBluetoothService.cancelAccept();
+      mAcceptPromise.resolve(null);
+      mAcceptPromise = null;
+      promise.resolve(true);
+    } else {
+      promise.reject(new Exception("Currently not in accept mode"));
+    }
+  }
+
+  /**
    * Attempts to connect to the device with the provided Id.
    *
    * @param id of the requested device
@@ -685,7 +724,11 @@ public class RNBluetoothClassicModule
     if (mConnectedPromise != null) {
       mConnectedPromise.resolve(RNUtils.deviceToWritableMap(device));
     }
+    if (mAcceptPromise != null) {
+      mAcceptPromise.resolve(RNUtils.deviceToWritableMap(device));
+    }
     mConnectedPromise = null;
+    mAcceptPromise = null;
   }
 
   @Override

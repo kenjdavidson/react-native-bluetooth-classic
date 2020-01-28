@@ -8,8 +8,10 @@ import {
   ScrollView,
   FlatList,
   TouchableOpacity,
-  SafeAreaView,
-} from 'react-native';
+  StatusBar,
+  KeyboardAvoidingView,
+  ActivityIndicator
+} from "react-native";
 import RNBluetoothClassic, {
   BTEvents,
   BTCharsets,
@@ -117,7 +119,7 @@ class ConnectionScreen extends React.Component {
     await RNBluetoothClassic.write(message);
 
     let scannedData = this.state.scannedData;
-    scannedData.push({
+    scannedData.unshift({
       timestamp: new Date(),
       data: this.state.text,
       type: 'sent',
@@ -314,8 +316,45 @@ export default class App extends React.Component {
     this.setState({connectedDevice: undefined});
   }
 
+  async acceptConnections() {
+    console.log("App is accepting connections now...");
+    this.setState({ isAccepting: true });
+
+    try {
+      let connectedDevice = await RNBluetoothClassic.accept();
+
+      if (connectedDevice) {
+        this.setState({ connectedDevice, isAccepting: false });
+      }      
+    } catch(error) {
+      console.log(error);
+      this.refs.toast.show(
+        `Unable to accept client connection`,
+        DURATION.LENGTH_SHORT
+      );
+      this.setSTate({ isAccepting: false });
+    }
+  }
+
+  async cancelAcceptConnections() {
+    console.log("Attempting to cancel accepting...");
+    
+    try {
+      await RNBluetoothClassic.cancelAccept();
+      this.setState({ connectedDevice: undefined, isAccepting: false });
+    } catch(error) {
+      console.log(error);
+      this.refs.toast.show(
+        `Unable to cancel client accept`,
+        DURATION.LENGTH_SHORT
+      );
+    }
+  }
+
   selectDevice = device => this.connectToDevice(device);
   unselectDevice = () => this.disconnectFromDevice();
+  accept = () => this.acceptConnections();
+  cancelAccept = () => this.cancelAcceptConnections();
 
   render() {
     console.log('App.render()');
@@ -324,6 +363,10 @@ export default class App extends React.Component {
     let connectedColor = !this.state.bluetoothEnabled
       ? styles.toolbarButton.color
       : 'green';
+
+    let acceptFn = !this.state.isAccepting 
+      ? () => this.accept()
+      : () => this.cancelAccept();      
 
     return (
       <StyleProvider style={getTheme(platform)}>
@@ -349,6 +392,20 @@ export default class App extends React.Component {
                 devices={this.state.deviceList}
                 onPress={this.selectDevice}
               />
+              <TouchableOpacity
+                style={styles.startAcceptButton}
+                onPress={acceptFn}
+              >
+                <Text style={[{ color: "#fff" }]}>
+                  {this.state.isAccepting
+                    ? "Waiting (cancel)..."
+                    : "Accept Connection"}
+                </Text>
+                <ActivityIndicator
+                  size={"small"}
+                  animating={this.state.isAccepting}
+                />
+              </TouchableOpacity>              
             </Container>
           )}
         </Root>
@@ -409,6 +466,13 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     paddingRight: 16,
   },
+  startAcceptButton: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#333",
+    padding: 9
+  },  
   deviceName: {
     fontSize: 16,
   },

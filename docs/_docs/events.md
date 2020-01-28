@@ -14,23 +14,13 @@ With that said, there are still some things that don't really fit in well with t
 
 Please feel free to shoot me a message if you've got these answers!
 
-There are a number of `BTEvents` available, across a number of categories while using the `RNBluetoothClassic` module.  They can be used for monitoring the environment, automatically connecting to devices or requested that device data is passed directly to your application.  In almost all cases you'll want to register these as such:
+Available events can be found in the `BTEvents` object:
 
 ```javascript
-componentDidMount() {
-  this.onRead = RNBluetoothClassic.addListener(
-    BTEvents.READ,
-    this.handleRead,
-    this,
-  );
-}
-
-componentWillUnmount() {
-  this.onRead.remove();
-  RNBluetoothClassic.disconnect();
-}
+import { BTEvents } from 'react-native-bluetooth-classic';
 ```
 
 {:.warning}
-> Always remembering to remove the subscription prior to your component unmounting.
+> Always remember to remove the subscription prior to your component unmounting to avoid memory leaks.
 
+{% include apiaccordion.html id="events" categories="events" %}

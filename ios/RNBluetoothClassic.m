@@ -20,7 +20,7 @@ RCT_EXTERN_METHOD(isEnabled: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(list: (RCTPromiseResolveBlock)resolve
-                  rejecter: (RCTPromiseRejectBlock)reject)
+                  rejecter: (RCTPromiseRejectBlock)reject)                                 
 
 RCT_EXTERN_METHOD(connect: (NSString)deviceId
                   resolver: (RCTPromiseResolveBlock)resolve
@@ -84,5 +84,11 @@ RCT_EXTERN_METHOD(pairDevice: (NSString)deviceId
 RCT_EXTERN_METHOD(unpairDevice: (NSString)deviceId
                   resolver: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(accept: (RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(cancelAccept: (RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject)                     
 
 @end

@@ -253,7 +253,7 @@ class RNBluetoothClassic : RCTEventEmitter {
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
-        let msg: String = "discoverDevices is not implemented on IOS"
+        let msg: String = "Discovery/cancel of devices is not available on IOS"
         reject("error", msg, nil)
     }
     
@@ -269,7 +269,7 @@ class RNBluetoothClassic : RCTEventEmitter {
         _ resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
-        let msg: String = "cancelDiscovery is not implemented on IOS"
+        let msg: String = "Discovery/cancel of devices is not available on IOS"
         reject("error", msg, nil)
     }
     
@@ -288,7 +288,7 @@ class RNBluetoothClassic : RCTEventEmitter {
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
-        let msg: String = "pairDevice is not implemented on IOS"
+        let msg: String = "Pairing/unpairing of device is not available on IOS"
         reject("error", msg, nil)
     }
     
@@ -306,10 +306,40 @@ class RNBluetoothClassic : RCTEventEmitter {
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
-        let msg: String = "unpairDevice is not implemented on IOS"
+        let msg: String = "Pairing/unpairing of devices is not available on IOS"
         reject("error", msg, nil)
     }
     
+    /**
+     Places the device into Accept mode - this is currently unavailable on IOS as connection is all done through
+     the system.
+     - parameter _: resolve with connected device
+     - parameter reject: reject accept connection
+     */
+    @objc
+    func accept(
+        _ resolve: RCTPromiseResolveBlock,
+        rejecter reject: RCTPromiseRejectBlock
+    ) -> Void {
+        let msg: String = "Accept/cancel connection mode is not available on IOS"
+        reject("error", msg, nil)
+    }
+
+    /**
+     Places the device into Accept mode - this is currently unavailable on IOS as connection is all done through
+     the system.
+     - parameter _: resolve the accept resolve with nil and exit gracefully
+     - parameter reject: reject the cancel request
+     */
+    @objc
+    func cancelAccept(
+        _ resolve: RCTPromiseResolveBlock,
+        rejecter reject: RCTPromiseRejectBlock
+    ) -> Void {
+        let msg: String = "Accept/cancel connection mode is not available on IOS"
+        reject("error", msg, nil)
+    }    
+
     /**
      Determines whether the device is still connected and attempts to open
      a connection to it.  This is done by providing the self to the BluetoothDevice

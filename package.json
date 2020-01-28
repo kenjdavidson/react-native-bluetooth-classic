@@ -4,7 +4,8 @@
   "description": "Implement bluetooth classic (serial) on Android (Bluetooth Adapter) and IOS (External Accessory)",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postversion": "git push && git push --tags && npm publish"
   },
   "repository": "git://github.com/kenjdavidson/react-native-bluetooth-classic.git",
   "keywords": [
@@ -21,7 +22,8 @@
     "Tony Lara <tony.lara.p@gmail.com> (https://github.com/tonyl)",
     "redloro@gmail.com (https://github.com/redloro)",
     "iamandiradustefan@gmail.com (https://github.com/iamandiradu)",
-    "Andrew Krugliak (https://github.com/andreykrugliak)"
+    "Andrew Krugliak (https://github.com/andreykrugliak)",
+    "Anton Petrov (https://github.com/tpettrov)"
   ],
   "license": "MIT",
   "bugs": {

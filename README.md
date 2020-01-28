@@ -9,10 +9,10 @@ Based off the [react-native-bluetooth-serial](https://github.com/rusel1989/react
 
 Since there seem to be some breaking changes introduced within React Native 0.60 and I'm not entirely sure how or if these changes will affect this projec; or that reason I feel it's important to start running with a number of release branches (for the time being) just in case things go down.  In the following table, the React Native version is the lowest version (from package.json).
 
-| Version | React Native | Android | IOS | Confirmed |
+| Version | React Native | Android | IOS | Notable Changes |
 | --- | --- | --- | --- | --- |
-| 0.9.x | 0.59.9 | > 4.1 (16) | > IOS 9 | :white_check_mark: |
-| 0.10.x | 0.60.0 | > 4.1 (16) | > IOS 9 | N/A |
+| 0.9.x | 0.41.0 - 0.59.9 | >= 4.1 (16) | >= IOS 9 | - Accept connection mode |
+| 0.10.x | >= 0.60.0 | >= 4.1 (16) | >= IOS 9 | - Accept connection mode |
 
 ## Getting started
 
@@ -123,10 +123,10 @@ The BluetoothClassicExample is included within the ./BluetoothClassicExample Rea
 
 ## Usage
 
-Import the module using the following:
+Import the module using the following (forgive the pluralization, it just happened and it's come to far now):
 
 ```javascript
-import RNBluetoothClassic, { BTEvents } from 'react-native-bluetooth-classic';
+import RNBluetoothClassic, { BTEvents, BTCharsets } from 'react-native-bluetooth-classic';
 ```
 
 In all cases the following API/Events are available within Javascript for both Android and IOS (no code splitting) if there are any native calls that are not available on the native side, the promise will be rejected with an appropriate message (kind of like UnssupportedOperationException since I'm used to Java) - I found this important as I see no point in duplicating code as the whole purpose of React Native was for me not to.
