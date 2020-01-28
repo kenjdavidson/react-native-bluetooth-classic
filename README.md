@@ -10,9 +10,9 @@ Based off the [react-native-bluetooth-serial](https://github.com/rusel1989/react
 
 Since there seem to be some breaking changes introduced within React Native 0.60 and I'm not entirely sure how or if these changes will affect this projec; or that reason I feel it's important to start running with a number of release branches (for the time being) just in case things go down.  In the following table, the React Native version is the lowest version (from package.json).
 
-| Version | React Native | Confirmed | Known Issues |
-| --- | --- | --- | --- |
-| 0.9.x | 0.59.9 | :white_check_mark: | N/A |
+| Version | React Native | Android Version | IOS Version | Notable Changes |
+| --- | --- | --- | --- | --- |
+| 0.9.x | 0.59.9 | >= 4.1 (16) | >= 9.0 | - Added client accept functionality |
 
 ## Getting started
 
@@ -157,7 +157,8 @@ The following API is available on both Android and IOS (unless specifically stat
 | pairDevice(deviceId:String)          | Resolves with the status of the requested device if paired. Rejects if unable to pair.                                                                                                                                                                                     | :white_check_mark: |     :no_entry:     |
 | unpairDevice(deviceId:String)        | Resolves with a list of the unpaired devices.                                                                                                                                                                                                                              | :white_check_mark: |     :no_entry:     |
 | connect(deviceId:String)             | Resolves with the device details if successfully paired. Rejects if the connection is unsuccessful - if already connected the rejection will also disconnect the currently connected device.                                                                               | :white_check_mark: | :white_check_mark: |
-| accept()                             | Starts accepting connections and resolves with the device details of successfully connected device.                                                                                                                                                                        | :white_check_mark: |     :no_entry:     |
+| accept()                             | Starts accepting connections and resolves with the device details of successfully connected device.  There is currently no timeout for this function, so it must be cancelled manually using an interval or second click.                                                                                                                                                                       | :white_check_mark: |     :no_entry:     |
+| cancelAccept()                             | Cancels the accepting of connections.  This will resolve the previous accept() request with an `undefined` device, and resolve as `true` itself.                                                                                                                                                                       | :white_check_mark: |     :no_entry:     |
 | disconnect()                         | Resolves **true\|false** based on whether disconnection was successful.                                                                                                                                                                                                    | :white_check_mark: | :white_check_mark: |
 | isConnected()                        | Resolves **true\|false** whether a device is currently connected.                                                                                                                                                                                                          | :white_check_mark: | :white_check_mark: |
 | getConnectedDevice()                 | Resolves with the currently connected devices, or rejects if there is none.                                                                                                                                                                                                | :white_check_mark: | :white_check_mark: |
