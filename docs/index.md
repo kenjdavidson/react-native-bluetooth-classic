@@ -27,6 +27,11 @@ Although it's probably not required, there are two versions of the project being
 
 For the purpose of this documentation only **0.10.x** will be used moving forward.
 
+## Notable Changes
+
+**0.10.6** 
+- Added listening functionality - The [`accept`](https://kenjdavidson.github.io/react-native-bluetooth-classic/adapter/#accept) call will start a `BluetoothServerSocket` which will wait (indefinitely) for a client to connect.
+
 ## Installation
 
 Installation, like almost everything, is done through `npm`:
