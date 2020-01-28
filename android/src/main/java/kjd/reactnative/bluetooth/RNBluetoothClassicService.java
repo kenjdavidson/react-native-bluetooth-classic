@@ -3,14 +3,17 @@ package kjd.reactnative.bluetooth;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.bluetooth.BluetoothServerSocket;
 import android.util.Log;
 
+import java.io.*;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import kjd.reactnative.CommonCharsets;
 
@@ -41,6 +44,11 @@ public class RNBluetoothClassicService {
      * Thread responsible for connecting to a new device
      */
     private ConnectThread mConnectThread;
+
+    /**
+     * Thread responsible for acepting connection
+     */
+    private AcceptThread mAcceptThread;
 
     /**
      * Communication thread takes over once ConnectThread has successfully handed off.
@@ -94,6 +102,26 @@ public class RNBluetoothClassicService {
 
         // Unsure about whether to set device while just connecting
         setState(DeviceState.CONNECTING, null);
+    }
+
+
+    /**
+     * Start the AcceptThread to wait for a connection from a remote device.
+     *
+     *
+     */
+
+    synchronized void accept() {
+        if (D) Log.d(TAG, "Start accept:");
+        // Start the thread to accept connection attempts
+        mAcceptThread = new AcceptThread();
+        mAcceptThread.start();
+    }
+
+    synchronized void cancelAccept() {
+        if (D) Log.d(TAG, "Cancelling accept:");
+        mAcceptThread.cancel();
+
     }
 
     /**
@@ -308,6 +336,78 @@ public class RNBluetoothClassicService {
     }
 
     /**
+     * A cancellable thread used for waiting for client connections.  There is currently no timeout,
+     * but the request can be cancelled (albeit not pretty) it seems to be working.
+     *
+     * @author tpettrov
+     */
+
+    private class AcceptThread extends Thread {
+        private final BluetoothServerSocket mmServerSocket;
+        private AtomicBoolean cancelled = new AtomicBoolean(false);
+
+        public AcceptThread() {
+            // Use a temporary object that is later assigned to mmServerSocket
+            // because mmServerSocket is final.
+            BluetoothServerSocket tmp = null;
+            try {
+                // MY_UUID is the app's UUID string, also used by the client code.
+                tmp = mAdapter.listenUsingRfcommWithServiceRecord("RNBluetoothClassic", UUID_SPP);
+            } catch (IOException e) {
+                Log.e(TAG, "Socket's accept() method failed", e);
+                listener.onError(e);
+            }
+            mmServerSocket = tmp;
+        }
+
+        public void run() {
+            BluetoothSocket socket = null;
+            BluetoothDevice device = null;
+            // Keep listening until exception occurs or a socket is returned.
+            while (true) {
+                try {
+                    socket = mmServerSocket.accept();
+                } catch (IOException e) {
+                    if (cancelled.get()) {
+                        if (D) Log.d(TAG, "Socket accept() was cancelled");
+                        return;
+                    }
+
+                    Log.e(TAG, "Socket accept() method failed", e);
+                    listener.onError(e);
+                    break;
+                }
+
+                if (socket != null) {
+                    // A connection was accepted. Perform work associated with
+                    // the connection in a separate thread.
+                    device = socket.getRemoteDevice();
+                    connectionSuccess(socket, device);
+                    try {
+                        mmServerSocket.close();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Could not close the connect socket", e);
+                        listener.onError(e);
+                        }
+                    break;
+                }
+            }
+        }
+
+        // Closes the connect socket and causes the thread to finish.
+        public void cancel() {
+            cancelled.set(true);
+            try {
+                mmServerSocket.close();
+            } catch (IOException e) {
+                Log.e(TAG, "Could not close the connect socket", e);
+                listener.onError(e);
+            }
+        }
+    }
+
+
+    /**
      * ConnectedThread runs throughout a device connection/registration.  It's responsible for
      * sending and receiving data from the device and passing it along to the appropriate
      * handlers.
@@ -355,12 +455,10 @@ public class RNBluetoothClassicService {
             // flag.
             while (!mmCancelled) {
                 try {
-                    if (mmInStream.available() > 0) {
-                        bytes = mmInStream.read(buffer);
-                        listener.onReceivedData(mmDevice, Arrays.copyOf(buffer, bytes));
-                    }
-
-                    Thread.sleep(500);      // Pause
+                    bytes = mmInStream.read(buffer);
+                    listener.onReceivedData(mmDevice, Arrays.copyOf(buffer, bytes));                    
+                    
+                    //Thread.sleep(500);      // Pause
                 } catch (Exception e) {
                     Log.e(TAG, "Disconnected", e);
 

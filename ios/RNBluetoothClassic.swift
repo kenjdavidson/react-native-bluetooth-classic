@@ -357,6 +357,29 @@ class RNBluetoothClassic : RCTEventEmitter {
         }
         return nil
     }
+
+    /**
+     Allows the device to start accepting client connections.  This is unavailable on IOS as the MFi and 
+     External Accessory protocols.  Will see if it's possible with latest changes to CoreBluetooth
+     but for now it just rejects.
+    */
+    @objc 
+    func accept(
+        _ resolve: RCTPromiseResolveBlock,
+        rejecter reject: RCTPromiseRejectBlock
+    ) -> Void {
+        let msg: String = "IOS does not support connecting client bluetooth connections"
+        reject("error", msg, nil)
+    }
+
+    @objc 
+    func cancelAccept(
+        _ resolve: RCTPromiseResolveBlock,
+        rejecter reject: RCTPromiseRejectBlock
+    ) -> Void {
+        let msg: String = "IOS does not support connecting client bluetooth connections"
+        reject("error", msg, nil)
+    }
     
     /**
      Disconnect from the currently connected device.
