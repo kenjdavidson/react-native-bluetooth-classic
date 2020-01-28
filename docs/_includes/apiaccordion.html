@@ -3,7 +3,7 @@
   {% assign apis = site.apis | where:"categories",include.categories | sort:chapter.index %}
   {% for api in apis %}
   <div class="card">
-    <div class="card-header" id="headingOne">
+    <div class="card-header" id="{{api.title | | downcase }}">
       <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#api-{{api.title}}" aria-expanded="true" aria-controls="collapseOne">
         <span class="api-title">{{api.title}}</span>
         <span class="api-platforms">

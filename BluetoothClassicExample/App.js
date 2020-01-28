@@ -328,11 +328,11 @@ export default class App extends React.Component {
       }      
     } catch(error) {
       console.log(error);
-      this.refs.toast.show(
-        `Unable to accept client connection`,
-        DURATION.LENGTH_SHORT
-      );
-      this.setSTate({ isAccepting: false });
+      Toast.show({
+        text: `Unable to accept client connection`,
+        duration: 3000,
+      });
+      this.setState({ isAccepting: false });
     }
   }
 
@@ -344,10 +344,10 @@ export default class App extends React.Component {
       this.setState({ connectedDevice: undefined, isAccepting: false });
     } catch(error) {
       console.log(error);
-      this.refs.toast.show(
-        `Unable to cancel client accept`,
-        DURATION.LENGTH_SHORT
-      );
+      Toast.show({
+        text: `Unable to cancel accept client connection`,
+        duration: 3000,
+      });
     }
   }
 
