@@ -69,6 +69,8 @@ All API calls are return a `Promise` for the purpose of keeping Android and IOS 
 | cancelDiscovery() | Attempts to cancel the previous discovery request. | :white_check_mark: | :no_entry: |
 | pairDevice(deviceId:String) | Attempts to pair a device. | :white_check_mark: | :no_entry: |
 | unpairDevice(deviceId:String) | Attempts to unpair a device. | :white_check_mark: | :no_entry: |
+| accept() | Places the device/application into server accept connection mode - currently only accepts one connection at a time.  Any subseqeuent calls will be ignored, if the device is already accepting connections. | :white_check_mark: | :no_entry: |
+| cancelAccept() | Attempts to cancel the previously requested server accept mode. | :white_check_mark: | :no_entry: |
 | connect(deviceId:String) | Attempts to establish a communication connection with a device. | :white_check_mark: | :white_check_mark: |
 | disconnect() | Attempts to disconnected from a device. | :white_check_mark: | :white_check_mark: |
 | isConnected() | Whether or not there is currently a device connected. | :white_check_mark: | :white_check_mark: |
