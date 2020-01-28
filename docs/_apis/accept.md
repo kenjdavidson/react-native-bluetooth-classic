@@ -43,7 +43,7 @@ async acceptConnections() {
       `Unable to accept client connection`,
       DURATION.LENGTH_SHORT
     );
-    this.setSTate({ isAccepting: false });
+    this.setState({ isAccepting: false });
   }
 }
 ```
