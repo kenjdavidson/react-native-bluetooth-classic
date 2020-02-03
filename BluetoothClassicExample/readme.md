@@ -178,3 +178,27 @@ which again looks like everything is great.  Switching over the the simulator we
     npx react-native run-android
 
 is also successful!
+
+## IOS MFi Protocols
+
+During the build process the application expects a `protocol-strings.plist` file to be available within the XCode project.  There is an example file `protocol-strings-example-plist` with the contents:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>UISupportedExternalAccessoryProtocols</key>
+  <array>
+    <string>com.apple.m1</string>
+  </array>
+</dict>
+</plist>
+```
+
+this is a requirement by the External Accessory framework.   Without this file (or providing the `UISupportedExternalAccessoryProtocols` directly) the application will not start and you will either receive:
+
+```
+Fatal error: Unexpectedly found nil while unwrapping an Optional value: file /Users/zames/Development/react-native-bluetooth-classic/ios/RNBluetoothClassic.swift, line 53
+```
+

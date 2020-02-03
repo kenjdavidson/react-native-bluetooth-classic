@@ -48,9 +48,28 @@ import RNBluetoothClassic, {
 } from 'react-native-bluetooth-classic';
 {% endhighlight %}
 
-where:
+#### IOS / MFi Protocol Strings
 
-#### RNBluetoothClassic
+**REMINDER** Remember to make sure you have your protocol strings provided within your application `plist` file - this is a requirement of the External Accessory framework.  This is the top cause of `Unhandled JS Exception: TypeError: Cannot read property 'xxx' of undefined` while attempting to use the library.
+
+An example of what this looks like is:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>UISupportedExternalAccessoryProtocols</key>
+  <array>
+    <string>com.apple.m1</string>
+  </array>
+</dict>
+</plist>
+```
+
+## API Overview
+
+#### RNBluetoothClassic API
 
 All API calls are return a `Promise` for the purpose of keeping Android and IOS inline.   A secondary goal of the project was to ensure that there is no more `Platform.IOS` checking nor `*.[android|ios].js` files.
 
@@ -80,7 +99,7 @@ All API calls are return a `Promise` for the purpose of keeping Android and IOS 
 {:.primary}
 > Currently only one device can be connected at a time, which is apparent based on the communication functions.  A goal is to have multiple devices available as soon as possible.
 
-#### Events
+#### RNBluetoothClassic Events
 
 Events are fired through the lifecycle of the `RNBluetoothClassic` module as configuration, devices and connectivity are changed:
 

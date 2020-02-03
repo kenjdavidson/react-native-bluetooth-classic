@@ -47,6 +47,25 @@ The development pod can be added updating the `Podfile` with the appropriate lin
 pod 'react-native-bluetooth-classic', :path => '<PATH TO RNBluetoothClassic>'
 ```
 
+#### MFi Protocol Strings
+
+**REMINDER** Remember to make sure you have your protocol strings provided within your application `plist` file - this is a requirement of the External Accessory framework.  This is the top cause of `Unhandled JS Exception: TypeError: Cannot read property 'xxx' of undefined` while attempting to use the library.
+
+An example of what this looks like is:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>UISupportedExternalAccessoryProtocols</key>
+  <array>
+    <string>com.apple.m1</string>
+  </array>
+</dict>
+</plist>
+```
+
 #### Android
 
 1. Open up `android/app/src/main/java/[...]/MainApplication.java`
@@ -119,7 +138,7 @@ The MIT License (MIT) - see full [license file](LICENSE)
 
 ## Example
 
-The BluetoothClassicExample is included within the ./BluetoothClassicExample React Native project.
+Check out the [BluetoothClassicExample](https://github.com/kenjdavidson/react-native-bluetooth-classic/tree/master/BluetoothClassicExample) for details on getting the project setup and performing some generic tasks.
 
 ## Usage
 
