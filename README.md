@@ -136,9 +136,11 @@ Again - if someone can point me on how to resolve these issues easily, I'd love 
 
 The MIT License (MIT) - see full [license file](LICENSE)
 
-## Example
+## Example(s)
 
-Check out the [BluetoothClassicExample](https://github.com/kenjdavidson/react-native-bluetooth-classic/tree/master/BluetoothClassicExample) for details on getting the project setup and performing some generic tasks.
+Check out the [BluetoothClassicExample](https://github.com/kenjdavidson/react-native-bluetooth-classic/tree/master/BluetoothClassicExample) for details on getting the project setup and performing some generic tasks.   If you've got a released app that you'd like / be ok with showcasing here please let me know (or submit a pull request) - I'd love to see how the library is getting used.
+
+#### Showcase
 
 ## Usage
 
