@@ -24,6 +24,7 @@ import com.facebook.react.bridge.WritableMap;
 
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -64,7 +65,8 @@ public class RNBluetoothClassicModule
         implements ActivityEventListener,
             LifecycleEventListener,
             RCTEventEmitter,
-            BluetoothEventListener {
+            BluetoothEventListener,
+            BluetoothDiscoveryReceiver.DiscoveryCompleteListener {
 
   private static final String TAG = RNBluetoothClassicModule.class.getSimpleName();
 
@@ -102,10 +104,18 @@ public class RNBluetoothClassicModule
   private final BroadcastReceiver mBluetoothConnectionReceiver = new BluetoothConnectionReceiver(this);
 
   /**
+   * Discovery receiver can be added and removed based on calls to {@link #discoverDevices(Promise)}
+   * and {@link #cancelDiscovery(Promise)}.  We still need to ensure that if we pause or stop the
+   * activity we kill the receiver.
+   */
+  private BroadcastReceiver mBluetoothDiscoveryReceiver;
+
+  /**
    * Delimiter used while reading.  It's possible the buffer may contain more than a single message
    * when this occurs, the specified mDelimiter will be used to split, and cause multiple read
    * events.  With manual reading, the last instance of the mDelimiter will be used.  For example
-   * if sending the command {@code ri} to retrieve the Reader Information, then a number of lines
+   * if sending the command {@code ri} to
+   * retrieve the Reader Information, then a number of lines
    * will be returned, therefore we can't split on the first "\n".
    * <p>
    * Defaults to "\n"
@@ -368,13 +378,36 @@ public class RNBluetoothClassicModule
   public void discoverDevices(final Promise promise) {
     if (D) Log.d(TAG, "Discover unpaired called");
 
-    mDeviceDiscoveryPromise = promise;
-    registerBluetoothDeviceDiscoveryReceiver();
-
     if (mBluetoothAdapter != null) {
+      IntentFilter intentFilter = new IntentFilter();
+      intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
+      intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+
+      mDeviceDiscoveryPromise = promise;
+      mBluetoothDiscoveryReceiver = new BluetoothDiscoveryReceiver(this);
+
+      mReactContext.registerReceiver(mBluetoothDiscoveryReceiver, intentFilter);
       mBluetoothAdapter.startDiscovery();
     } else {
       promise.resolve(Arguments.createArray());
+    }
+  }
+
+  @Override
+  public void onDiscoveryComplete(Collection<BluetoothDevice> unpairedDevices) {
+    WritableArray deviceArray = Arguments.createArray();
+    for (BluetoothDevice device : unpairedDevices) {
+      deviceArray.pushMap(RNUtils.deviceToWritableMap(device));
+    }
+
+    mDeviceDiscoveryPromise.resolve(deviceArray);
+    mDeviceDiscoveryPromise = null;
+
+    try {
+      mReactContext.unregisterReceiver(mBluetoothDiscoveryReceiver);
+      mBluetoothDiscoveryReceiver = null;
+    } catch (Exception e) {
+      Log.e(this.getClass().getSimpleName(), "Unable to unregister receiver", e);
     }
   }
 
@@ -842,6 +875,16 @@ public class RNBluetoothClassicModule
   private void unregisterBluetoothReceivers() {
     mReactContext.unregisterReceiver(mBluetoothStateReceiver);
     mReactContext.unregisterReceiver(mBluetoothConnectionReceiver);
+
+    if (mBluetoothDiscoveryReceiver != null) {
+      mReactContext.unregisterReceiver(mBluetoothDiscoveryReceiver);
+      mBluetoothDiscoveryReceiver = null;
+    }
+
+    if (mDeviceDiscoveryPromise != null) {
+      mDeviceDiscoveryPromise.reject(new Exception("Discovery was cancelled due to Activity lifecycle"));
+      mDeviceDiscoveryPromise = null;
+    }
   }
 
   /**
@@ -903,47 +946,9 @@ public class RNBluetoothClassicModule
     mReactContext.registerReceiver(devicePairingReceiver, intentFilter);
   }
 
-  /**
-   * Register receiver for bluetooth device discovery
-   */
-  private void registerBluetoothDeviceDiscoveryReceiver() {
-    IntentFilter intentFilter = new IntentFilter();
-
-    intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
-    intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-
-    final BroadcastReceiver deviceDiscoveryReceiver = new BroadcastReceiver() {
-      private WritableArray unpairedDevices = Arguments.createArray();
-      public void onReceive(Context context, Intent intent) {
-        String action = intent.getAction();
-        if (D) Log.d(TAG, "onReceive called");
-
-        if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-          BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-          WritableMap d = RNUtils.deviceToWritableMap(device);
-          unpairedDevices.pushMap(d);
-        } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-          if (D) Log.d(TAG, "Discovery finished");
-          if (mDeviceDiscoveryPromise != null) {
-            mDeviceDiscoveryPromise.resolve(unpairedDevices);
-            mDeviceDiscoveryPromise = null;
-          }
-
-          try {
-            mReactContext.unregisterReceiver(this);
-          } catch (Exception e) {
-            Log.e(TAG, "Unable to unregister receiver", e);
-            onError(e);
-          }
-        }
-      }
-    };
-
-    mReactContext.registerReceiver(deviceDiscoveryReceiver, intentFilter);
-  }
-
   @Override
   public ReactContext getReactContext() {
     return mReactContext;
   }
+
 }
