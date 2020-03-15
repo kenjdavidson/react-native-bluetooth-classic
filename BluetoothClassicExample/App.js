@@ -191,6 +191,8 @@ export default class App extends React.Component {
       deviceList: [],
       connectedDevice: undefined,
       scannedData: [],
+      isAccepting: false,
+      isDiscovering: false
     };
   }
 
@@ -341,7 +343,7 @@ export default class App extends React.Component {
     
     try {
       await RNBluetoothClassic.cancelAccept();
-      this.setState({ connectedDevice: undefined, isAccepting: false });
+      this.setState({ isDiscovering: false });
     } catch(error) {
       console.log(error);
       Toast.show({
@@ -351,10 +353,50 @@ export default class App extends React.Component {
     }
   }
 
+  async discoverDevices() {
+    console.log("Attempting to discover devices...");
+    this.setState({ isDiscovering: true });
+
+    try {
+      const unpaired = await RNBluetoothClassic.discoverDevices();
+      console.log("Unpaired Devices");
+      console.log(unpaired);
+      Toast.show({
+        text: `Found ${unpaired.length} unpaired devices.`,
+        duration: 3000
+      })
+    } catch(error) {
+      console.log(error);
+      Toast.show({
+        text: `Error occurred while attempting to discover devices`,
+        duration: 3000
+      });
+    } finally {
+      this.setState({ isDiscovering: false });
+    }
+  }
+
+  async cancelDiscoverDevices() {
+    console.log(`Attempting to cancel discovery...`);
+
+    try {
+      await RNBluetoothClassic.cancelDiscovery();
+      console.log("Discovery cancelled");
+    } catch(error) {
+      console.log(error);
+      Toast.show({
+        text: `Error occurred while attempting to cancel discover devices`,
+        duration: 3000
+      });
+    }
+  }
+
   selectDevice = device => this.connectToDevice(device);
   unselectDevice = () => this.disconnectFromDevice();
   accept = () => this.acceptConnections();
   cancelAccept = () => this.cancelAcceptConnections();
+  discover = () => this.discoverDevices();
+  cancelDiscover = () => this.cancelDiscoverDevices();
 
   render() {
     console.log('App.render()');
@@ -367,6 +409,10 @@ export default class App extends React.Component {
     let acceptFn = !this.state.isAccepting 
       ? () => this.accept()
       : () => this.cancelAccept();      
+
+    let discoverFn = !this.state.isDiscovering
+      ? () => this.discover()
+      : () => this.cancelDiscover();
 
     return (
       <StyleProvider style={getTheme(platform)}>
@@ -398,14 +444,28 @@ export default class App extends React.Component {
               >
                 <Text style={[{ color: "#fff" }]}>
                   {this.state.isAccepting
-                    ? "Waiting (cancel)..."
+                    ? "Accepting (cancel)..."
                     : "Accept Connection"}
                 </Text>
                 <ActivityIndicator
                   size={"small"}
                   animating={this.state.isAccepting}
                 />
-              </TouchableOpacity>              
+              </TouchableOpacity>    
+              <TouchableOpacity
+                style={styles.startAcceptButton}
+                onPress={discoverFn}
+              >
+                <Text style={[{ color: "#fff" }]}>
+                  {this.state.isDiscovering
+                    ? "Discovering (cancel)..."
+                    : "Discover Devices"}
+                </Text>
+                <ActivityIndicator
+                  size={"small"}
+                  animating={this.state.isDiscovering}
+                />
+              </TouchableOpacity>                         
             </Container>
           )}
         </Root>
@@ -471,7 +531,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#333",
-    padding: 9
+    padding: 9,
+    marginBottom: 9
   },  
   deviceName: {
     fontSize: 16,
