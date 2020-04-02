@@ -16,17 +16,16 @@ import javax.annotation.Nullable;
 /**
  * Needed to simulate the RCTEventEmitter from IOS in order to better manage the events so that
  * data is not lost due to the READ event, even if there are no READ listeners.
- *
+ * <p>
  * https://github.com/facebook/react-native/blob/master/React/Modules/RCTEventEmitter.h
+ *
+ * @deprecated with a commit to the Android {@link com.facebook.react.bridge.JavaModuleWrapper} the
+ *          ability to add {@code @ReactMethod} to extended classes or implemented interfaces was
+ *          removed (due to the method in which reflected methods are retrieved).  For that reason
+ *          we've had to move this logic into the actual module.
  */
+@Deprecated
 public interface RCTEventEmitter {
-
-    /**
-     * Current number of listeners.  An AtomicInteger might be overkill, but since the docs say
-     * we can't make guarantees about which thread being called, so play it safe.  If this causes
-     * issues, we can use a counter type.
-     */
-    AtomicInteger listenerCount = new AtomicInteger(0);
 
     /**
      * Return the list of supported events, this determines whether the requested event can be
@@ -39,7 +38,8 @@ public interface RCTEventEmitter {
     }
 
     /**
-     * Return the current ReactContext.
+     * Get the {@link ReactContext} from the implementing
+     * {@link com.facebook.react.module.annotations.ReactModule}.
      *
      * @return
      */
@@ -55,61 +55,51 @@ public interface RCTEventEmitter {
      */
     default void sendEvent(String eventName, @Nullable WritableMap body) {
         ReactContext context = getReactContext();
-        if (listenerCount.get() > 0 && context.hasActiveCatalystInstance()) {
-            Log.d(RCTEventEmitter.class.getSimpleName(),
-                    String.format("Sending event [%s] with data [%s]", eventName, body));
 
+        if (context.hasActiveCatalystInstance()) {
             context
                     .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                     .emit(eventName, body);
+        } else {
+            Log.e(RCTEventEmitter.class.getSimpleName(),
+                    String.format("%s has no active Catalyst instance", RCTEventEmitter.class.getSimpleName()));
         }
     }
 
     /**
-     * Set any required settings for starting to observe.
+     * startObserving from IOS version.  Default implementation does nothing.
      */
     default void startObserving() {}
 
     /**
-     * Handle any requirements for when observing is stopped.
+     * stopObserving from IOS version.  Default implementation does nothing.
      */
     default void stopObserving() {}
 
     /**
-     * Called by the NativeEventEmitter.js when a Subscription/Listener is added.
+     * addListener from IOS version.
      *
-     * @param eventName event name for which listener was added
+     * @param eventName
      */
-    @ReactMethod
-    default void addListener(String eventName) {
-        int currentCount = listenerCount.incrementAndGet();
-
-        Log.d(RCTEventEmitter.class.getSimpleName(),
-                String.format("Adding listener to %s, currently have %d listeners",
-                        eventName, currentCount));
-        if (1 == currentCount) {
-            startObserving();
-        }
-    }
+    void addListener(String eventName);
 
     /**
-     * Called by the NativeEventEmitter (React Native) when a subscription/listener is removed.
+     * removeListeners from IOS version.
      *
-     * @param count number of listeners removed
+     * @param count
      */
-    @ReactMethod
-    default void removeListeners(int count) {
-        int currentCount = listenerCount.get();
-        if (count > currentCount) {
-            Log.d(RCTEventEmitter.class.getSimpleName(),
-                    String.format("Attempted to remove more listeners than added"));
-        }
+    void removeListeners(int count);
 
-        currentCount = Math.max(currentCount - count, 0);
-        listenerCount.set(currentCount);
+    /**
+     * Sadly the IOS implementation doesn't provide a removeListeners which contains
+     * an {@code eventName}.  So in both IOS and Android we need to provide such method
+     * and call it only on reads.
+     * <p>
+     * There are better ways to do this, but to keep IOS and Android in line, was the
+     * fastest at the time.
+     *
+     * @param address
+     */
+    void removeListener(String address);
 
-        if (0 == currentCount) {
-            stopObserving();
-        }
-    }
 }

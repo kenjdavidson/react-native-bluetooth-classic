@@ -5,7 +5,7 @@ public enum BluetoothRequest {
     PAIR_DEVICE(2);
 
     public final int code;
-    private BluetoothRequest(int code) {
+    BluetoothRequest(int code) {
         this.code = code;
     }
 }

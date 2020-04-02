@@ -6,6 +6,13 @@ import com.facebook.react.bridge.WritableMap;
 import java.util.Calendar;
 import java.util.Date;
 
+/**
+ * Wraps bluetooth message data within a message containing the device from which and timestamp
+ * of when the message was received.  Provides customized data to be transferred by configuring
+ * each connection with a specific type of DataTransformer (Byte[] to T).
+ *
+ * @param <T> type of data being transferred.
+ */
 public class BluetoothMessage<T> {
 
     private WritableMap device;

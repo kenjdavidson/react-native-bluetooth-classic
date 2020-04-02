@@ -10,29 +10,29 @@ import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import kjd.reactnative.bluetooth.RNBluetoothClassicPackage;
+import kjd.reactnative.RNBluetoothClassicPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =
       new ReactNativeHost(this) {
-        @Override
-        public boolean getUseDeveloperSupport() {
+            @Override
+            public boolean getUseDeveloperSupport() {
           return BuildConfig.DEBUG;
         }
 
-        @Override
-        protected List<ReactPackage> getPackages() {
-          @SuppressWarnings("UnnecessaryLocalVariable")
-          List<ReactPackage> packages = new PackageList(this).getPackages();
-          packages.add(new RNBluetoothClassicPackage());
-          // Packages that cannot be autolinked yet can be added manually here, for example:
-          // packages.add(new MyReactNativePackage());
-          return packages;
-        }
+            @Override
+            protected List<ReactPackage> getPackages() {
+                @SuppressWarnings("UnnecessaryLocalVariable")
+                List<ReactPackage> packages = new PackageList(this).getPackages();
+                // Packages that cannot be autolinked yet can be added manually here, for example:
+                // packages.add(new MyReactNativePackage());
+                packages.add(RNBluetoothClassicPackage.DEFAULT);
+                return packages;
+            }
 
-        @Override
-        protected String getJSMainModuleName() {
+            @Override
+            protected String getJSMainModuleName() {
           return "index";
         }
       };

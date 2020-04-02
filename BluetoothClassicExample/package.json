@@ -10,7 +10,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "native-base": "^2.13.8",
+    "@react-native-community/toolbar-android": "0.1.0-rc.2",
+    "native-base": "2.13.14",
     "react": "16.9.0",
     "react-native": "0.61.5"
   },
