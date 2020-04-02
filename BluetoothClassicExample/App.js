@@ -343,7 +343,7 @@ export default class App extends React.Component {
     
     try {
       await RNBluetoothClassic.cancelAccept();
-      this.setState({ isDiscovering: false });
+      this.setState({ isAccepting: false });
     } catch(error) {
       console.log(error);
       Toast.show({
@@ -381,7 +381,7 @@ export default class App extends React.Component {
 
     try {
       await RNBluetoothClassic.cancelDiscovery();
-      console.log("Discovery cancelled");
+      this.setState({ isDiscovering: false });
     } catch(error) {
       console.log(error);
       Toast.show({
