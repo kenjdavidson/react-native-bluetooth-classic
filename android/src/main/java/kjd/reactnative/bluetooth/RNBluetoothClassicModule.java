@@ -535,17 +535,22 @@ public class RNBluetoothClassicModule
   }
 
   /**
-   * Start listening for connections
+   * Start listening for connections.
    *
    * @param promise resolve or reject the requested listening
+   *
+   * @throws IllegalStateException if the Bluetooth adapter is disabled or the service is already
+   *          in accept mode.
    */
   @ReactMethod
   public void accept(Promise promise) {
-    mAcceptPromise = promise;
-    if (mBluetoothAdapter != null) {
-      mBluetoothService.accept();
+    if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+      promise.reject(new IllegalStateException("Bluetooth is not currently enabled"));
+    } else if (mAcceptPromise != null) {
+      promise.reject(new IllegalStateException("Bluetooth is already in the accept mode"));
     } else {
-      promise.reject(new Exception("BluetoothAdapter is not enabled"));
+      mAcceptPromise = promise;
+      mBluetoothService.accept();
     }
   }
 
@@ -557,13 +562,15 @@ public class RNBluetoothClassicModule
    */
   @ReactMethod
   public void cancelAccept(Promise promise) {
-    if (mAcceptPromise != null) {
+    if (mBluetoothAdapter == null || mBluetoothAdapter.isEnabled()) {
+      promise.reject(new IllegalStateException("Bluetooth is not currently enabled"));
+    } else if (mAcceptPromise == null) {
+      promise.resolve(null);
+    } else {
       mBluetoothService.cancelAccept();
       mAcceptPromise.resolve(null);
       mAcceptPromise = null;
-      promise.resolve(true);
-    } else {
-      promise.reject(new Exception("Currently not in accept mode"));
+      promise.resolve(null);
     }
   }
 
@@ -575,11 +582,11 @@ public class RNBluetoothClassicModule
    */
   @ReactMethod
   public void connect(String id, Promise promise) {
-    mConnectedPromise = promise;
     if (mBluetoothAdapter != null) {
       try {
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(id);
         if (device != null) {
+          mConnectedPromise = promise;
           mBluetoothService.connect(device);
         } else {
           promise.reject(new Exception("No device found with id " + id));
@@ -757,12 +764,11 @@ public class RNBluetoothClassicModule
     sendEvent(BluetoothEvent.CONNECTION_SUCCESS.code, nativeDevice.map());
     if (mConnectedPromise != null) {
       mConnectedPromise.resolve(nativeDevice.map());
-    }
-    if (mAcceptPromise != null) {
+      mConnectedPromise = null;
+    } else if (mAcceptPromise != null) {
       mAcceptPromise.resolve(nativeDevice.map());
+      mAcceptPromise = null;
     }
-    mConnectedPromise = null;
-    mAcceptPromise = null;
   }
 
   @Override
@@ -772,9 +778,8 @@ public class RNBluetoothClassicModule
 
     if (mConnectedPromise != null) {
       mConnectedPromise.reject(new Exception("Connection unsuccessful"), new NativeDevice(device).map());
+      mConnectedPromise = null;
     }
-
-    mConnectedPromise = null;
   }
 
   @Override

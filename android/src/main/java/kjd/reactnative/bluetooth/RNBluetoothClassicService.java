@@ -9,13 +9,9 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import kjd.reactnative.CommonCharsets;
 
 /**
  * Provides the communication threads and message delivering/handling for a single connected
@@ -91,7 +87,7 @@ public class RNBluetoothClassicService {
         if (D) Log.d(TAG, String.format("Connecting to %s", device.getName()));
 
         if (DeviceState.CONNECTING.equals(mState)) {
-            cancelConnectThread(); // Cancel any thread attempting to make a connection
+            cleanConnectThreads(); // Cancel any thread attempting to make a connection
         }
 
         cancelConnectedThread(); // Cancel any thread currently running a connection
@@ -178,7 +174,7 @@ public class RNBluetoothClassicService {
     synchronized void stop() {
         if (D) Log.d(TAG, "Stopping RNBluetoothClassic service");
 
-        cancelConnectThread();
+        cleanConnectThreads();
         cancelConnectedThread();
 
         setState(DeviceState.DISCONNECTED, null);
@@ -211,7 +207,7 @@ public class RNBluetoothClassicService {
     private synchronized void connectionSuccess(BluetoothSocket socket, BluetoothDevice device) {
         if (D) Log.d(TAG, String.format("Connected to %s", device.getAddress()));
 
-        cancelConnectThread(); // Cancel any thread attempting to make a connection
+        cleanConnectThreads(); // Cancel any thread attempting to make a connection
 
         // Start the thread to manage the connection and perform transmissions
         mConnectedThread = new ConnectedThread(device, socket);
@@ -241,9 +237,15 @@ public class RNBluetoothClassicService {
     }
 
     /**
-     * Cancel connect thread
+     * Cancels and nulls out the {@link ConnectThread} and the {@link AcceptThread} in order to
+     * ensure that subsequent requests work properly.
      */
-    private void cancelConnectThread () {
+    private void cleanConnectThreads() {
+        if (mAcceptThread != null) {
+            mAcceptThread.cancel();
+            mAcceptThread = null;
+        }
+
         if (mConnectThread != null) {
             mConnectThread.cancel();
             mConnectThread = null;
@@ -458,16 +460,14 @@ public class RNBluetoothClassicService {
             byte[] buffer = new byte[1024];
             int bytes;
 
-            // Keep listening to the InputStream while connected, the thread is currently cancelled
-            // by closing the socket and causing the mmInStream.read() to fail, allowing the
-            // Exception handling to notify.  This should be updated to use an isConnected
-            // flag.
+            // The device will continue attempting to read until there is an IOException thrown
+            // due to the other side disconnecting.  Apparently when the other side disconnects
+            // mmStream.isConnected() still returns true.
             while (!mmCancelled) {
                 try {
-                    if (mmInStream.available() > 0) {
-                        bytes = mmInStream.read(buffer);
+                    bytes = mmInStream.read(buffer);
+                    if (bytes > 0)
                         listener.onReceivedData(mmDevice, Arrays.copyOf(buffer, bytes));
-                    }
 
                     Thread.sleep(500);      // Pause
                 } catch (Exception e) {
