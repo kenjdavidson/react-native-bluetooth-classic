@@ -269,29 +269,34 @@ export default class App extends React.Component {
 
   async initialize() {
     let enabled = await RNBluetoothClassic.isEnabled();
+    this.setState({ bluetoothEnabled: enabled });
+
+    if (enabled) {
+      this.refreshDevices();
+    }    
+  }
+
+  async refreshDevices() {
     let newState = {
-      bluetoothEnabled: enabled,
       devices: [],
       connectedDevice: undefined,
     };
+   
+    try {
+      let connectedDevice = await RNBluetoothClassic.getConnectedDevice();
 
-    if (enabled) {
+      console.log('initializeDevices::connectedDevice');
+      console.log(connectedDevice);
+      newState.connectedDevice = connectedDevice;
+    } catch (error) {
       try {
-        let connectedDevice = await RNBluetoothClassic.getConnectedDevice();
+        let devices = await RNBluetoothClassic.list();
 
-        console.log('initializeDevices::connectedDevice');
-        console.log(connectedDevice);
-        newState.connectedDevice = connectedDevice;
+        console.log('initializeDevices::list');
+        console.log(devices);
+        newState.deviceList = devices;
       } catch (error) {
-        try {
-          let devices = await RNBluetoothClassic.list();
-
-          console.log('initializeDevices::list');
-          console.log(devices);
-          newState.deviceList = devices;
-        } catch (error) {
-          console.error(error.message);
-        }
+        console.error(error.message);
       }
     }
 
@@ -391,6 +396,7 @@ export default class App extends React.Component {
     }
   }
 
+  refresh = () => this.refreshDevices();
   selectDevice = device => this.connectToDevice(device);
   unselectDevice = () => this.disconnectFromDevice();
   accept = () => this.acceptConnections();
@@ -431,7 +437,10 @@ export default class App extends React.Component {
                   <Title>Devices</Title>
                 </Left>
                 <Right>
-                  <Text style={{color: connectedColor}}>O</Text>
+                  <TouchableOpacity
+                    onPress={this.refresh}>
+                    <Icon type="Ionicons" name="md-sync" style={styles.toolbarButton} />
+                  </TouchableOpacity>
                 </Right>
               </Header>
               <DeviceList

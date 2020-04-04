@@ -17,8 +17,4 @@ public class DevicePairingException extends RuntimeException {
         super(cause);
     }
 
-    public DevicePairingException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
-
 }

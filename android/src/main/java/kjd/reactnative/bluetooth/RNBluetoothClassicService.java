@@ -146,6 +146,8 @@ public class RNBluetoothClassicService {
     /**
      * Return the currently connected device, null if none.
      *
+     * TODO update so that service only deals with NativeDevice instead
+     *
      * @return connected device
      */
     BluetoothDevice connectedDevice() {
@@ -210,7 +212,6 @@ public class RNBluetoothClassicService {
         if (D) Log.d(TAG, String.format("Connected to %s", device.getAddress()));
 
         cancelConnectThread(); // Cancel any thread attempting to make a connection
-        cancelConnectedThread(); // Cancel any thread currently running a connection
 
         // Start the thread to manage the connection and perform transmissions
         mConnectedThread = new ConnectedThread(device, socket);
@@ -470,7 +471,7 @@ public class RNBluetoothClassicService {
 
                     Thread.sleep(500);      // Pause
                 } catch (Exception e) {
-                    Log.e(TAG, "Disconnected", e);
+                    Log.e(TAG, "Disconnected - was it cancelled? " + mmCancelled, e);
 
                     if (!mmCancelled) {
                         connectionLost(mmDevice, e);
@@ -509,8 +510,14 @@ public class RNBluetoothClassicService {
          * Cancel the connection - gracefully
          */
         synchronized void cancel() {
-            if (D) Log.d(TAG, String.format("Closing connection to %s", mmDevice.getAddress()));
+            if (D) Log.d(TAG, String.format("Cancelling connection to %s", mmDevice.getAddress()));
             mmCancelled = true;
+
+            try {
+                mmSocket.close();
+            } catch (IOException e) {
+                // Forced close
+            }
         }
     }
 }

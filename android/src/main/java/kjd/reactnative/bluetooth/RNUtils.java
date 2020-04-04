@@ -21,23 +21,5 @@ public class RNUtils {
         return sdf.format(cal.getTime());
     }
 
-    /**
-     * This needs to be put somewhere better, but for now it'll work.
-     *
-     * @param device BluetoothDevice
-     */
-    public static WritableMap deviceToWritableMap(BluetoothDevice device) {
-        if (device == null)
-            return null;
-
-        WritableMap params = Arguments.createMap();
-
-        params.putString("name", device.getName());
-        params.putString("address", device.getAddress());
-        params.putString("id", device.getAddress());
-        params.putInt("class", device.getBluetoothClass() != null
-                ? device.getBluetoothClass().getDeviceClass() : -1);
-        return params;
-    }
 }
 

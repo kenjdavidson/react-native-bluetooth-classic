@@ -360,8 +360,7 @@ public class RNBluetoothClassicModule
     if (mBluetoothAdapter != null) {
       Set<BluetoothDevice> bondedDevices = mBluetoothAdapter.getBondedDevices();
       for (BluetoothDevice rawDevice : bondedDevices) {
-        WritableMap device = RNUtils.deviceToWritableMap(rawDevice);
-        deviceList.pushMap(device);
+        deviceList.pushMap(new NativeDevice(rawDevice).map());
       }
     }
     if (D) Log.d(TAG, "Devices = " + deviceList.toString());
@@ -394,10 +393,10 @@ public class RNBluetoothClassicModule
   }
 
   @Override
-  public void onDiscoveryComplete(Collection<BluetoothDevice> unpairedDevices) {
+  public void onDiscoveryComplete(Collection<NativeDevice> unpairedDevices) {
     WritableArray deviceArray = Arguments.createArray();
-    for (BluetoothDevice device : unpairedDevices) {
-      deviceArray.pushMap(RNUtils.deviceToWritableMap(device));
+    for (NativeDevice device : unpairedDevices) {
+      deviceArray.pushMap(device.map());
     }
 
     mDeviceDiscoveryPromise.resolve(deviceArray);
@@ -619,7 +618,7 @@ public class RNBluetoothClassicModule
   @ReactMethod
   public void getConnectedDevice(Promise promise) {
     if (mBluetoothService.isConnected()) {
-      promise.resolve(RNUtils.deviceToWritableMap(mBluetoothService.connectedDevice()));
+      promise.resolve(new NativeDevice(mBluetoothService.connectedDevice()).map());
     }
     promise.reject(new Error("No bluetooth device connected"));
   }
@@ -753,12 +752,14 @@ public class RNBluetoothClassicModule
     // now a module registration.  I don't see it making sense to return a module event as well
     // as a resolved promise, since this should only ever be called after a request to a specific
     // device.
-    sendEvent(BluetoothEvent.CONNECTION_SUCCESS.code, RNUtils.deviceToWritableMap(device));
+    NativeDevice nativeDevice = new NativeDevice(device);
+
+    sendEvent(BluetoothEvent.CONNECTION_SUCCESS.code, nativeDevice.map());
     if (mConnectedPromise != null) {
-      mConnectedPromise.resolve(RNUtils.deviceToWritableMap(device));
+      mConnectedPromise.resolve(nativeDevice.map());
     }
     if (mAcceptPromise != null) {
-      mAcceptPromise.resolve(RNUtils.deviceToWritableMap(device));
+      mAcceptPromise.resolve(nativeDevice.map());
     }
     mConnectedPromise = null;
     mAcceptPromise = null;
@@ -770,7 +771,7 @@ public class RNBluetoothClassicModule
     Log.d(this.getClass().getSimpleName(),  msg, reason);
 
     if (mConnectedPromise != null) {
-      mConnectedPromise.reject(new Exception("Connection unsuccessful"), RNUtils.deviceToWritableMap(device));
+      mConnectedPromise.reject(new Exception("Connection unsuccessful"), new NativeDevice(device).map());
     }
 
     mConnectedPromise = null;
@@ -782,7 +783,7 @@ public class RNBluetoothClassicModule
     Log.d(this.getClass().getSimpleName(),  msg, reason);
 
     WritableMap params = Arguments.createMap();
-    params.putMap("device", RNUtils.deviceToWritableMap(device));
+    params.putMap("device", new NativeDevice(device).map());
     params.putString("message", msg);
     params.putString("error", reason.getMessage());
     sendEvent(BluetoothEvent.CONNECTION_LOST.code, params);
@@ -795,7 +796,7 @@ public class RNBluetoothClassicModule
     WritableMap params = Arguments.createMap();
     params.putString("message", e.getMessage());
     params.putString("error", e.getMessage());
-    params.putMap("device", RNUtils.deviceToWritableMap(mBluetoothService.connectedDevice()));
+    params.putMap("device", new NativeDevice(mBluetoothService.connectedDevice()).map());
     sendEvent(BluetoothEvent.ERROR.code, params);
   }
 
@@ -829,7 +830,7 @@ public class RNBluetoothClassicModule
     String message;
     while ((message = readUntil(this.mDelimiter)) != null) {
       BluetoothMessage bluetoothMessage
-              = new BluetoothMessage<>(RNUtils.deviceToWritableMap(mBluetoothService.connectedDevice()), message);
+              = new BluetoothMessage<>(new NativeDevice(mBluetoothService.connectedDevice()).map(), message);
       sendEvent(BluetoothEvent.READ.code, bluetoothMessage.asMap());
     }
   }

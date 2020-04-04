@@ -17,10 +17,19 @@ import java.util.Map;
 
 import kjd.reactnative.RCTEventEmitter;
 
+/**
+ * Creates and updates device based on ACTION_FOUND intents.  Once completed the full list is
+ * returned to the React Native client.
+ *
+ * TODO ACTION_FOUND should update React Native with an event, in order to live update the RSSI
+ *
+ * @author kendavidson
+ *
+ */
 public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
 
     private DiscoveryCompleteListener onComplete;
-    private Map<String,BluetoothDevice> unpairedDevices;
+    private Map<String,NativeDevice> unpairedDevices;
 
     public BluetoothDiscoveryReceiver(DiscoveryCompleteListener listener) {
         this.onComplete = listener;
@@ -30,13 +39,21 @@ public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        Log.d(this.getClass().getSimpleName(), "Bluetooth Discovery Receiver: " + action);
 
         if (BluetoothDevice.ACTION_FOUND.equals(action)) {
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            NativeDevice nativeDevice = new NativeDevice(device);
+            nativeDevice.addExtra("name", intent.getStringExtra(BluetoothDevice.EXTRA_NAME));
+            nativeDevice.addExtra("rssi", intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE));
 
             if (!unpairedDevices.containsKey(device.getAddress())) {
-                unpairedDevices.put(device.getAddress(), device);
+                if (BuildConfig.DEBUG)
+                    Log.d(this.getClass().getSimpleName(), "onReceive found: " + nativeDevice);
+
+                unpairedDevices.put(device.getAddress(), nativeDevice);
+            } else {
+                unpairedDevices.get(device.getAddress()).addExtra("rssi",
+                        intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE));
             }
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
             onComplete.onDiscoveryComplete(unpairedDevices.values());
@@ -44,6 +61,6 @@ public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
     }
 
     public interface DiscoveryCompleteListener {
-        void onDiscoveryComplete(Collection<BluetoothDevice> unpairedDevices);
+        void onDiscoveryComplete(Collection<NativeDevice> unpairedDevices);
     }
 }
