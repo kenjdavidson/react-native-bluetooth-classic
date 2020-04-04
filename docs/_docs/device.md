@@ -5,8 +5,27 @@ chapter:
 title: Device
 ---
 
-Once the Bluetooth adapter has been turned on and configured you can start attempting to pair and connect with Bluetooth devices.  Currently there is only one connection available at a time, so these functions are actually called against the `RNBluetoothClassic` module.  
+`RNBluetoothClassic` attempts to standardize the native Android and IOS implementations of Bluetooth Devices/Peripherals for communication and access within React Native.
 
-When multiple device connections are competed, these will be used against the `BTConnectedDevice` or whatever naming is used.
+## Android NativeDevice
+
+Android maintains device information and communication by wrapping the `BluetoothDevice` within a `NativeDevice` object.  The `NativeDevice` is the direct tie to serialization to React Native.  At it's base it defines the following:
+
+```json
+{
+  name: 'Device Name',
+  address: 'AA:AA:AA:AA:AA',
+
+  extra: {
+    // See specific API calls for added Intent extras
+  }
+}
+```
+
+## IOS
+
+
+
+## API
 
 {% include apiaccordion.html id="device" categories="device" %}

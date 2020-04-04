@@ -25,9 +25,10 @@ Although it's probably not required, there are two versions of the project being
 | 0.9.x | 0.59.9 | > 4.1 (16) | > IOS 9 | 
 | 0.10.x | 0.60.0 | > 4.1 (16) | > IOS 9 |
 
-For the purpose of this documentation only **0.10.x** will be used moving forward.
-
 ## Notable Changes
+
+**0.10.7**
+- Added RSSI to `NativeDevice` responses from [`discoverDevices`](https://kenjdavidson.github.io/react-native-bluetooth-classic/adapter/#discoverDevices)
 
 **0.10.6** 
 - Added listening functionality - The [`accept`](https://kenjdavidson.github.io/react-native-bluetooth-classic/adapter/#accept) call will start a `BluetoothServerSocket` which will wait (indefinitely) for a client to connect.
