@@ -4,9 +4,34 @@ declare module 'react-native-bluetooth-classic' {
   export interface BTDevice {
     name: string;
     address: string;
+    id: string;
+
+    /**
+     * Android only
+     */
+    class?: string;
+
+    /**
+     * Android only
+     */
     extra: {
       [key: string]: any;
     };
+
+    /**
+     * iOS only
+     */
+    modelNumber?: string;
+
+    /**
+     * iOS only
+     */
+    protocolStrings?: string[];
+
+    /**
+     * iOS only
+     */
+    isConnected?: boolean;
   }
 
   export enum BTEvents {
