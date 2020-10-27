@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
-import RNBluetoothClassic, { BluetoothEvents } from 'react-native-bluetooth-classic';
-import { Container, Text, Header, Left, Button, Icon, Body, Title, Subtitle } from 'native-base';
+import RNBluetoothClassic, { BluetoothEventType } from 'react-native-bluetooth-classic';
+import { Container, Text, Header, Left, Button, Icon, Body, Title, Subtitle, Right } from 'native-base';
 import { FlatList, View, StyleSheet, TextInput, TouchableOpacity, BackHandler } from 'react-native';
-import Logger from '../common/logger';
 
 /**
  * Manages a selected device connection.  The selected Device should 
@@ -23,7 +22,10 @@ export default class ConnectionScreen extends React.Component {
         type: 'error'
       }],
       polling: false,
-      connection: undefined
+      connection: false,
+      connectionOptions: {
+        delimiter: '1'
+      }
     }
   }
 
@@ -34,11 +36,9 @@ export default class ConnectionScreen extends React.Component {
    * of this screen.
    */
   async componentWillUnmount() {      
-    Logger(`ConnectionScreen::componentWillUnmount state`, this.state);
     if (this.state.connection) {
       try {      
-        Logger(`ConnectionScreen::componentWillUnmount attempting disconnect`);
-        await RNBluetoothClassic.disconnectFromDevice(this.props.device.address);
+        await this.props.device.disconnect();
       } catch (error) {
         // Unable to disconnect from device
       }    
@@ -53,29 +53,15 @@ export default class ConnectionScreen extends React.Component {
    * data based on the configuration.
    */
   componentDidMount() {
-    Logger(`ConnectionScreen::componentDidMount with state`, this.state);
-    Logger(`ConnectionScreen::componentDidMount with props`, this.props);
-    setTimeout(this.connect, 0);
+    setTimeout(() => this.connect(), 0);
   }
 
-  connect = async () => {
+  async connect() {
     try {
-      let connection = undefined;
-      let connected = await RNBluetoothClassic.isDeviceConnected(this.props.device.address);      
+      let connection = await this.props.device.isConnected();
+      if (!connection) {
+        connection = await this.props.device.connect(this.state.connectionOptions);
 
-      if (connected) {
-        connection = await RNBluetoothClassic.getConnectedDevice(this.props.device.address);      
-
-        Logger(`ConnectionScreen::connect received connected device`, connection);
-        this.addData({
-          data: `Re-established connection`,
-          timestamp: new Date(),
-          type: 'info'
-        });
-      } else {
-        connection = await RNBluetoothClassic.connectToDevice(this.props.device.address, {});
-
-        Logger(`ConnectionScreen::connect connected to device`, connection);
         this.addData({
           data: `Connection successful`,
           timestamp: new Date(),
@@ -84,9 +70,8 @@ export default class ConnectionScreen extends React.Component {
       }
 
       this.setState({connection});
-      this.onConnection();
+      this.initializeRead();
     } catch (error) {
-      Logger(`ConnectionScreen::connect error`, error);
       this.addData({
         data: `Connection failed: ${error.message}`,
         timestamp: new Date(),
@@ -95,14 +80,28 @@ export default class ConnectionScreen extends React.Component {
     }
   }
 
-  onConnection() {
-    if (this.state.polling) {
-      this.readInterval = setInterval((data) => onReceivedData(data), 300);
-    } else {
-      let eventType = `${BluetoothEvents.DEVICE_READ}@${this.props.device.address}`;
-      this.readSubscription = RNBluetoothClassic.addListener(eventType, 
-          (data) => this.onReceivedData(data));
+  async disconnect() {
+    try {
+      let disconnected = await this.props.device.disconnect();
+      
+      this.addData({
+        data: `Disconnected`,
+        timestamp: new Date(),
+        type: 'info'
+      });
+
+      this.setState({connection: !disconnected});
+    } catch(error) {
+      this.addData({
+        data: `Disconnect failed: ${error.message}`,
+        timestamp: new Date(),
+        type: 'error'
+      });
     }
+  }
+
+  initializeRead() {
+    this.readSubscription = this.props.device.onDataReceived((data) => this.onReceivedData(data));
   }
 
   /**
@@ -112,10 +111,6 @@ export default class ConnectionScreen extends React.Component {
     if (this.readSubscription) {
       this.readSubscription.remove();
     }
-
-    if (this.readInterval) {
-      clearInterval(this.readInterval);
-    }
   }
 
   /**
@@ -124,7 +119,7 @@ export default class ConnectionScreen extends React.Component {
    * 
    * @param {ReadEvent} event 
    */
-  onReceivedData = (event) => {
+  async onReceivedData(event) {
     event.timestamp = new Date();
     this.addData({
       ...event,
@@ -133,7 +128,7 @@ export default class ConnectionScreen extends React.Component {
     });
   }
 
-  addData = (message) => {
+  async addData(message) {
     this.setState({data: [message, ...this.state.data]});
   }
 
@@ -141,10 +136,10 @@ export default class ConnectionScreen extends React.Component {
    * Attempts to send data to the connected Device.  The input text is
    * padded with a NEWLINE (which is required for most commands)
    */
-  sendData = async () => {
+  async sendData() {
     try {
       let message = this.state.text + '\r'; 
-      await RNBluetoothClassic.write(this.props.device.address, message);
+      await RNBluetoothClassic.writeToDevice(this.props.device.address, message);
   
       this.addData({
         timestamp: new Date(),
@@ -158,7 +153,17 @@ export default class ConnectionScreen extends React.Component {
     }
   };
 
+  async toggleConnection() {
+      if (this.state.connection) {
+        this.disconnect();
+      } else {
+        this.connect();
+      }
+  }
+
   render() {
+    let toggleIcon = this.state.connection ? 'radio-button-on' : 'radio-button-off';
+
     return (
       <Container>
         <Header>
@@ -172,6 +177,12 @@ export default class ConnectionScreen extends React.Component {
             <Title>{this.props.device.name}</Title>
             <Subtitle>{this.props.device.address}</Subtitle>
           </Body>
+          <Right>
+            <Button transparent
+              onPress={() => this.toggleConnection()}>
+              <Icon type="Ionicons" name={toggleIcon}/>
+            </Button>
+          </Right>
         </Header>
         <View style={styles.connectionScreenWrapper}>
           <FlatList
@@ -195,7 +206,7 @@ export default class ConnectionScreen extends React.Component {
             text={this.state.text}
             onChangeText={(text) => this.setState({text})}
             onSend={this.sendData}
-            disabled={this.state.connection == undefined} />
+            disabled={!this.state.connection} />
         </View>        
       </Container>
     );

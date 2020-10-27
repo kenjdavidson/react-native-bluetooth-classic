@@ -4,14 +4,13 @@ import {
   StyleProvider,
 } from 'native-base';
 import RNBluetoothClassic, {
-  BluetoothEvents,
+  BluetoothEventType,
   BluetoothErrors
 } from 'react-native-bluetooth-classic';
 import getTheme from './native-base-theme/components';
 import platform from './native-base-theme/variables/platform';
 import ConnectionScreen from './src/connection/ConnectionScreen';
 import DeviceListScreen from './src/device-list/DeviceListScreen';
-import Logger from './src/common/logger';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -33,7 +32,9 @@ export default class App extends React.Component {
    * @param device the BluetoothDevice selected or connected
    */
   selectDevice = (device) => {
-    Logger(`App::selectDevice`, device);
+    console.log(`App::selectDevice`)
+    console.log(device);
+
     this.setState({ device });
   }
 
@@ -43,20 +44,20 @@ export default class App extends React.Component {
    * - determine if bluetooth is enabled (may be redundant with listener)
    */
   async componentDidMount() {
-    Logger(`App::componentDidMount adding listeners`)
-    this.enabledSubscription = RNBluetoothClassic.addListener(BluetoothEvents.BLUETOOTH_ENABLED, 
-      (event) => this.onStateChanged(event));
-    this.disabledSubscription = RNBluetoothClassic.addListener(BluetoothEvents.BLUETOOTH_DISABLED, 
-      (event) => this.onStateChanged(event));
+    console.log(`App::componentDidMount adding listeners`)
+    this.enabledSubscription = RNBluetoothClassic
+      .onBluetoothEnabled((event) => this.onStateChanged(event));
+    this.disabledSubscription = RNBluetoothClassic
+      .onBluetoothDisabled((event) => this.onStateChanged(event));
 
     try {
-      Logger(`App::componentDidMount checking bluetooth status`);
+      console.log(`App::componentDidMount checking bluetooth status`);
       let enabled = await RNBluetoothClassic.isBluetoothEnabled();
 
-      Logger(`App::componentDidMount status => ${enabled}`);
+      console.log(`App::componentDidMount status => ${enabled}`);
       this.setState({ bluetoothEnabled: enabled });
     } catch (error) {
-      Logger(`App::componentDidMount error`, error);
+      console.log(`App::componentDidMount error`, error);
       this.setState({ bluetoothEnabled: false});
     }
   }
@@ -65,9 +66,9 @@ export default class App extends React.Component {
    * Clear subscriptions
    */
   componentWillUnmount() {
-    Logger(`App:componentWillUnmount removing subscriptions`)
-    RNBluetoothClassic.removeListener(this.enabledSubscription);
-    RNBluetoothClassic.removeListener(this.disabledSubscription);
+    console.log(`App:componentWillUnmount removing subscriptions`)
+    this.enabledSubscription.remove()
+    this.disabledSubscription.remove();
   }
 
   /**
@@ -76,7 +77,9 @@ export default class App extends React.Component {
    * @param stateChangedEvent event sent from Native side during state change
    */
   onStateChanged(stateChangedEvent) {
-    Logger(`App::onStateChanged`, stateChangedEvent);
+    console.log(`App::onStateChanged`)
+    console.log(stateChangedEvent);
+    
     this.setState({
       bluetoothEnabled: stateChangedEvent.enabled,
       device: stateChangedEvent.enabled ? this.state.device : undefined

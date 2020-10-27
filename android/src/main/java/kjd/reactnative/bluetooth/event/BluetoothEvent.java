@@ -1,40 +1,37 @@
 package kjd.reactnative.bluetooth.event;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
-public enum BluetoothEvent {
-    /**
-     * Fired when the {@link android.bluetooth.BluetoothAdapter} is enabled.
-     */
-    BLUETOOTH_ENABLED("bluetoothEnabled"),
+import java.time.LocalDateTime;
+import java.util.Calendar;
 
-    /**
-     * Fired when the {@link android.bluetooth.BluetoothAdapter} is disabled.
-     */
-    BLUETOOTH_DISABLED("bluetoothDisabled"),
+import kjd.reactnative.Mappable;
+import kjd.reactnative.bluetooth.device.NativeDevice;
 
-    /**
-     * Fired when a {@link android.bluetooth.BluetoothDevice} is connected.  This is not the same
-     * thing as paired - it's an actual socket connection being established.  Previously this
-     * was the primary method for knowing when the device connection was successful, it's best
-     * that the connection {@link com.facebook.react.bridge.Promise} be used instead.
-     */
-    DEVICE_CONNECTED("deviceConnected"),
-    DEVICE_DISCONNECTED("deviceDisconnected"),
-    DEVICE_READ("deviceRead"),
-    ERROR("error");
+public abstract class BluetoothEvent implements Mappable {
 
-    public final String code;
-    BluetoothEvent(String code) {
-        this.code = code;
+    private EventType eventType;
+
+    public BluetoothEvent(EventType eventType) {
+        this.eventType = eventType;
     }
 
-    public static WritableMap eventNames() {
-        WritableMap events = Arguments.createMap();
-        for(BluetoothEvent event : BluetoothEvent.values()) {
-            events.putString(event.name(), event.name());
-        }
-        return events;
+    @Override
+    public WritableMap map() {
+        WritableMap map = Arguments.createMap();
+        map.putString("eventType", eventType.name());
+        map.putString("timestamp", LocalDateTime.now().toString());
+        map.merge(buildMap());
+        return map;
     }
+
+    /**
+     * Applies custom information for the event.
+     *
+     * @return
+     */
+    public abstract ReadableMap buildMap();
+
 }

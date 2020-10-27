@@ -1,12 +1,11 @@
-import { EventSubscription } from 'react-native';
 import BluetoothNativeDevice from './BluetoothNativeDevice';
-export interface BluetoothNativeModule {
+export default interface BluetoothNativeModule {
     /**
      * Requests whether or not Bluetooth is enabled.
      *
      * @return Promise resolved with enabled value
      */
-    isBluetoothEnabled(): Promise<Boolean>;
+    isBluetoothEnabled(): Promise<boolean>;
     /**
      * Retrieves a list of the currently bonded devices.  This was originally
      * called list but caused some confusion.
@@ -34,13 +33,13 @@ export interface BluetoothNativeModule {
      * @param address of which we will try to disconnect
      * @return Promise resolved with connection success
      */
-    disconnectFromDevice(address: string): Promise<Boolean>;
+    disconnectFromDevice(address: string): Promise<boolean>;
     /**
      * Determine if the provided address as an established connection.
      *
      * @param address address in which to check for connection
      */
-    isDeviceConnected(address: string): Promise<Boolean>;
+    isDeviceConnected(address: string): Promise<boolean>;
     /**
      * Attempts to get the BluetoothDevice specified by the address.  This should generally
      * be called after isConnected(address:string) unless you're expecting to
@@ -72,7 +71,7 @@ export interface BluetoothNativeModule {
      * @param address address of the device to be cleared
      * @return Promise resolved whether clear was successful
      */
-    clearFromDevice(address: string): Promise<Boolean>;
+    clearFromDevice(address: string): Promise<boolean>;
     /**
      * Write the provdied data to the device.
      *
@@ -80,7 +79,7 @@ export interface BluetoothNativeModule {
      * @param data string data which will be encoded and written
      * @return Promise resolved whether write was successful
      */
-    writeToDevice(address: string, data: string): Promise<Boolean>;
+    writeToDevice(address: string, data: string): Promise<boolean>;
     /**
      * Attempts to enable the BluetoothAdapter.
      *
@@ -88,7 +87,7 @@ export interface BluetoothNativeModule {
      *
      * @return Promise resolved whether bluetooth is enabled
      */
-    requestBluetoothEnabled(): Promise<Boolean>;
+    requestBluetoothEnabled(): Promise<boolean>;
     /**
      * Attempts to rename the BluetoothAdapter.
      *
@@ -97,7 +96,7 @@ export interface BluetoothNativeModule {
      * @param name to which the BluetoothAdapter will be renamed
      * @return Promise resolved whether adapter name was set
      */
-    setBluetoothAdapterName(name: string): Promise<Boolean>;
+    setBluetoothAdapterName(name: string): Promise<boolean>;
     /**
      * Attempts to accept a connection from a client device.
      *
@@ -113,7 +112,7 @@ export interface BluetoothNativeModule {
      *
      * @return Promise resolved whether cancel was successful
      */
-    cancelAccept(): Promise<Boolean>;
+    cancelAccept(): Promise<boolean>;
     /**
      * Starts discovery.
      *
@@ -129,7 +128,7 @@ export interface BluetoothNativeModule {
      *
      * @returns Promise resolved whether discover cancelled successfully
      */
-    cancelDiscovery(): Promise<Boolean>;
+    cancelDiscovery(): Promise<boolean>;
     /**
      * Attempt to pair the device.
      *
@@ -147,36 +146,33 @@ export interface BluetoothNativeModule {
      *
      * @return Promise resolved on whether device was unpaired
      */
-    unpairDevice(address: string): Promise<Boolean>;
-}
-export interface BluetoothEventEmitter {
+    unpairDevice(address: string): Promise<boolean>;
     /**
-     * Adds a listener of the specified type to the native
-     * RNBluetoothClassicModule.  This is required on top of the
-     * EventEmitter so that we know when we actually need to send
-     * Events (as per the Native documentation).
+     * Informs the RNBluetoothClassic native module about the addition of the
+     * requested eventType listener.  This enables the specified eventType messages
+     * to be sent from native to the React Native.
      *
-     * @param eventType to which we wish to start listening
+     * Event listeners on the native side are solely just counters used to determine
+     * whethere there is a point in  sending the event across the bridge.
+     *
+     * Event with device context should be in the format `EVENT_TYPE@DEIVCE_ADDRESS`
+     *
+     * @param eventType
      */
-    addListener(eventType: string): EventSubscription;
+    addListener(eventType: string): any;
     /**
-     * Removes a listener of the specified type from the native
-     * RNBluetoothClassicModule.  This is required on top of the
-     * EventEmitter so that we know when we actually need to send
-     * Events (as per the Native documentation).
+     * Removes a single listener count of the specified event type.  Once all listeners
+     * are removed, the native side will not send an more events.
      *
-     * @param eventType which we are removing
+     * @param eventType
      */
-    removeListener(eventType: string): void;
+    removeListener(eventType: string): any;
     /**
-     * Removes all the current listeners from the native
-     * RNBluetoothClassicModule.  This is required on top of the
-     * EventEmitter so that we know when we actually need to send
-     * Events (as per the Native documentation).
+     * Clears out all listener counts on the native side for the provided event type.   This
+     * may need to be separated into a removeAllListeners with no argument that would
+     * remove every listener all together.
      *
-     * @param eventType eventType we wish to remove
+     * @param eventType
      */
-    removeAllListeners(eventType: string): void;
-}
-export default interface RNBluetoothClassicModule extends BluetoothNativeModule, BluetoothEventEmitter {
+    removeAllListeners(eventType: string): any;
 }

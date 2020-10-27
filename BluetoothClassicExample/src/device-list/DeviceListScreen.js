@@ -19,7 +19,6 @@ import RNBluetoothClassic from 'react-native-bluetooth-classic';
 import {
   PermissionsAndroid, View, FlatList, TouchableOpacity, SafeAreaView, StyleSheet
 } from 'react-native';
-import Logger from '../common/logger';
 
 /**
  * See https://reactnative.dev/docs/permissionsandroid for more information
@@ -65,7 +64,6 @@ export default class DeviceListScreen extends React.Component {
   }
 
   componentDidMount() {
-    Logger(`DeviceListScreen::componentDidMount enabled => ${this.props.bluetoothEnabled}`);
     this.getBondedDevices();
   }
 
@@ -81,10 +79,10 @@ export default class DeviceListScreen extends React.Component {
    * Gets the currently bonded devices.
    */
   getBondedDevices = async () => {
-    Logger(`DeviceListScreen::getBondedDevices`);
+    console.log(`DeviceListScreen::getBondedDevices`);
     try {
       let bonded = await RNBluetoothClassic.getBondedDevices();
-      Logger(`DeviceListScreen::getBondedDevices found`, bonded);
+      console.log(`DeviceListScreen::getBondedDevices found`, bonded);
       this.setState({ devices: bonded });
     } catch (error) {
       this.setState({ devices: [] });
@@ -138,7 +136,6 @@ export default class DeviceListScreen extends React.Component {
    */
   cancelAcceptConnections = async () => {
     if (!this.state.accepting) {
-      console.log(`Currently not in accepting state - skipping`);
       return;
     }
 
@@ -146,7 +143,6 @@ export default class DeviceListScreen extends React.Component {
       await RNBluetoothClassic.cancelAccept();
       this.setState({ isAccepting: false });
     } catch(error) {
-      console.log(`Cancel accept error: error.message`);
       Toast.show({
         text: `Unable to cancel accept connection`,
         duration: 2000,
@@ -193,7 +189,6 @@ export default class DeviceListScreen extends React.Component {
   cancelDiscovery = async () => {
     try {
       let cancelled = await RNBluetoothClassic.cancelDiscovery();
-      Logger(`DeviceListScreen::cancelDiscoverDevices discovery cancelled => ${cancelled}`);
     } catch(error) {
       Toast.show({
         text: `Error occurred while attempting to cancel discover devices`,

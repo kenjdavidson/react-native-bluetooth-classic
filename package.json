@@ -7,6 +7,7 @@
   "scripts": {
     "clean": "rm -rf lib",
     "tsc": "tsc",
+    "tsc:watch": "tsc --watch",
     "build": "npm run clean && npm run tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postversion": "git push && git push --tags && npm publish"

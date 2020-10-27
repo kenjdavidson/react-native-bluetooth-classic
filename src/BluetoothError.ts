@@ -1,4 +1,4 @@
-enum BluetoothErrors {
+export enum BluetoothError {
     BLUETOOTH_NOT_ACCEPTING = "BLUETOOTH_NOT_ACCEPTING",
     BLUETOOTH_IN_ACCEPTING = "BLUETOOTH_IN_ACCEPTING",
     BLUETOOTH_IN_DISCOVERY = "BLUETOOTH_IN_DISCOVERY",
@@ -14,5 +14,3 @@ enum BluetoothErrors {
     CONNECTION_LOST = "CONNECTION_LOST",
     PAIRING_FAILED = "PAIRING_FAILED"
 };
-
-export default BluetoothErrors;

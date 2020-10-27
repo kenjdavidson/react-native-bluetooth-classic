@@ -38,7 +38,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
-import kjd.reactnative.bluetooth.event.BluetoothEvent;
+import kjd.reactnative.bluetooth.event.BluetoothStateEvent;
+import kjd.reactnative.bluetooth.event.EventType;
 import kjd.reactnative.bluetooth.BluetoothException;
 import kjd.reactnative.bluetooth.BluetoothMessage;
 import kjd.reactnative.bluetooth.BluetoothRequest;
@@ -57,7 +58,6 @@ import kjd.reactnative.bluetooth.device.DataReceivedListener;
 import kjd.reactnative.bluetooth.device.DeviceConnection;
 import kjd.reactnative.bluetooth.device.DeviceConnectionFactory;
 import kjd.reactnative.bluetooth.device.NativeDevice;
-import kjd.reactnative.bluetooth.event.BluetoothStateChangeEvent;
 import kjd.reactnative.bluetooth.receiver.ActionACLReceiver;
 import kjd.reactnative.bluetooth.receiver.DiscoveryReceiver;
 import kjd.reactnative.bluetooth.receiver.PairingReceiver;
@@ -94,7 +94,7 @@ public class RNBluetoothClassicModule
         ActionACLReceiver.ActionACLCallback {
 
     /**
-     * React native module name.
+     * Name of the module when provided to React Native {@code NativeModules}.
      */
     public  static final String MODULE_NAME = "RNBluetoothClassic";
 
@@ -178,6 +178,15 @@ public class RNBluetoothClassicModule
     private Map<String, AtomicInteger> mListenerCounts;
 
     //region: Constructors
+
+    /**
+     * Creates the RNBlutoothClassicModule.  As a final step of initialization the appropriate
+     * {@link EventType#BLUETOOTH_ENABLED}/{@link EventType#BLUETOOTH_DISABLED} is
+     * sent and the activity and lifecyle listeners are register.
+     *
+     * @param context React application context
+     * @param factories {@link DeviceConnection} factories
+     */
     public RNBluetoothClassicModule(ReactApplicationContext context,
                                     Map<String,DeviceConnectionFactory> factories) {
         super(context);
@@ -189,11 +198,11 @@ public class RNBluetoothClassicModule
         this.mListenerCounts = new ConcurrentHashMap<>();
 
         if (mAdapter != null && mAdapter.isEnabled()) {
-            sendEvent(BluetoothEvent.BLUETOOTH_ENABLED,
-                    new BluetoothStateChangeEvent(BluetoothState.ENABLED).map());
+            sendEvent(EventType.BLUETOOTH_ENABLED,
+                    new BluetoothStateEvent(BluetoothState.ENABLED).map());
         } else {
-            sendEvent(BluetoothEvent.BLUETOOTH_DISABLED,
-                    new BluetoothStateChangeEvent(BluetoothState.DISABLED).map());
+            sendEvent(EventType.BLUETOOTH_DISABLED,
+                    new BluetoothStateEvent(BluetoothState.DISABLED).map());
         }
 
         getReactApplicationContext().addActivityEventListener(this);
@@ -221,7 +230,7 @@ public class RNBluetoothClassicModule
     @Override
     public Map<String, Object> getConstants() {
         Map<String, Object> constants = new HashMap<>();
-        constants.put("BTEvents", BluetoothEvent.eventNames());
+        constants.put("BTEvents", EventType.eventNames());
         return constants;
     }
     //endregion
@@ -244,7 +253,7 @@ public class RNBluetoothClassicModule
      * <li><strong>ENABLE_BLUETOOTH</strong> requests the user to enable Bluetooth from settings.</li>
      * <li><strong>PAIR_DEVICE</strong> after a user has completed pairing the device.</li>
      * </ul>
-     * This sends a {@link BluetoothEvent#BLUETOOTH_ENABLED} event.  It probably shouldn't duplicate
+     * This sends a {@link EventType#BLUETOOTH_ENABLED} event.  It probably shouldn't duplicate
      * the promise but this gives the opportunity to do both things.
      *
      * @param activity    the activity which is returning the result
@@ -264,12 +273,13 @@ public class RNBluetoothClassicModule
 
                 if (mEnabledPromise != null) {
                     mEnabledPromise.resolve(true);
-                    sendEvent(BluetoothEvent.BLUETOOTH_ENABLED,
-                            new BluetoothStateChangeEvent(BluetoothState.ENABLED).map());
+                    sendEvent(EventType.BLUETOOTH_ENABLED,
+                            new BluetoothStateEvent(BluetoothState.ENABLED).map());
                 }
             } else {
                 if (BuildConfig.DEBUG)
                     Log.d(TAG, "User did *NOT* enable Bluetooth");
+
                 if (mEnabledPromise != null) {
                     mEnabledPromise.reject(new Exception("User did not enable Bluetooth"));
                 }
@@ -888,31 +898,37 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Adds a new listener for the {@link BluetoothEvent} provided.  If a {@link BluetoothEvent#DEVICE_READ}
-     * is requested, the device address must accompany it (separated by an @).   If an unsupported
-     * {@link BluetoothEvent} is requested, and error is thrown.
+     * Adds a new listener for the {@link EventType} provided.
+     * <p>
+     * Listeners can be provided with or without a device context.  A device context is applied
+     * by sending the event name followed by a device's address.  An example of this would be
+     * {@code READ@12:34:56:78:90}.
      *
-     * @param requestedEvent {@link BluetoothEvent} name for which the client wishes to listen
+     * @param requestedEvent {@link EventType} name for which the client wishes to listen
      */
     @ReactMethod
     public void addListener(String requestedEvent) {
-        String[] eventSplit = requestedEvent.split("@");
-        String eventType = eventSplit[0];
+        String eventType = requestedEvent,
+                eventDevice = null;
 
-        if (!BluetoothEvent.eventNames().hasKey(eventSplit[0])) {
+        if (requestedEvent.contains("@")) {
+            String[] context = requestedEvent.split("@");
+            eventType = context[0];
+            eventDevice = context[1];
+        }
+
+        if (!EventType.eventNames().hasKey(eventType)) {
             throw new InvalidBluetoothEventException(requestedEvent);
         }
 
-        BluetoothEvent event = BluetoothEvent.valueOf(eventSplit[0]);
+        EventType event = EventType.valueOf(eventType);
 
-        if (BluetoothEvent.DEVICE_READ == event) {
-            String address = eventSplit[1];
-
-            if (!mConnections.containsKey(address)) {
+        if (EventType.DEVICE_READ == event) {
+            if (!mConnections.containsKey(eventDevice)) {
                 throw new IllegalStateException(String.format("Cannot read from %s, not currently connected", requestedEvent));
             }
 
-            DeviceConnection connection = mConnections.get(address);
+            DeviceConnection connection = mConnections.get(eventDevice);
             connection.addDeviceListener(this);
         }
 
@@ -930,58 +946,67 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Removes the specified {@link BluetoothEvent}.  If this is a {@link BluetoothEvent#DEVICE_READ}
+     * Removes the specified {@link EventType}.  If this is a {@link EventType#DEVICE_READ}
      * the device address must be supplied (separated by an @) in the same way as when the
      * listener was applied.
      *
-     * @param eventName name of the {@link BluetoothEvent} for which the client wishes to remove
+     * @param requestedEvent name of the {@link EventType} for which the client wishes to remove
      *                  listener.
      */
     @ReactMethod
-    public void removeListener(String eventName) {
-        if (!BluetoothEvent.eventNames().hasKey(eventName)) {
-            throw new InvalidBluetoothEventException(eventName);
+    public void removeListener(String requestedEvent) {
+        String eventType = requestedEvent,
+                eventDevice = null;
+
+        if (requestedEvent.contains("@")) {
+            String[] context = requestedEvent.split("@");
+            eventType = context[0];
+            eventDevice = context[1];
         }
 
-        String[] requestedEvent = eventName.split("@");
-        BluetoothEvent event = BluetoothEvent.valueOf(requestedEvent[0]);
+        if (!EventType.eventNames().hasKey(eventType)) {
+            throw new InvalidBluetoothEventException(eventType);
+        }
 
-        if (BluetoothEvent.DEVICE_READ == event) {
-            if (!mConnections.containsKey(requestedEvent[1])) {
-                throw new IllegalStateException(String.format("Cannot read from %s, not currently connected", eventName));
+        EventType event = EventType.valueOf(eventType);
+
+        if (EventType.DEVICE_READ == event) {
+            if (!mConnections.containsKey(eventDevice)) {
+                throw new IllegalStateException(String.format("Cannot read from %s, not currently connected", eventType));
             }
 
-            DeviceConnection connection = mConnections.get(requestedEvent[1]);
+            DeviceConnection connection = mConnections.get(eventDevice);
             connection.removeDeviceListener();
         }
 
         // Only remove the listener if it currently exists.  If you're attemping to remove a listener
         // which hasn't been added, just let it go.
-        if (mListenerCounts.containsKey(eventName)) {
-            AtomicInteger listenerCount = mListenerCounts.get(eventName);
+        if (mListenerCounts.containsKey(eventType)) {
+            AtomicInteger listenerCount = mListenerCounts.get(eventType);
             int currentCount = listenerCount.decrementAndGet();
 
             Log.d(TAG,
                     String.format("Removing listener to %s, currently have %d listeners",
-                            eventName, currentCount));
+                            eventType, currentCount));
         }
     }
 
     /**
-     * Remove all the listeners for the provided eventName.
+     * Remove all the listeners for the provided eventName.   Removing all listeners also has a
+     * context (prefixed with @) which will remove all the listeners for that specified device.
      *
      * @param eventName for which all listeners will be removed
      */
     @ReactMethod
     public void removeAllListeners(String eventName) {
-        if (!BluetoothEvent.eventNames().hasKey(eventName)) {
+        if (!EventType.eventNames().hasKey(eventName)) {
             throw new InvalidBluetoothEventException(eventName);
         }
 
         String[] requestedEvent = eventName.split("@");
-        BluetoothEvent event = BluetoothEvent.valueOf(requestedEvent[0]);
+        EventType event = EventType.valueOf(requestedEvent[0]);
 
-        if (BluetoothEvent.DEVICE_READ == event) {
+        if (EventType.DEVICE_READ == event) {
             if (!mConnections.containsKey(requestedEvent[1])) {
                 throw new IllegalStateException(String.format("Cannot read from %s, not currently connected", eventName));
             }
@@ -1021,7 +1046,7 @@ public class RNBluetoothClassicModule
         mConnections.put(device.getAddress(), connection.getConnection());
         connection.resolve();
 
-        sendEvent(BluetoothEvent.DEVICE_CONNECTED, device.map());
+        sendEvent(EventType.DEVICE_CONNECTED, device.map());
     }
 
     /**
@@ -1066,7 +1091,7 @@ public class RNBluetoothClassicModule
                     ex.map());
 
         mConnections.remove(device.getAddress());
-        sendEvent(BluetoothEvent.DEVICE_DISCONNECTED, ex.map());
+        sendEvent(EventType.DEVICE_DISCONNECTED, ex.map());
     }
 
     /**
@@ -1078,7 +1103,7 @@ public class RNBluetoothClassicModule
     @Override
     public void onError(NativeDevice device, Throwable e) {
         BluetoothException ex = new BluetoothException(device, e.getMessage(), e);
-        sendEvent(BluetoothEvent.ERROR, ex.map());
+        sendEvent(EventType.ERROR, ex.map());
     }
     //endregion
 
@@ -1103,7 +1128,7 @@ public class RNBluetoothClassicModule
 
         BluetoothMessage bluetoothMessage
                 = new BluetoothMessage<>(device.map(), data);
-        sendEvent(BluetoothEvent.DEVICE_READ, device, bluetoothMessage.asMap());
+        sendEvent(EventType.DEVICE_READ, device, bluetoothMessage.asMap());
     }
 
     /**
@@ -1118,10 +1143,10 @@ public class RNBluetoothClassicModule
     public void onStateChange(BluetoothState newState, BluetoothState oldState) {
         Log.d(TAG, "onStateChange from " + oldState.name() + "  to " + newState.name());
 
-        BluetoothEvent event = (BluetoothState.ENABLED == newState)
-                ? BluetoothEvent.BLUETOOTH_ENABLED : BluetoothEvent.BLUETOOTH_DISABLED;
+        EventType event = (BluetoothState.ENABLED == newState)
+                ? EventType.BLUETOOTH_ENABLED : EventType.BLUETOOTH_DISABLED;
 
-        sendEvent(event, new BluetoothStateChangeEvent(newState).map());
+        sendEvent(event, new BluetoothStateEvent(newState).map());
     }
 
     /**
@@ -1153,22 +1178,22 @@ public class RNBluetoothClassicModule
 
         DeviceConnection connection = mConnections.remove(device.getAddress());
 
-        sendEvent(BluetoothEvent.DEVICE_DISCONNECTED, device.map());
-        sendEvent(BluetoothEvent.DEVICE_DISCONNECTED, device, Arguments.createMap());
+        sendEvent(EventType.DEVICE_DISCONNECTED, device.map());
+        sendEvent(EventType.DEVICE_DISCONNECTED, device, Arguments.createMap());
     }
     //endregion
 
     /**
-     * Sends a {@link BluetoothEvent} to the React Native JS module
+     * Sends a {@link EventType} to the React Native JS module
      * {@link com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter}.
      * <p>
      * Currently having no active {@link com.facebook.react.bridge.CatalystInstance} will not cause
      * the application to crash, although I'm not sure if it should.
      *
-     * @param event the {@link BluetoothEvent} being sent
+     * @param event the {@link EventType} being sent
      * @param body the content of the event
      */
-    private void sendEvent(BluetoothEvent event, WritableMap body) {
+    private void sendEvent(EventType event, WritableMap body) {
         ReactContext context = getReactApplicationContext();
 
         if (context.hasActiveCatalystInstance()) {
@@ -1181,19 +1206,19 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Sends a {@link BluetoothEvent} to the React Native JS module
+     * Sends a {@link EventType} to the React Native JS module
      * {@link com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter}.  This
      * version allows for sending events do a specific Device (providing the address along side
      * the event name separated by a semi-colon).
      * <p>
-     * This should generally only be used for {@link BluetoothEvent#DEVICE_READ} events, but nothing
+     * This should generally only be used for {@link EventType#DEVICE_READ} events, but nothing
      * stops it from providing other types.
      *
-     * @param event the {@link BluetoothEvent} being sent to React Native JS
+     * @param event the {@link EventType} being sent to React Native JS
      * @param device the {@link NativeDevice} which caused/receiving the event
      * @param body the event content
      */
-    private void sendEvent(BluetoothEvent event, NativeDevice device, WritableMap body) {
+    private void sendEvent(EventType event, NativeDevice device, WritableMap body) {
         ReactContext context = getReactApplicationContext();
 
         if (context.hasActiveCatalystInstance()) {

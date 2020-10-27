@@ -1,9 +1,10 @@
 import BluetoothModule from "./BluetoothModule";
 import BluetoothNativeDevice from "./BluetoothNativeDevice";
+import { BluetoothEvent, BluetoothEventListener, BluetoothDeviceReadEvent, BluetoothEventSubscription } from "./BluetoothEvent";
 
 export default class BluetoothDevice implements BluetoothNativeDevice {
-	_bluetoothModule: BluetoothModule;
-	_nativeDevice: BluetoothNativeDevice;
+	private _bluetoothModule: BluetoothModule;
+	private _nativeDevice: BluetoothNativeDevice;
 
 	name: string;
 	address: string;
@@ -28,4 +29,32 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
 		this.rssi = nativeDevice.rssi;
 		this.extra = nativeDevice.extra;
 	}
+	
+	async connect(options: Map<string, object>): Promise<boolean> {
+		return new Promise(async (resolve, reject) => {
+			try {
+				let connected = await this._bluetoothModule.connectToDevice(this.address, options);
+				resolve(!!connected)
+			} catch (err) {
+				reject(err);
+			}			
+		});
+	}
+
+	isConnected(): Promise<boolean> {
+		return this._bluetoothModule.isDeviceConnected(this.address);
+	}
+	
+	disconnect(): Promise<boolean> {
+		return this._bluetoothModule.disconnectFromDevice(this.address);
+	}
+	
+	async write(data: any): Promise<boolean> {
+		throw new Error("Method not implemented.");
+	}
+	
+	onDataReceived(listener: BluetoothEventListener<BluetoothDeviceReadEvent>): BluetoothEventSubscription {
+		return this._bluetoothModule.onDeviceRead(this.address, listener);
+	}
+
 }

@@ -1,6 +1,8 @@
-import { NativeEventEmitter, EmitterSubscription } from 'react-native';
-import RNBluetoothClassicModule, { BluetoothNativeModule } from './BluetoothNativeModule';
+import { NativeEventEmitter } from 'react-native';
+import RNBluetoothClassicModule from './BluetoothNativeModule';
 import BluetoothDevice from './BluetoothDevice';
+import { BluetoothEventListener, StateChangeEvent, BluetoothDeviceEvent, BluetoothEventSubscription } from './BluetoothEvent';
+import { BluetoothDeviceReadEvent } from '../lib/BluetoothEvent';
 /**
  * Provides access to native module.  In general the methods will be direct calls
  * through to {@code NativeModules.RNBluetoothClassc}, although there are instances
@@ -10,7 +12,7 @@ import BluetoothDevice from './BluetoothDevice';
  *
  * @author kendavidson
  */
-export default class BluetoothModule implements BluetoothNativeModule {
+export default class BluetoothModule {
     /**
      * Native RNBluetoothClassicModule provided from Java and IOS through
      * the NativeModules.
@@ -32,7 +34,7 @@ export default class BluetoothModule implements BluetoothNativeModule {
      *
      * @return Promise resolved with whether Bluetooth is enabled
      */
-    isBluetoothEnabled(): Promise<Boolean>;
+    isBluetoothEnabled(): Promise<boolean>;
     /**
      * Requests whether there is data availabled on the Device.  At this point
      * this is a yes/no, it may be wise to turn it into number of bytes based
@@ -56,14 +58,14 @@ export default class BluetoothModule implements BluetoothNativeModule {
      * @param address for which device we will clear
      * @return Promise resolved with whether clear was successful
      */
-    clearFromDevice(address: string): Promise<Boolean>;
+    clearFromDevice(address: string): Promise<boolean>;
     /**
      * Disconnect from device.
      *
      * @param address of Device we will disconnect
      * @return Promise resolved with disconnection success status
      */
-    disconnectFromDevice(address: string): Promise<Boolean>;
+    disconnectFromDevice(address: string): Promise<boolean>;
     /**
      * Determines whether device is currently connected.  Connected means that there
      * is an actual Socket open (not just pairing)
@@ -71,7 +73,7 @@ export default class BluetoothModule implements BluetoothNativeModule {
      * @param address of which we are checking for connection
      * @returns Promise resolved with whether there is a connection
      */
-    isDeviceConnected(address: string): Promise<Boolean>;
+    isDeviceConnected(address: string): Promise<boolean>;
     /**
      * Wraps the bonded native devices with a BluetoothDevice to allow for
      * event management.
@@ -109,41 +111,7 @@ export default class BluetoothModule implements BluetoothNativeModule {
      * @param address the address to which we will send data
      * @param message String or Buffer which will be sent
      */
-    writeToDevice(address: string, message: any): Promise<Boolean>;
-    /**
-     * Override the NativeEventEmitter#addListener method providing functionality for
-     * Android.  I felt this was important as I didn't want clients to have to determine
-     * which platform to use the event listening features of React.
-     *
-     * When adding a listener for READ event, it's required to include the address in
-     * the string - READ:address - or else an exception will be thrown.  Since React Native
-     * RCTEventEmitter had no way to do this normally this needed to be improvised.  This should
-     * be improved, but I need to spend some time getting used to the React Native
-     * functionality.
-     *
-     * @param {string} eventName to which the listener will be attached, if this is for read
-     *    it should be READ:address
-     * @param {function} handler which will be called on event
-     * @param {object} context optional context object of the listener
-     */
-    addListener(eventType: string, listener: (...args: any[]) => any, context?: any): EmitterSubscription;
-    /**
-     * Remove all the listeners for an eventName.  This should probably never be called, as
-     * I'm not entirely sure the upstream effects after the latest changes.  If this were to
-     * remove all READ listeners, we would need to loop through all Devices and remove
-     * their listeners.
-     *
-     * @param eventType which will have all it's listeners removed
-     *
-     */
-    removeAllListeners(eventType: string): void;
-    /**
-     * Remove the subscription - this is actually called from subscription.remove()
-     * and provides a way for determining if we have any BTEvents.READ event still.
-     *
-     * @param {Subscription} subscription the subscription to be removed
-     */
-    removeListener(subscription: EmitterSubscription): void;
+    writeToDevice(address: string, message: any): Promise<boolean>;
     /**
      * Starts discovery on the bluetooth adatper.
      *
@@ -156,7 +124,7 @@ export default class BluetoothModule implements BluetoothNativeModule {
      *
      * This is an Android only feature.
      */
-    cancelDiscovery(): Promise<Boolean>;
+    cancelDiscovery(): Promise<boolean>;
     /**
      * Pair the device request.
      *
@@ -172,7 +140,7 @@ export default class BluetoothModule implements BluetoothNativeModule {
      *
      * @param address address of the device we wish to unpair
      */
-    unpairDevice(address: string): Promise<Boolean>;
+    unpairDevice(address: string): Promise<boolean>;
     /**
      * Attempt to start accepting connections.   Accepts only one connection at a time,
      * once this has been established the device is returned and accepting is disabled.
@@ -187,7 +155,7 @@ export default class BluetoothModule implements BluetoothNativeModule {
      *
      * This is an Android only feature.
      */
-    cancelAccept(): Promise<Boolean>;
+    cancelAccept(): Promise<boolean>;
     /**
      * Request user to turn on Bluetooth Adapter
      *
@@ -195,7 +163,7 @@ export default class BluetoothModule implements BluetoothNativeModule {
      *
      * @param state
      */
-    requestBluetoothEnabled(): Promise<Boolean>;
+    requestBluetoothEnabled(): Promise<boolean>;
     /**
      * Attempts to set the bluetooth adapter name.
      *
@@ -203,5 +171,52 @@ export default class BluetoothModule implements BluetoothNativeModule {
      *
      * @param name the name to which we will change BluetoothAdapter
      */
-    setBluetoothAdapterName(name: string): Promise<Boolean>;
+    setBluetoothAdapterName(name: string): Promise<boolean>;
+    private createBluetoothEventSubscription;
+    /**
+     * Creates an EventSubscription which calls the provided listener when the native
+     * device is notified of the BluetoothAdapter being enabled.
+     *
+     * @param listener
+     */
+    onBluetoothEnabled(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription;
+    /**
+     * Creates an EventSubscription which calls the provided listener when the native
+     * device is notified of the BluetoothAdapter being disabled.
+     *
+     * @param listener
+     */
+    onBluetoothDisabled(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription;
+    /**
+     * Creates an EventSubscription which wraps both enabled and disabled.
+     *
+     * @param listener
+     */
+    onStateChanged(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription;
+    /**
+     * Creates an EventSubscription which wraps the DEVICE_CONNECTED event type.
+     *
+     * @param listener
+     */
+    onDeviceConnected(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription;
+    /**
+     * Creates an EventSubscription which wraps the DEVICE_DISCONNECTED event type.
+     *
+     * @param listener
+     */
+    onDeviceDisconnected(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription;
+    /**
+     * Creates an EventSubscription based on the read event from a specified device.  If the device
+     * is not currently connected an exception will be thrown, although I'm not sure if
+     * this is required, since it may be annoying to continually add/remove subscriptions.
+     *
+     * @param listener
+     */
+    onDeviceRead(address: string, listener: BluetoothEventListener<BluetoothDeviceReadEvent>): BluetoothEventSubscription;
+    /**
+     * Creates an EventSubscription which wraps the ERROR event.
+     *
+     * @param listener
+     */
+    onError(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription;
 }

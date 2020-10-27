@@ -32,10 +32,10 @@ import java.util.Properties;
 abstract public class AbstractDelimitedConnection
         implements DeviceConnection {
 
-    public static final String PROP_DELIMITER = "DELIMITER";
-    public static final String PROP_READ_TIMEOUT = "READ_TIMEOUT";
-    public static final String PROP_READ_SIZE = "READ_SIZE";
-    public static final String PROP_CHARSET = "CHARSET";
+    public static final String PROP_DELIMITER = "delimiter";
+    public static final String PROP_READ_TIMEOUT = "readTimeout";
+    public static final String PROP_READ_SIZE = "readSize";
+    public static final String PROP_CHARSET = "charset";
 
     public static final String DEFAULT_DELIMITER = "\n";
     public static final int DEFAULT_READ_TIMEOUT = 300;
@@ -116,13 +116,13 @@ abstract public class AbstractDelimitedConnection
         this.mBuffer = new StringBuffer();
         this.mConnectionStatus = ConnectionStatus.DISCONNECTED;
 
-        this.mCharset = properties.contains(PROP_CHARSET)
+        this.mCharset = properties.containsKey(PROP_CHARSET)
                 ? Charset.forName(properties.getProperty(PROP_CHARSET)) : DEFAULT_CHARSET;
-        this.mDelimiter = properties.contains(PROP_DELIMITER)
+        this.mDelimiter = properties.containsKey(PROP_DELIMITER)
                 ? properties.getProperty(PROP_DELIMITER) : DEFAULT_DELIMITER;
-        this.mReadSize = properties.contains(PROP_READ_SIZE)
+        this.mReadSize = properties.containsKey(PROP_READ_SIZE)
                 ? (Integer) properties.get(PROP_READ_SIZE) : DEFAULT_READ_SIZE;
-        this.mReadTimeout = properties.contains(PROP_READ_TIMEOUT)
+        this.mReadTimeout = properties.containsKey(PROP_READ_TIMEOUT)
                 ? (Integer) properties.get(PROP_READ_TIMEOUT) : DEFAULT_READ_TIMEOUT;
 
         return startConnection(properties);
