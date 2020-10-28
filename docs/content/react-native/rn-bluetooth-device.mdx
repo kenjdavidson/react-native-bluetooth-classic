@@ -1,0 +1,30 @@
+---
+title: Bluetooth Device
+description: Connect and communicate with device(s)
+---
+
+import {
+  ExpansionPanel
+} from 'gatsby-theme-apollo-docs';
+
+To access the Adapter/External Accessory related features you're going to be working with the `RNBluetoothClassic` object.
+
+```javascript
+import RNBluetoothClassic, {
+  BluetoothEventType,
+  BluetoothDevice
+} from 'react-native-bluetooth-classic';
+```
+
+## Android/IOS API
+
+The following are available on both Android and IOS.
+
+<ExpansionPanel title="isConnected"></ExpansionPanel>
+<ExpansionPanel title="connect"></ExpansionPanel>
+<ExpansionPanel title="disconnect"></ExpansionPanel>
+<ExpansionPanel title="available"></ExpansionPanel>
+<ExpansionPanel title="clear"></ExpansionPanel>
+<ExpansionPanel title="read"></ExpansionPanel>
+<ExpansionPanel title="write"></ExpansionPanel>
+<ExpansionPanel title="onDataReceived"></ExpansionPanel>

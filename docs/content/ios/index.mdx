@@ -1,0 +1,47 @@
+---
+title: Getting Started with IOS
+description: ""
+---
+
+## Installation
+
+As previously described the `react-native-bluetooth-classic` is installed through NPM:
+
+```shell
+$ npm install react-native-bluetooth-classic --save
+```
+
+Once installed [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) will take over and all that is required is starting the application as normal.  Be sure to check out the previous link if you need to customize or disable the autolinking of this (or any) module.
+
+## MFi Protocols
+
+Remember to make sure you have your protocol strings provided within your application `plist` file - this is a requirement of the External Accessory framework.  This is the top cause of:
+
+> `Unhandled JS Exception: TypeError: Cannot read property 'xxx' of undefined` 
+
+while attempting to use the library.  An example of what this looks like in your own `plist` file is:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>UISupportedExternalAccessoryProtocols</key>
+  <array>
+    <string>com.apple.m1</string>
+  </array>
+</dict>
+</plist>
+```
+
+## F.A.Q
+
+#### Why isn't my protocol working?
+
+Remember these are MFi protocols, they are not communication protocols.  I've received a number of issues based on this confusion.  
+
+#### Where do I get MFi protocols?
+
+You either need to find the protocols listed on the companies website (Zebra for example has some posted) but in most cases these are kept super secret; like Fight Club secret!
+
+Getting devices MFi compliant costs companies a boat load of money, so they don't generally give these out for free.  You'll need to work with a vendor constantly (as you'll find there are some super annoying things to do for releasing). 

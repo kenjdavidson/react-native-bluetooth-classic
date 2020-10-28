@@ -1,0 +1,213 @@
+---
+title: Bluetooth Classic Module
+description: Access Adapter/External Accessory features
+---
+
+import {
+  ExpansionPanel
+} from 'gatsby-theme-apollo-docs';
+
+To access the Adapter/External Accessory related features you're going to be working with the `RNBluetoothClassic` object.
+
+```javascript
+import RNBluetoothClassic from 'react-native-bluetooth-classic';
+```
+
+## Android/IOS API
+
+The following are available on both Android and IOS.
+
+<ExpansionPanel title="isBluetoothEnabled(): Promise<boolean>">
+
+Requests whether the device Bluetooth adapter is enabled `true` or disabled `false`.
+
+```javascript
+try {
+    await enabled = RNBluetoothClassic.isBluetoothEnabled();
+    this.setState({enabled});
+} catch (err) {
+    // Handle accordingly
+}
+```
+</ExpansionPanel>
+
+<ExpansionPanel title="getBondedDevices(): Promise<BluetoothDevice[]>">
+
+Requests an array of the bonded/paired `BluetoothDevice`(s).
+
+```javascript
+try {
+    await paired = RNBluetoothClassic.getBondedDevices();
+    this.setState({paired});
+} catch (err) {
+    // Error if Bluetooth is not enabled
+    // Or there are any issues requesting paired devices
+}
+```
+</ExpansionPanel>
+
+<ExpansionPanel title="getConnectedDevices(): Promise<BluetoothDevice[]>">
+
+Requests an array of the connected `BluetoothDevice`(s); in this context conncted means an active `Socket`.
+
+```javascript
+try {
+    await connected = RNBluetoothClassic.getConnectedDevices();
+    this.setState({connected});
+} catch (err) {
+    // Error if Bluetooth is not enabled
+    // Or there are any issues requesting paired devices
+}
+```
+</ExpansionPanel>
+
+<ExpansionPanel title="getConnectedDevice(address: string): Promise<BluetoothDevice>">
+
+Requests whether a device `BluetoothDevice` is currently connected; in this context conncted means an active `Socket`.
+
+```javascript
+try {
+    let address = this.props.device.address;
+    await device = RNBluetoothClassic.getConnectedDevice(address);
+    this.setState({device});
+} catch (err) {
+    // Error if Bluetooth is not enabled
+    // Or there are any issues requesting paired devices
+}
+```
+</ExpansionPanel>
+
+<ExpansionPanel title="onBluetoothEnabled(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription">
+
+Adds a `BluetoothEventListener<StateChangeEvent>` which is notified when the device enables Bluetooth.
+
+```javascript 
+componentDidMount() {
+    this.enabledSubscription = RNBluetoothClassic.onBluetoothEnabled(this.onStateChange);
+}
+
+componetWillUnmount() {    
+    this.enabledSubscription.remove(); // don't forget!
+}
+
+onStateChange(event: StateChangeEvent) {
+    this.setState({ enabled: event.enabled });
+}
+```
+</ExpansionPanel>
+
+<ExpansionPanel title="onBluetoothDisabled(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription">
+
+Adds a `BluetoothEventListener<StateChangeEvent>` which is notified when the device disables Bluetooth.
+
+```javascript 
+componentDidMount() {
+    this.disableSubscription = RNBluetoothClassic.onBluetoothDisabled(this.onStateChange);
+}
+
+componetWillUnmount() {    
+    this.disableSubscription.remove(); // don't forget!
+}
+
+onStateChange(event: StateChangeEvent) {
+    // little reverse action
+    this.setState({ enabled: !event.enabled });
+}
+```
+</ExpansionPanel>
+
+<ExpansionPanel title="onStateChanged(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription">
+
+Adds a `BluetoothEventListener<StateChangeEvent>` which is notified when the device enables or disables Bluetooth.
+
+```javascript 
+componentDidMount() {
+    this.subscription = RNBluetoothClassic.onStateChanged(this.onStateChange);
+}
+
+componetWillUnmount() {    
+    this.subscription.remove(); // don't forget!
+}
+
+onStateChange(event: StateChangeEvent) {
+    this.setState({ enabled: event.enabled });
+}
+```
+</ExpansionPanel>
+
+<ExpansionPanel title="onDeviceConnected(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription">
+
+When a device opens a new `Socket` connection.  This was a hold over from the original library and I'm not entirely sure whether it will be used with the advent of `BluetoothDevice#connect()`, but it's here.
+
+```javascript
+componentDidMount() {
+    this.subscription = RNBluetoothClassic.onDeviceConnected(this.onDeviceConnected);
+}
+
+componetWillUnmount() {    
+    this.subscription.remove(); // don't forget!
+}
+
+onDeviceConnected(event: BluetoothDeviceEvent) {
+    this.setState({ device: event.device });
+}
+```
+</ExpansionPanel>
+
+<ExpansionPanel title="onDeviceDisconnected(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription">
+
+Provides a listener for events fired when `Socket` connections are: closed, dropped, failed, etc.  This was a hold over from the original library, it's a little more useful as a global check on connetivity than just using the `BluetoothDevice#disconnect()` function.
+
+```javascript
+componentDidMount() {
+    this.subscription = RNBluetoothClassic.onDeviceDisconnected(this.onDeviceConnected);
+}
+
+componetWillUnmount() {    
+    this.subscription.remove(); // don't forget!
+}
+
+onDeviceDisconnected(event: BluetoothDeviceEvent) {
+    let device = this.state.device; // Or loop through paired devices
+    device.connected = false;
+    this.setState({ device });
+}
+```
+</ExpansionPanel>
+
+<ExpansionPanel title="onError(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription">
+
+Handles any and all errors that occur on the native side.  These can be from a connected `BluetoothDevice` or just from the module.   For that reason, you need to check `event.device` before attempting to use it.
+
+```javascript
+componentDidMount() {
+    this.subscription = RNBluetoothClassic.onError(this.onError);
+}
+
+componetWillUnmount() {    
+    this.subscription.remove(); // don't forget!
+}
+
+onDeviceDisconnected(event: BluetoothDeviceEvent) {
+    if (event.device) {
+        // Handle device error
+    } else {
+        // Adapter related error
+    }
+}
+```
+</ExpansionPanel>
+
+## Android Only API
+
+The following are available only on Android.
+
+<ExpansionPanel title="startDiscovery"></ExpansionPanel>
+<ExpansionPanel title="cancelDiscovery"></ExpansionPanel>
+<ExpansionPanel title="pairDevice"></ExpansionPanel>
+<ExpansionPanel title="unpairDevice"></ExpansionPanel>
+<ExpansionPanel title="accept"></ExpansionPanel>
+<ExpansionPanel title="cancelAccept"></ExpansionPanel>
+<ExpansionPanel title="requestBluetoothEnabled"></ExpansionPanel>
+<ExpansionPanel title="setBluetoothAdapterName"></ExpansionPanel>
+

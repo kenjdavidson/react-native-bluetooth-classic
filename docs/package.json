@@ -1,0 +1,20 @@
+{
+  "name": "gatsby-theme-apollo-docs-basic",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "keywords": [],
+  "description": "",
+  "dependencies": {
+    "gatsby": "^2.20.13",
+    "gatsby-theme-apollo-docs": "^4.1.4",
+    "puppeteer": "^2.1.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-icons": "^3.11.0"
+  },
+  "scripts": {
+    "start": "gatsby develop",
+    "build": "gatsby build"
+  }
+}

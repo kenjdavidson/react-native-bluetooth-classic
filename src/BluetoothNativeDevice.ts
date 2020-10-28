@@ -1,5 +1,5 @@
 import { EmitterSubscription } from 'react-native';
-import { BluetoothEventListener, BluetoothDeviceReadEvent } from "./BluetoothEvent";
+import { BluetoothEventListener, BluetoothDeviceReadEvent } from './BluetoothEvent';
 
 export default interface BluetoothNativeDevice {
     

@@ -1,0 +1,68 @@
+---
+title: API Overview
+description: ""
+summary: Overview and links to the React Native API
+---
+
+import { IoLogoAndroid } from 'react-icons/io';
+import { IoLogoApple } from 'react-icons/io';
+
+Not all functionality is available across both Android and IOS (for Apple MFi related annoying details); for that reason all calls will respond with a `Promise` which will throw an implementation error if attempting to call on IOS.
+
+You'll probably want to either:
+
+- Wrap your functionality in `Platform.IOS`
+- Duplicate your code with `Component.[android|ios].js`
+- or handle the the `Error` appropriately
+
+## RN Bluetooth Classic
+
+`RNBluetoothClassic` is the primary point of access for all Adapter/External Accessory related calls.
+
+```javascript
+import RNBluetoothClassic from 'react-native-bluetooth-classic';
+```
+
+Provides access to the following:
+
+| API | Description | Platforms |
+| --- | --- | --- | 
+| [isBluetoothEnabled]() | Determine whether device has enabled Bluetooth | <IoLogoAndroid/> <IoLogoApple/> |
+| [getBondedDevices]() | List currently paired/bonded devices | <IoLogoAndroid/> <IoLogoApple/> |
+| [getConnectedDevices]() | List currently connected devices | <IoLogoAndroid/> <IoLogoApple/> |
+| [getConnectedDevice]() | Retrieves a connected `BluetoothDevice` | <IoLogoAndroid/> <IoLogoApple/> |
+| [onBluetoothEnabled]() | Provide a listener for Bluetooth enabled events | <IoLogoAndroid/> <IoLogoApple/> |
+| [onBluetoothDisabled]() | Provide a listener for Bluetooth disabled events | <IoLogoAndroid/> <IoLogoApple/> |
+| [onStateChanged]() | Provides a listener for Bluetooth state change events | <IoLogoAndroid/> <IoLogoApple/> |
+| [onDeviceConnected]() | Provide a listener for when a device connection is initiated | <IoLogoAndroid/> <IoLogoApple/> |
+| [onDeviceDisconnected]() | Provide a listener for when a device connection has dropped | <IoLogoAndroid/> <IoLogoApple/> |
+| [onError]() | Provide a listener for any generic errors from Adapter or Device | <IoLogoAndroid/> <IoLogoApple/> |
+| [startDiscovery]() | Initiate the discovery process | <IoLogoAndroid/> |
+| [cancelDiscovery]() | Cancel the discovery process | <IoLogoAndroid/> |
+| [pairDevice]() | Request to pair with a device | <IoLogoAndroid/> |
+| [unpairDevice]() | Request to unapir a device | <IoLogoAndroid/> |
+| [accept]() | Attempt to accept a device connection | <IoLogoAndroid/> |
+| [cancelAccept]() | Cancels accepting a device connection | <IoLogoAndroid/> |
+| [requestBluetoothEnabled]() | Request that the system enable Bluetooth | <IoLogoAndroid/> |
+| [setBluetoothAdapterName]() | Attempt to rename the `BluetoothAdapter` | <IoLogoAndroid/> |
+
+> The term **connection** refers to an active `socket`; not just being paired/bonded.  Please be aware of this prior to opening any issues.
+
+## Bluetooth Device
+
+`BluetoothDevice`(s) are available from a number of `RNBluetoothClassic` functions.  These are the functions available while working with `BluetoothDevice`(s):
+
+| API | Description | Platforms |
+| --- | --- | --- | 
+| [isConnected]() | Determine whether the device has an active connection | <IoLogoAndroid/> <IoLogoApple/> |
+| [connect]() | Attempt connection to the device | <IoLogoAndroid/> <IoLogoApple/> |
+| [disconnect]() | Attempt to disconnect from the device | <IoLogoAndroid/> <IoLogoApple/> |
+| [available]() | Whether and how much data is available for read | <IoLogoAndroid/> <IoLogoApple/> |
+| [clear]() | Clear the current read buffer | <IoLogoAndroid/> <IoLogoApple/> |
+| [read]() | Read data from the device (if available) | <IoLogoAndroid/> <IoLogoApple/> |
+| [write]() | Write to the device | <IoLogoAndroid/> <IoLogoApple/> |
+| [onDataReceived]() | Add a listener to handle read events | <IoLogoAndroid/> <IoLogoApple/> |
+
+> **onDataReceived** and **read** shouldn't really be used at the same time as you could end up with half filled data or random errors.  I suggest sticking to one method `setInterval` or `onRead` in order to continuously get data
+
+> A number of the previous functions are also available directly from `RNBluetoothClassic`.  But in most cases it's wise to use the `BluetoothDevice` returned from one of the prior functions in order to manage directly

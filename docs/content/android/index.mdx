@@ -1,0 +1,36 @@
+---
+title: Getting Started with Android
+description: ""
+---
+
+## Installation
+
+As previously described the `react-native-bluetooth-classic` is installed through NPM:
+
+```shell
+$ npm install react-native-bluetooth-classic --save
+```
+
+Once installed [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) will take over and all that is required is starting the application as normal.  Be sure to check out the previous link if you need to customize or disable the autolinking of this (or any) module.
+
+Auto linking performs the same initialization and module creation as the following example:
+
+```java
+@Override
+protected List<ReactPackage> getPackages() {
+    @SuppressWarnings("UnnecessaryLocalVariable")
+    List<ReactPackage> packages = new PackageList(this).getPackages();
+    // Packages that cannot be autolinked yet can be added manually here, for example:
+    // packages.add(new MyReactNativePackage());
+    packages.add(RNBluetoothClassicPackage.DEFAULT);
+    return packages;
+}
+```
+
+See the Android API for more details.
+
+## Manual Linking
+
+If you need to make customizations to your Bluetooth connections you'll need to [disable auto linking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md#how-can-i-disable-autolinking-for-unsupported-library).  
+
+You should only need to do this, if you have to provide customized `BluetoothConnectionFactory`(s) to your application.
