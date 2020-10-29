@@ -7,11 +7,15 @@
   "description": "",
   "dependencies": {
     "gatsby": "^2.20.13",
+    "gatsby-plugin-typography": "^2.5.13",
     "gatsby-theme-apollo-docs": "^4.1.4",
     "puppeteer": "^2.1.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-icons": "^3.11.0"
+    "react-icons": "^3.11.0",
+    "react-typography": "^0.16.19",
+    "typography": "^0.16.19",
+    "typography-theme-kirkham": "^0.16.19"
   },
   "scripts": {
     "start": "gatsby develop",

@@ -1,0 +1,1 @@
+export { ReactComponent as MobileLogo } from "../../../static/bc-logo.svg";
