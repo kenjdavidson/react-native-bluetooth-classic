@@ -225,7 +225,14 @@ abstract public class AbstractDelimitedConnection
 
     @Override
     public synchronized int available() {
-        return mBuffer.length();
+        int count = 0;
+        int lastIndex = -1;
+
+        while ((lastIndex = mBuffer.indexOf(mDelimiter, lastIndex+1)) > -1) {
+            count++;
+        }
+
+        return count;
     }
 
     @Override

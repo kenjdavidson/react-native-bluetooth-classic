@@ -41,16 +41,24 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
 		});
 	}
 
-	isConnected(): Promise<boolean> {
+	async isConnected(): Promise<boolean> {
 		return this._bluetoothModule.isDeviceConnected(this.address);
 	}
 	
-	disconnect(): Promise<boolean> {
+	async disconnect(): Promise<boolean> {
 		return this._bluetoothModule.disconnectFromDevice(this.address);
+	}
+
+	async available(): Promise<number> {
+		return this._bluetoothModule.availableFromDevice(this.address);
+	}
+
+	async read(): Promise<String> {
+		return this._bluetoothModule.readFromDevice(this.address);
 	}
 	
 	async write(data: any): Promise<boolean> {
-		throw new Error("Method not implemented.");
+		return this._bluetoothModule.writeToDevice(this.address, data);
 	}
 	
 	onDataReceived(listener: BluetoothEventListener<BluetoothDeviceReadEvent>): BluetoothEventSubscription {

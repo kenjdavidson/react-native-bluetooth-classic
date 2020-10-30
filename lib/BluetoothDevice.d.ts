@@ -15,6 +15,8 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
     connect(options: Map<string, object>): Promise<boolean>;
     isConnected(): Promise<boolean>;
     disconnect(): Promise<boolean>;
+    available(): Promise<number>;
+    read(): Promise<String>;
     write(data: any): Promise<boolean>;
     onDataReceived(listener: BluetoothEventListener<BluetoothDeviceReadEvent>): BluetoothEventSubscription;
 }

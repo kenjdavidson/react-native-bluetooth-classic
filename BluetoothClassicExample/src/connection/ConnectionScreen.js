@@ -24,7 +24,7 @@ export default class ConnectionScreen extends React.Component {
       polling: false,
       connection: false,
       connectionOptions: {
-        delimiter: '1'
+        delimiter: '\n'
       }
     }
   }
@@ -101,16 +101,44 @@ export default class ConnectionScreen extends React.Component {
   }
 
   initializeRead() {
-    this.readSubscription = this.props.device.onDataReceived((data) => this.onReceivedData(data));
+    if (this.state.polling) {
+      this.readInterval = setInterval(() => this.performRead(), 5000);
+    } else {
+      this.readSubscription = this.props.device.onDataReceived((data) => this.onReceivedData(data));
+    }    
   }
 
   /**
    * Clear the reading functionality.
    */
   uninitializeRead(){
+    if (this.readInterval) {
+      clearInterval(this.readInterval);
+    }
     if (this.readSubscription) {
       this.readSubscription.remove();
     }
+  }
+
+  async performRead() {
+    try {
+      console.log(`Polling for available messages`);
+      let available = await this.props.device.available();
+      console.log(`There is data available [${available}], attempting read`);            
+
+      if (available > 0) {
+        for (let i = 0; i < available; i++) {
+          console.log(`reading ${i}th time`);
+          let data = await this.props.device.read();
+  
+          console.log(`Read data ${data}`);  
+          console.log(data);    
+          this.onReceivedData({ data });
+        }  
+      }  
+    } catch (err) {
+      console.log(err);
+    }  
   }
 
   /**
@@ -138,6 +166,7 @@ export default class ConnectionScreen extends React.Component {
    */
   async sendData() {
     try {
+      console.log(`Attempting to send data ${this.state.text}`);
       let message = this.state.text + '\r'; 
       await RNBluetoothClassic.writeToDevice(this.props.device.address, message);
   
@@ -205,7 +234,7 @@ export default class ConnectionScreen extends React.Component {
           <InputArea
             text={this.state.text}
             onChangeText={(text) => this.setState({text})}
-            onSend={this.sendData}
+            onSend={() => this.sendData()}
             disabled={!this.state.connection} />
         </View>        
       </Container>

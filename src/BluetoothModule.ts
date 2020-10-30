@@ -14,6 +14,8 @@ import { BluetoothEventListener,
 } from './BluetoothEvent';
 import { BluetoothDeviceReadEvent } from '../lib/BluetoothEvent';
 
+global.Buffer = global.Buffer || require('buffer').Buffer;
+
 /**
  * Provides access to native module.  In general the methods will be direct calls
  * through to {@code NativeModules.RNBluetoothClassc}, although there are instances 
