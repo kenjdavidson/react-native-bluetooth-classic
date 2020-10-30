@@ -29,9 +29,8 @@ let theme = {
 };
 
 theme.overrideThemeStyles = ({ rhythm }, options) => ({
-  'span.site-branding': {
-    fontFamily: options.scriptFontFamily.join(','),
-    fontSize: '3em',
+  'body': {
+    fontFamily: options.bodyFontFamily.join(',') + ' !important'
   },
 });
 

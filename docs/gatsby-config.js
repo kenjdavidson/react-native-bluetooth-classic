@@ -13,7 +13,6 @@ module.exports = {
             'api-overview'
           ],
           'React Native': [
-            'react-native/index',
             'react-native/rn-bluetooth-classic',
             'react-native/rn-bluetooth-device'
           ],
@@ -32,5 +31,6 @@ module.exports = {
         pathToConfigModule: `src/utils/typography`,
       },
     },
+
   ]
 };

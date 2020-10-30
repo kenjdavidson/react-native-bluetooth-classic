@@ -52,6 +52,8 @@ $ npm install react-native-bluetooth-classic --save
 
 Once installed [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) will take over within your application.  
 
+> With the changes in v1.0.0 it's possible that Autolinking doesn't actually work (just be prepared for that).  The goal is to have it 100% working and customizable as per the React Native documentation, but until then just beware.
+
 #### Manual Linking / Customization
 
 There may be times where overriding autolinking is required, for those examples please see the specific [android](android/) and [ios](ios/) APi(s).

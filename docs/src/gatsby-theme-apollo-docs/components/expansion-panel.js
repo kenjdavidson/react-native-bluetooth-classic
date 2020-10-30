@@ -8,7 +8,6 @@ import {colors} from 'gatsby-theme-apollo-core';
 import {size, transparentize} from 'polished';
 
 const Container = styled.div({
-  marginBottom: '1.45rem',
   borderLeft: `2px solid ${colors.primary}`
 });
 

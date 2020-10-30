@@ -7,7 +7,7 @@ import {
   ExpansionPanel
 } from 'gatsby-theme-apollo-docs';
 
-To access the Adapter/External Accessory related features you're going to be working with the `RNBluetoothClassic` object.
+The `BluetoothDevice` is where the magic of communicating with your actual devices takes place.  You're always going to be requesting your `BluetoothDevice` from one of the `RNBluetoothClassic` functions.  Once you've got that device (or a saved address which which you can simulate an address) you're good to go.
 
 ```javascript
 import RNBluetoothClassic, {
@@ -16,15 +16,171 @@ import RNBluetoothClassic, {
 } from 'react-native-bluetooth-classic';
 ```
 
-## Android/IOS API
+## Common API
 
 The following are available on both Android and IOS.
 
-<ExpansionPanel title="isConnected"></ExpansionPanel>
-<ExpansionPanel title="connect"></ExpansionPanel>
-<ExpansionPanel title="disconnect"></ExpansionPanel>
-<ExpansionPanel title="available"></ExpansionPanel>
-<ExpansionPanel title="clear"></ExpansionPanel>
-<ExpansionPanel title="read"></ExpansionPanel>
-<ExpansionPanel title="write"></ExpansionPanel>
-<ExpansionPanel title="onDataReceived"></ExpansionPanel>
+<a name="isConnected"></a>
+<ExpansionPanel title="isConnected(): Promise<boolean>">
+
+Whether or not the current device is connected - note that like everywhere else **connected** means that there is an active `BluetoothSocket` and not just paired.
+
+#### Requests
+
+- Look into adding an `isPaired()` request that does the same
+
+</ExpansionPanel>
+
+<a name="connect"></a>
+<ExpansionPanel title="connect(options: Map<string,object>): Promise<boolean>">
+
+Connect to the device.  This will attempt to open a `BluetoothSocket` (or some other connection type based on configuration) using the options provided.
+
+```javascript
+async connect() {
+  try {
+    let connection = await this.props.device.isConnected();
+    if (!connection) {
+      connection = await this.props.device.connect(this.state.connectionOptions);
+    }
+
+    this.setState({connection});
+    this.initializeRead();
+  } catch (error) {
+    // Handle error accordingly
+  }
+}
+```
+
+#### Parameters
+
+`options: map<string,object>` is an arbitrary set of properties that are passed into the `BluetoothConnection` that is created and managed. 
+
+The default connection type is `DelimitedConnectionClientImpl`, provided by the default options:
+
+```javascript
+let connected = await connect({ TYPE: "CLIENT" });
+```
+
+</ExpansionPanel>
+
+<a name="disconnect"></a>
+<ExpansionPanel title="disconnect(): Promise<boolean>">
+
+Attempts to disconnect from the device.
+
+```javascript
+async disconnect() {
+  try {
+    let disconnected = await this.props.device.disconnect();
+    this.setState({connection: !disconnected});
+  } catch(error) {
+    // Handle error accordingly
+  }
+}
+```
+
+</ExpansionPanel>
+
+<a name="available"></a>
+<ExpansionPanel title="available(): Promise<number>">
+
+Requests how much data is available for read.   Resolves with a number based on the connection type, for example the `DelimitedConnection*Impl`(Java) connections return the number of delimited messages **not the number of bytes** as you might expect.
+
+```javascript
+try {
+  let messages = await this.props.device.available();
+  if (messages.length > 0) {
+    performRead();
+  }
+} catch(error) {
+  // Handle accordingly
+}
+```
+
+</ExpansionPanel>
+
+<a name="clear"></a>
+<ExpansionPanel title="clear(): Promise<boolean>">
+
+Clear all the messages currently in the buffer.  This is really only used for manual reads, as listening to received data would automatically clear.
+
+</ExpansionPanel>
+
+<a name="read"></a>
+<ExpansionPanel title="read(): Promise<BluetoothMessage>">
+
+Reads from the device buffer and returns a `BluetoothMessage` containing information regarding the data.  The amount and type of data is dependant on the native `DeviceConnection`.  The default `DelimitedConnection*Impl` connections return plain strings, encoded/decoded using the requested `Charset`
+
+```javascript
+try {
+  let message = await this.props.device.read();
+  this.setState({ data: message.data });
+} catch(error) {
+  // Handle error accordingly 
+}
+```
+
+#### Errors
+
+- Any errors occur during reading
+
+</ExpansionPanel>
+
+<a name="write"></a>
+<ExpansionPanel title="write(data: string|Buffer)">
+
+Attempts to write to the device.   Like the `read` function, this is completely dependant on the `DeviceConnection` on how this data is written. 
+
+#### Parameters
+
+`data: string|buffer` must be in the format that your `DeviceConnection` is expecting.  Upon request, the content will be sent to the native side as after being `Base64` encoded.  This means that if you wish to send `byte[]` or `hex` you need to ensure the data is already encoded as such.
+
+#### Errors
+
+- If the `Socket` is closed
+- Any other errors occur while writing
+
+</ExpansionPanel>
+
+<a name="onDataReceived"></a>
+<ExpansionPanel title="onDataReceived(listener: BluetoothEventListener<BluetoothDeviceReadEvent>): BluetoothEventSubscription">
+
+Provide a listener for incoming data.  Without adding a listener data will be appended to the buffer and made available for:
+
+- `read()`
+- the next `onReceivedData()`
+
+> This is controlled by an augmented `RCTDeviceEmitter` and a ported Android version that is based specifically on the `BluetoothEventType` instead of just a rough estimate.
+
+```javascript 
+initializeRead() {
+  this.readSubscription = this.props.device.onDataReceived((data) => this.onReceivedData(data));
+}
+
+async onReceivedData(event: BluetoothReadEvent) {
+    this.addData({
+      ...event,
+      timestamp: new Date(),  // Add the current date 
+      type: 'receive'         // Add a type for UI
+    });
+  }
+```
+
+#### Parameters
+
+`listener: BluetoothEventListener<BluetoothDeviceReadEvent>` called when new `BluetoothReadEvent` is fired.
+
+#### Returns
+
+`BluetoothEventSubscription` which must be used to `remove()` the listener.
+
+</ExpansionPanel>
+
+## Android API
+
+There are no current Android only API.
+
+## IOS API
+
+There are no current IOS only API.

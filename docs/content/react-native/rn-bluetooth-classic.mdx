@@ -10,13 +10,16 @@ import {
 To access the Adapter/External Accessory related features you're going to be working with the `RNBluetoothClassic` object.
 
 ```javascript
-import RNBluetoothClassic from 'react-native-bluetooth-classic';
+import RNBluetoothClassic, {
+  BluetoothDevice
+} from 'react-native-bluetooth-classic';
 ```
 
-## Android/IOS API
+## Common API
 
 The following are available on both Android and IOS.
 
+<a name="isBluetoothEnabled"></a>
 <ExpansionPanel title="isBluetoothEnabled(): Promise<boolean>">
 
 Requests whether the device Bluetooth adapter is enabled `true` or disabled `false`.
@@ -31,6 +34,7 @@ try {
 ```
 </ExpansionPanel>
 
+<a name="getBondedDevices"></a>
 <ExpansionPanel title="getBondedDevices(): Promise<BluetoothDevice[]>">
 
 Requests an array of the bonded/paired `BluetoothDevice`(s).
@@ -46,6 +50,7 @@ try {
 ```
 </ExpansionPanel>
 
+<a name="getConnectedDevices"></a>
 <ExpansionPanel title="getConnectedDevices(): Promise<BluetoothDevice[]>">
 
 Requests an array of the connected `BluetoothDevice`(s); in this context conncted means an active `Socket`.
@@ -61,6 +66,7 @@ try {
 ```
 </ExpansionPanel>
 
+<a name="getConnectedDevice"></a>
 <ExpansionPanel title="getConnectedDevice(address: string): Promise<BluetoothDevice>">
 
 Requests whether a device `BluetoothDevice` is currently connected; in this context conncted means an active `Socket`.
@@ -77,6 +83,7 @@ try {
 ```
 </ExpansionPanel>
 
+<a name="onBluetoothEnabled"></a>
 <ExpansionPanel title="onBluetoothEnabled(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription">
 
 Adds a `BluetoothEventListener<StateChangeEvent>` which is notified when the device enables Bluetooth.
@@ -96,6 +103,7 @@ onStateChange(event: StateChangeEvent) {
 ```
 </ExpansionPanel>
 
+<a name="onBluetoothDisabled"></a>
 <ExpansionPanel title="onBluetoothDisabled(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription">
 
 Adds a `BluetoothEventListener<StateChangeEvent>` which is notified when the device disables Bluetooth.
@@ -116,6 +124,7 @@ onStateChange(event: StateChangeEvent) {
 ```
 </ExpansionPanel>
 
+<a name="onStateChanged"></a>
 <ExpansionPanel title="onStateChanged(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription">
 
 Adds a `BluetoothEventListener<StateChangeEvent>` which is notified when the device enables or disables Bluetooth.
@@ -135,6 +144,7 @@ onStateChange(event: StateChangeEvent) {
 ```
 </ExpansionPanel>
 
+<a name="onDeviceConnected"></a>
 <ExpansionPanel title="onDeviceConnected(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription">
 
 When a device opens a new `Socket` connection.  This was a hold over from the original library and I'm not entirely sure whether it will be used with the advent of `BluetoothDevice#connect()`, but it's here.
@@ -154,6 +164,7 @@ onDeviceConnected(event: BluetoothDeviceEvent) {
 ```
 </ExpansionPanel>
 
+<a name="onDeviceDisconnected"></a>
 <ExpansionPanel title="onDeviceDisconnected(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription">
 
 Provides a listener for events fired when `Socket` connections are: closed, dropped, failed, etc.  This was a hold over from the original library, it's a little more useful as a global check on connetivity than just using the `BluetoothDevice#disconnect()` function.
@@ -175,6 +186,7 @@ onDeviceDisconnected(event: BluetoothDeviceEvent) {
 ```
 </ExpansionPanel>
 
+<a name="onError"></a>
 <ExpansionPanel title="onError(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription">
 
 Handles any and all errors that occur on the native side.  These can be from a connected `BluetoothDevice` or just from the module.   For that reason, you need to check `event.device` before attempting to use it.
@@ -198,16 +210,188 @@ onDeviceDisconnected(event: BluetoothDeviceEvent) {
 ```
 </ExpansionPanel>
 
-## Android Only API
+## Android API
 
 The following are available only on Android.
 
-<ExpansionPanel title="startDiscovery"></ExpansionPanel>
-<ExpansionPanel title="cancelDiscovery"></ExpansionPanel>
-<ExpansionPanel title="pairDevice"></ExpansionPanel>
-<ExpansionPanel title="unpairDevice"></ExpansionPanel>
-<ExpansionPanel title="accept"></ExpansionPanel>
-<ExpansionPanel title="cancelAccept"></ExpansionPanel>
-<ExpansionPanel title="requestBluetoothEnabled"></ExpansionPanel>
-<ExpansionPanel title="setBluetoothAdapterName"></ExpansionPanel>
+<a name="startDiscovery"></a>
+<ExpansionPanel title="startDiscovery(): Promise<BluetoothDevice[]>">
 
+Requests that the `BluetoothAdapter` be placed into discovery mode.  This will resolve with an array of discovered `BluetoothDevice`(s).  You'll need to ensure that you've requested [fine location permissions within Android](https://reactnative.dev/docs/permissionsandroid) prior to starting:
+
+```javascript 
+async requestAccessFineLocationPermission() {
+  const granted = await PermissionsAndroid.request(
+    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    {
+      title: 'Access fine location required for discovery',
+      message:
+        'In order to perform discovery, you must enable/allow ' +
+        'fine location access.',
+      buttonNeutral: 'Ask Me Later"',
+      buttonNegative: 'Cancel',
+      buttonPositive: 'OK'
+    }
+  );
+  return granted === PermissionsAndroid.RESULTS.GRANTED;
+};
+
+startDiscovery = async () => {
+  try {
+    let granted = await requestAccessFineLocationPermission();
+
+    if (!granted) {
+    throw new Error(`Access fine location was not granted`);
+    }
+
+    this.setState({ discovering: true });
+
+    try {
+    let unpaired = await RNBluetoothClassic.startDiscovery();
+            
+    Toast.show({
+        text: `Found ${unpaired.length} unpaired devices.`,
+        duration: 2000
+    });
+    } finally {
+    this.setState({ devices, discovering: false });
+    }      
+  } catch (err) {
+    Toast.show({
+    text: err.message,
+    duration: 2000
+    });
+  }
+}
+```
+
+#### Errors:
+
+Will throw an error if:
+
+- The `BluetoothAdapter` is disabled
+- The `BluetoothAdapter` is already in discovery
+
+#### Requests:
+
+- Start discovery for a specific device
+- Provide a **DEVICE_DISCOVERED** event for intermediate handling
+
+</ExpansionPanel>
+
+<a name="cancelDiscovery"></a>
+<ExpansionPanel title="cancelDiscovery(): Promise<boolean>">
+
+Cancels the discovery process.  This will automatically resolve the `startDiscovery` promise with the already found `BluetoothDevice`(s).
+
+```javascript
+cancelDiscovery = async () => {
+  try {
+    let cancelled = await RNBluetoothClassic.cancelDiscovery();
+  } catch(error) {
+    Toast.show({
+      text: `Error occurred while attempting to cancel discover devices`,
+      duration: 2000
+    });
+  }
+}  
+```
+
+#### Error:
+
+Will throw an error if:
+
+- The `BluetoothAdapter` is disabled
+- The `BluetoothAdapter` is not already in discovery
+
+</ExpansionPanel>
+
+<a name="pairDevice"></a>
+<ExpansionPanel title="pairDevice(address: string): Promise<BluetoothDevice>">
+
+Attempts to pair the specified device.
+
+**Note** I haven't actually used or spent any time testing this.  It was a hold over from the original library.  Feel free to update me with information on whether this is working.
+
+#### Parameters
+
+`address: string` the address of the device to be paired.  This will be provided by the `BluetoothDevice.address` found from discovery.
+
+</ExpansionPanel>
+
+<a name="unpairDevice"></a>
+<ExpansionPanel title="unpairDevice(address: string): Promise<boolean>">
+
+Attempts to unpair the specified device.
+
+**Note** I haven't actually used or spent any time testing this.  It was a hold over from the original library.  Feel free to update me with information on whether this is working.
+
+</ExpansionPanel>
+
+<a name="accept"></a>
+<ExpansionPanel title="accept(properties: Map<string,object>): Promise<BluetoothDevice>">
+
+Places the device into `accept` mode.  This is done (`DelimitedConnectionAcceptImpl`) by opening a `BluetoothServerSocket` and resolving with the first `BluetoothDevice` which connects.
+
+```javascript
+acceptConnections = async () => {
+    this.setState({ accepting: true });
+      
+    try {      
+      let device = await RNBluetoothClassic.accept({});
+      this.setState({device});
+    } catch (error) {
+      // Handle error accordingly
+    } finally {
+      this.setState({ accepting: false });
+    }
+  }
+```
+
+#### Parameters
+
+`properties: Map<string,object>` is determined by the type of connection that you are attempting.  This depends highly on the native configuration of your **ACCEPT** connection type.
+
+</ExpansionPanel>
+
+<a name="cancelAccept"></a>
+<ExpansionPanel title="cancelAccept(): Promise<boolean>">
+
+Attempts to cancel the accept state.   This will resolve the accept promise with a null value.  I'm torn on whether this should throw instead, but both of them don't sit well with me.
+
+```javascript
+cancelAcceptConnections = async () => {
+    if (!this.state.accepting) {
+      return;
+    }
+
+    try {
+      await RNBluetoothClassic.cancelAccept();
+      this.setState({ isAccepting: false });
+    } catch(error) {
+      // Handle error accordingly
+    }
+  }
+```
+
+</ExpansionPanel>
+
+<a name="requestBluetoothEnabled"></a>
+<ExpansionPanel title="requestBluetoothEnabled(): Promise<boolean>">
+
+Request that Android enable the `BluetoothAdapter`.  This will resolve `true` if Bluetooth is already enabled or the user manually turns the adapter on. 
+
+</ExpansionPanel>
+
+<a name="setBluetoothAdapterName"></a>
+<ExpansionPanel title="setBluetoothAdapterName(name: string): Promise<boolean>">
+
+Attempt to change the name of the `BluetoothAdatper`.
+
+This is another hold over from the original library.  I'm not sure if it's in use, but it's marked as deprecated for now without any plans to remove it.
+
+</ExpansionPanel>
+
+## IOS API
+
+There are no current (and probably no future) IOS only API.
