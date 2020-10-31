@@ -12,7 +12,7 @@ import { BluetoothEventListener,
   BluetoothEventSubscription,
   BluetoothEvent
 } from './BluetoothEvent';
-import { BluetoothDeviceReadEvent } from '../lib/BluetoothEvent';
+import { BluetoothDeviceReadEvent } from './BluetoothEvent';
 
 global.Buffer = global.Buffer || require('buffer').Buffer;
 
@@ -332,7 +332,7 @@ export default class BluetoothModule {
    */
   onStateChanged(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription {
     let enabledSubscription = this._eventEmitter.addListener(BluetoothEventType.BLUETOOTH_ENABLED, listener);
-    let disabledSubscription = this._eventEmitter.addListener(BluetoothEventType.BLUETOOTH_ENABLED, listener);
+    let disabledSubscription = this._eventEmitter.addListener(BluetoothEventType.BLUETOOTH_DISABLED, listener);
 
     return {
       remove() {

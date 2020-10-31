@@ -11,78 +11,52 @@ As previously described the `react-native-bluetooth-classic` is installed throug
 $ npm install react-native-bluetooth-classic --save
 ```
 
-Once installed [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) will take over and all that is required is starting the application as normal.  Be sure to check out the previous link if you need to customize or disable the autolinking of this (or any) module.
+Once installed [auto linking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) will take over and all that is required is starting the application as normal.  Be sure to check out the previous link if you need to customize or disable the autolinking of this (or any) module.
 
 Auto linking performs the task of dynamically adding the default package:
 
-`RNBluetoothClassicPackage.DEFAULT_BUILDER.build()`
+`new RNBluetoothClassicPackage()`
 
 to your application packages.  This default configuration adds the standard delimited `DeviceConnection`(s):
 
 - **CLIENT** connection type `DelimitedConnectionClientImpl`
 - **SERVER** connection type `DelimitedConnectionAcceptImpl`
 
-## Customized connections
+## API Overview
 
-If you need to apply your own connection types, you can do so by creating your implementations and manually linking them into the `RNBluetoothClassicPackage`.  This might be required if you need to:
+The primary classes that you may need to work with are:
 
-- Change read/write logic to allow for (a common change) `byte[]` data
-- Change the connection/communication types from `BluetoothSocket` to a custom Bluetooth profile
+### RNBluetoothClassicPackage
 
-### Manual linking
+[RNBluetoothClassicPackage](/android/rn-bluetooth-classic-package/) is responsible for providing the `DeviceConnection` configuration to the `RNBluetoothClassicModule`.  You're able to provide your own implementation to React Native `MainApplication` or `react-native.config.js` file, more information can be found in the [guides](/guides/customize-connection/).
 
-In order to perform manual linking, you first need to tell your application to disable auto linking for this library.  Information on this can be found [https://github.com/react-native-community/cli/blob/master/docs/autolinking.md#how-can-i-disable-autolinking-for-unsupported-library](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md#how-can-i-disable-autolinking-for-unsupported-library):
+#### RNBluetoothClassicPackage.Builder
 
-```javascript
-// react-native.config.js 
-module.exports = {
-  dependencies: {
-    'react-native-bluetooth-classic': {
-      platforms: {
-        android: null, // disable Android platform, other platforms will still autolink if provided
-      },
-    },
-  },
-};
-```
+[RNBluetoothClassicPackage.Builder](/android/rn-bluetooth-classic-package/#Builder) provides a fluent method for creating the `RNBluetoothClassicPackage`.
 
-Once this is done you can apply your custom configuration to your application:
+### DeviceConnection
 
-```java
-// MainApplication.java 
-RNBluetoothClassicPackage customPackage = RNBluetoothClassicPackage.DEFAULT_BUILDER
-  .withFactory("BYTE_ARRAY_CLIENT", new ByteArrayConnectionFactory())
-  .build();
+[DeviceConnection](/android/device-connection/) the base interface used to manage connections.
 
-// Find me in MainApplication class
-private final ReactNativeHost mReactNativeHost =
-    new ReactNativeHost(this) {
-      @Override
-      public boolean getUseDeveloperSupport() {
-      return BuildConfig.DEBUG;
-    }
+#### DelimitedConnectionClientImpl
 
-    @Override
-    protected List<ReactPackage> getPackages() {
-        @SuppressWarnings("UnnecessaryLocalVariable")
-        List<ReactPackage> packages = new PackageList(this).getPackages();
-        // Packages that cannot be autolinked yet can be added manually here, for example:
-        // packages.add(new MyReactNativePackage());
-        packages.add(customPackage);
-        return packages;
-    }
+[DelimitedConnectionClientImpl](/android/delimited-client-impl/) the default implementation for **TYPE = CLIENT** connections.  This `DeviceConnection` manages data by storing it in a `Buffer` providing access based on a specfieid **delimiter**.  The `StandardOptions` used for the client connections are:
 
-    @Override
-    protected String getJSMainModuleName() {
-    return "index";
-  }
-};
-```
+- `secure` default `true`
+- `delimiter` default `\n`
+- `charset` default `ascii`
+- `read_timeout` default `300ms`
+- `read_size` default `1024`
 
-You'll now be able to use your connection:
+#### DelimitedConnectionAcceptImpl
 
-```javascript 
-let device[] = await RNBluetoothClassic.getBondedDevices();
-let device = devices.find(d => d.name == 'myDevice');
-let connected = await device.connect({ TYPE: 'BYTE_ARRAY_CLIENT'});
-```
+[DelimitedConnectionAcceptImpl](/android/delimited-accept-impl/) the default implementation for **TYPE = SERVER** connections.  This `DeviceConnection` manages data by storing it in a `Buffer` providing access based on a specfieid **delimiter**.
+
+The `StandardOptions` used for the client connections are:
+
+- `service_name` default `RNBluetoothClassic
+- `secure` default `true`
+- `delimiter` default `\n`
+- `charset` default `ascii`
+- `read_timeout` default `300ms`
+- `read_size` default `1024`

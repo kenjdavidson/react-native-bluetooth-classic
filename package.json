@@ -1,6 +1,6 @@
 {
   "name": "react-native-bluetooth-classic",
-  "version": "1.0.0-rc.0",
+  "version": "1.0.0-rc.1",
   "description": "Implement bluetooth classic (serial) on Android (Bluetooth Adapter) and IOS (External Accessory)",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -36,14 +36,13 @@
   },
   "homepage": "https://github.com/kenjdavidson/react-native-bluetooth-classic",
   "peerDependencies": {
-    "react-native": ">=0.60.0",
-    "react-native-windows": "0.41.0-rc.1"
+    "react-native": ">=0.60.0"
   },
   "dependencies": {
     "buffer": "^5.4.3"
   },
   "files": [
-    "src",
+    "lib",
     "android",
     "ios",
     "react-native-bluetooth-classic.podspec",

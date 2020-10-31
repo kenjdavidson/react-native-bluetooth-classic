@@ -8,8 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-import kjd.reactnative.RCTEventEmitter;
-import kjd.reactnative.RNBluetoothClassicModule;
+import kjd.reactnative.bluetooth.RNBluetoothClassicModule;
 import kjd.reactnative.bluetooth.device.NativeDevice;
 
 /**
@@ -23,10 +22,6 @@ import kjd.reactnative.bluetooth.device.NativeDevice;
  * Can be built out to provide receiving other ACL events, although from initial testing they
  * didn't add much.  For more information on the available ACL (connection) events see
  * https://developer.android.com/reference/android/bluetooth/BluetoothDevice
- * <p>
- * Currently it requires an {@link RCTEventEmitter} to be provided in order to send events directly
- * to React Native - although this may need to be re-designed as the other receivers don't follow
- * this - they use listeners which allow the module to manage the communication.
  * <p>
  * This receiver is still mean to be used with from the {@link RNBluetoothClassicModule}
  * as it was super annoying to convert these all over.  Once I take a look at getting RxBluetooth

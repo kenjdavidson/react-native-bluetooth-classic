@@ -1,4 +1,4 @@
-package kjd.reactnative;
+package kjd.reactnative.bluetooth;
 
 import com.facebook.react.bridge.WritableMap;
 

@@ -1,6 +1,24 @@
 ---
 title: Getting Started
-description: Start using RNBluetoothClassic in your Application 
+description: Start using RNBluetoothClassic in your Application
 ---
 
-Once you've got `react-native-bluetooth-classic` installed you can start importing and using the modules API.
+Get started by installing the library into your application:
+
+```shell
+npm install --save react-native-bluetooth-classic
+```
+
+or from a specific branch:
+
+```shell
+npm install --save kenjdavidson/react-native-bluetooth-classic#release/1.0.x
+```
+
+Once installed, you can open up your environment(s) and rebuild your application. Your native builds should be autolinked (I hope) so you'll just need to pull in the native module and get going with the [api](/react-native/rn-bluetooth-classic/).
+
+```javascript
+import RNBluetoothClassic, {
+  BluetoothDevice
+} from 'react-native-bluetooth-classic;
+```

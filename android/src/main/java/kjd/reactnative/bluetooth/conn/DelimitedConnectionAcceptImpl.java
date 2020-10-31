@@ -1,4 +1,4 @@
-package kjd.reactnative.bluetooth.device;
+package kjd.reactnative.bluetooth.conn;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
@@ -10,19 +10,29 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import kjd.reactnative.bluetooth.BluetoothUUID;
+import kjd.reactnative.bluetooth.device.NativeDevice;
 
 public class DelimitedConnectionAcceptImpl extends AbstractDelimitedConnection {
 
     private static final String TAG = DelimitedConnectionAcceptImpl.class.getSimpleName();
 
     private AcceptThread mAcceptThread;
-    private DeviceConnectionListener mListener;
+    private String mServiceName;
+    private boolean mSecure;
 
     @Override
     protected boolean startConnection(Properties properties) {
+        this.mSecure = properties.contains(StandardOptions.Secure.code())
+                ? (Boolean) properties.get(StandardOptions.Secure.code())
+                : StandardOptions.Secure.defaultValue();
+        this.mServiceName = properties.contains(StandardOptions.ServiceName)
+                ? properties.getProperty(StandardOptions.ServiceName.code())
+                : StandardOptions.ServiceName.defaultValue();
+
+
         setConnectionStatus(ConnectionStatus.CONNECTING);
-        mAcceptThread = new AcceptThread();
-        mAcceptThread.start();
+        this. mAcceptThread = new AcceptThread();
+        this.mAcceptThread.start();
         return true;
     }
 
@@ -50,9 +60,13 @@ public class DelimitedConnectionAcceptImpl extends AbstractDelimitedConnection {
             // because mmServerSocket is final.
             BluetoothServerSocket tmp = null;
             try {
-                // MY_UUID is the app's UUID string, also used by the client code.
-                tmp = mAdapter.listenUsingRfcommWithServiceRecord("RNBluetoothClassic",
-                        BluetoothUUID.SPP.uuid);
+                if (mSecure) {
+                    tmp = mAdapter.listenUsingRfcommWithServiceRecord(mServiceName,
+                            BluetoothUUID.SPP.uuid);
+                } else {
+                    tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord(mServiceName,
+                            BluetoothUUID.SPP.uuid);
+                }
             } catch (IOException e) {
                 setConnectionStatus(ConnectionStatus.DISCONNECTED);
                 getConnectionListener().onError(getDevice(), e);

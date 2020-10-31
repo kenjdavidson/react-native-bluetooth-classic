@@ -22,6 +22,9 @@ module.exports = {
           ],
           'IOS': [
             'ios/index'
+          ],
+          'Guides': [
+            'guides/hex-encoding-decoding'
           ]
         }
       }

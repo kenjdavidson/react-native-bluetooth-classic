@@ -1,7 +1,9 @@
-package kjd.reactnative.bluetooth.device;
+package kjd.reactnative.bluetooth.conn;
 
 import java.io.IOException;
 import java.util.Properties;
+
+import kjd.reactnative.bluetooth.device.NativeDevice;
 
 /**
  * {@link DeviceConnection} provides implemention details for a number of different connection

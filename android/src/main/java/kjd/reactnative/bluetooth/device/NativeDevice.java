@@ -1,11 +1,8 @@
 package kjd.reactnative.bluetooth.device;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.os.ParcelUuid;
-import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
@@ -13,10 +10,7 @@ import com.facebook.react.bridge.WritableMap;
 import java.util.HashMap;
 import java.util.Map;
 
-import kjd.reactnative.Mappable;
-import kjd.reactnative.bluetooth.BluetoothDeviceListener;
-import kjd.reactnative.bluetooth.BondState;
-import kjd.reactnative.bluetooth.BuildConfig;
+import kjd.reactnative.bluetooth.Mappable;
 
 /**
  * Provides wrapping of {@link android.bluetooth.BluetoothDevice} details and communication.

@@ -1,0 +1,149 @@
+---
+title: Hex Encoding/Decoding
+description: Work with Hex encoded data to and from your device
+---
+
+The largest number of issues and forks are created around how to change the encoding/decoding of message data when communicating with the device.  Some examples of this are:
+
+- Reading HEX data [https://github.com/kenjdavidson/react-native-bluetooth-classic/issues/50](https://github.com/kenjdavidson/react-native-bluetooth-classic/issues/50)
+- Sending HEX data [https://github.com/kenjdavidson/react-native-bluetooth-classic/issues/51](https://github.com/kenjdavidson/react-native-bluetooth-classic/issues/51)
+- Using the Korean charset [https://github.com/kenjdavidson/react-native-bluetooth-classic/issues/62](https://github.com/kenjdavidson/react-native-bluetooth-classic/issues/62)
+
+which have been solved by the community.  One of the most important features was the ability for you to create and customize these within your own application, without needing to fork/modify/install locally the project.  The following describes how to implement the request from issues 50 and 51 in order to work with HEX data.
+
+## Installation
+
+First thing first, you need to grab the latest version:
+
+```shell
+npm install --save react-native-bluetooth-classic
+```
+
+## Android 
+
+Next you'll want to sanity check that things are working.  Once you've installed and run/sync Gradle you should have the `PackageList` class generated and containing the `RNBluetoothClassicPackage`.
+
+```java
+// com.facebook.react.PackageList
+
+  public ArrayList<ReactPackage> getPackages() {
+    return new ArrayList<>(Arrays.<ReactPackage>asList(
+      new MainReactPackage(),
+      new RNBluetoothClassicPackage()
+    ));
+  }
+```
+
+### Create your Implementations
+
+There are a number of custom classes that are required, I'm not entirely happy with it as is, but it works and can be further absracted for a future release.
+
+#### Implement `DeviceConnection` 
+
+If the rest of the `DelimitedConnection*Impl` classes is acceptable, the easiest method for providing hex data is by extending the two classes and overriding the encode/decode methods.  There are a number of ways to do this, based on what and how you need things done:
+
+- Build your client and accept `DeviceConnection` from scratch
+- Extend the current `DelimitedConnection*Impl` classes and override the `encodeData` and `decodeData` methods
+
+Choosing the latter would result in something like this:
+
+```java
+// com.example.bluetooth.conn.DelimitedHexConnectionClientImpl extends DelimitedConnectionClientImpl
+
+private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+
+/**
+ * Incoming data is encoded into HEX prior to writing it to the Buffer.
+ */
+@Override
+public String decodeData(byte[] bytes) {
+  char[] hexChars = new char[bytes.length * 2];
+  for (int j = 0; j < bytes.length; j++) {
+    int v = bytes[j] & 0xFF;
+    hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+    hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+  }
+
+  return new String(hexChars);
+}
+```
+
+> Don't forget to do the Accept `DeviceConnection` if you're going to need a server connection.
+
+#### Implement `DeviceConnectionFactory`
+
+If your `DeviceConnection` requires some configuration or logic, you may want to create your own `DeviceConnectionFactory` to perform that logic.  Otherwise you can just lambda it up during configuration.
+
+#### Implement `RNBluetoothClassicPackage`
+
+Finally you'll need to customize the package so that you create the appropriate `RNBluetoothClassicModule`.  This isn't needed, but it makes life a lot simpler when working on the next step.
+
+```java
+public abstract class CustomBluetoothPackage {
+  public static RNBluetoothClassicPackage PACKAGE = RNBluetoothClassicPackage.builder() 
+    .withFactory('CLIENT', () -> new DelimitedHexConnectionClientImpl())
+    .withFactory('SERVER', () -> new DelimitedHexConnectionAcceptImpl())
+    .build();
+}
+```
+
+### React Native Modules
+
+Once we have the `DeviceConnection`(s) and possibly `DeviceConnectionFactory`(s) we need to inform pass these into the `RNBluetoothClassicModule`.  This can be done in a number of ways:
+
+#### Customize Auto Linking
+
+The preferred method (from React Native) is to provide a `react-native.config.js` file which customizes the `react-native-bluetooth-classic` dependency configuration.  For this to work (easily) you'll need to create your own `ReactPackage` that builds the appropriate `RNBluetoothClassicModule` and then tell auto linking to use it:
+
+```javascript
+// react-native.config.js
+// This file must be added setting android to null so that auto linking is skipped
+module.exports = {
+  dependencies: {
+    'react-native-bluetooth-classic': {
+      platforms: {
+        android: {
+          packageImportPath: 'import com.example.bluetooth.CustomBluetoothPackage;',
+          packageInstance: 'CustomBluetoothPackage.PACKAGE'
+        }
+      }
+    }
+  }
+}
+```
+
+#### Skip Auto Linking Completely
+
+You can skip auto linking completely by nulling out the Android dependency:
+
+```javascript
+// react-native.config.js
+// This file must be added setting android to null so that auto linking is skipped
+module.exports = {
+  dependencies: {
+    'react-native-bluetooth-classic': {
+      platforms: {
+        android: null
+      }
+    }
+  }
+}
+```
+
+and then manually adding the custom package to React Native:
+
+```java
+// MainApplication.java 
+@Override
+protected List<ReactPackage> getPackages() {
+  @SuppressWarnings("UnnecessaryLocalVariable")
+  List<ReactPackage> packages = new PackageList(this).getPackages();
+  // Packages that cannot be autolinked yet can be added manually here, for example:
+  packages.add(CustomBluetoothPackage.PACKAGE)
+  return packages;
+}
+```
+
+## IOS 
+
+IOS has not currently been updated to use new `DeviceConnection`.

@@ -3,12 +3,11 @@ package kjd.reactnative.bluetooth;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 
-import kjd.reactnative.Mappable;
 import kjd.reactnative.bluetooth.device.NativeDevice;
 
 /**
  * General exception which is {@link Mappable} for the React Native bridge.   It provides the
- * {@link NativeDevice}, {@link kjd.reactnative.RNBluetoothClassicModule} related error message
+ * {@link NativeDevice}, {@link RNBluetoothClassicModule} related error message
  * and the thrown exception.
  *
  * @author kendavidson

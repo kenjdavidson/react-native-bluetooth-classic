@@ -1,5 +1,5 @@
 
-package kjd.reactnative;
+package kjd.reactnative.bluetooth;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,9 +14,9 @@ import com.facebook.react.uimanager.ViewManager;
 import com.facebook.react.bridge.JavaScriptModule;
 
 import kjd.reactnative.bluetooth.conn.ConnectionType;
-import kjd.reactnative.bluetooth.device.DelimitedConnectionAcceptFactory;
-import kjd.reactnative.bluetooth.device.DelimitedConnectionClientFactory;
-import kjd.reactnative.bluetooth.device.DeviceConnectionFactory;
+import kjd.reactnative.bluetooth.conn.DelimitedConnectionAcceptImpl;
+import kjd.reactnative.bluetooth.conn.DelimitedConnectionClientImpl;
+import kjd.reactnative.bluetooth.conn.DeviceConnectionFactory;
 
 /**
  * {@link ReactPackage} provides a method for applications to implement customized
@@ -27,9 +27,9 @@ import kjd.reactnative.bluetooth.device.DeviceConnectionFactory;
  * <p>
  * The standard/default package has the following connections configured:
  * <ul>
- *     <li><strong>connect</strong> connection using {@link kjd.reactnative.bluetooth.device.DelimitedConnectionClientImpl}
+ *     <li><strong>connect</strong> connection using {@link DelimitedConnectionClientImpl}
  *     which connects as a client using the standard delimited messaging.</li>
- *     <li><strong>accept</strong> connection using {@link kjd.reactnative.bluetooth.device.DelimitedConnectionAcceptImpl}
+ *     <li><strong>accept</strong> connection using {@link DelimitedConnectionAcceptImpl}
  *     which accepts a connection from a device using the standard delimited messaging.</li>
  * </ul>
  * The package should be added to your {@code MainApplication} using the following:
@@ -56,8 +56,8 @@ public class RNBluetoothClassicPackage implements ReactPackage {
      */
     public static final Builder DEFAULT_BUILDER
             = RNBluetoothClassicPackage.builder()
-                .withFactory(ConnectionType.CLIENT.name(), new DelimitedConnectionClientFactory())
-                .withFactory(ConnectionType.SERVER.name(), new DelimitedConnectionAcceptFactory());
+                .withFactory(ConnectionType.CLIENT.name(), () -> new DelimitedConnectionClientImpl())
+                .withFactory(ConnectionType.SERVER.name(), () -> new DelimitedConnectionAcceptImpl());
 
     /**
      * {@link DeviceConnectionFactory} map which will be passed into the module.  The factory map
@@ -68,13 +68,23 @@ public class RNBluetoothClassicPackage implements ReactPackage {
     private Map<String, DeviceConnectionFactory> mFactories;
 
     /**
-     * Creates a {@link RNBluetoothClassicPackage} - the {@link Builder} or standard packages
-     * should be used.
-     *
+     * Creates a new package with the default {@link kjd.reactnative.bluetooth.conn.DeviceConnectionFactory}
+     * for CLIENT and SERVER.
+     */
+    public RNBluetoothClassicPackage() {
+        this.mFactories = new HashMap<>();
+        this.mFactories .put(ConnectionType.CLIENT.name(), () -> new DelimitedConnectionClientImpl());
+        this.mFactories .put(ConnectionType.SERVER.name(), () -> new DelimitedConnectionAcceptImpl());
+    }
+
+    /**
+     * Provides the builder with a constructor.  This is the preferred method, but apprently the
+     * autolinking doesn't work exactly as defined.
+     * 
      * @param factories
      */
     private RNBluetoothClassicPackage(Map<String,DeviceConnectionFactory> factories) {
-        this.mFactories = new HashMap<>(factories);
+        this.mFactories = factories;
     }
 
     /**

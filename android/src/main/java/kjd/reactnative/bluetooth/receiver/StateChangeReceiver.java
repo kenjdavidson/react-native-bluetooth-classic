@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-import kjd.reactnative.RNBluetoothClassicModule;
+import kjd.reactnative.bluetooth.RNBluetoothClassicModule;
 import kjd.reactnative.bluetooth.BluetoothState;
 import kjd.reactnative.bluetooth.BuildConfig;
 

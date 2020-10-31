@@ -1,6 +1,6 @@
-package kjd.reactnative.bluetooth.device;
+package kjd.reactnative.bluetooth.conn;
 
-import kjd.reactnative.RNBluetoothClassicModule;
+import kjd.reactnative.bluetooth.RNBluetoothClassicModule;
 
 /**
  * Provides the ability to create {@link DeviceConnection}.  The factory

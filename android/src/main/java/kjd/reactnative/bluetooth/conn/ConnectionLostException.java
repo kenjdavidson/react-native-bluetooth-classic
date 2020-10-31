@@ -1,5 +1,7 @@
-package kjd.reactnative.bluetooth;
+package kjd.reactnative.bluetooth.conn;
 
+import kjd.reactnative.bluetooth.BluetoothException;
+import kjd.reactnative.bluetooth.Exceptions;
 import kjd.reactnative.bluetooth.device.NativeDevice;
 
 /**

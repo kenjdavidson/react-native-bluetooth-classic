@@ -1,4 +1,6 @@
-package kjd.reactnative.bluetooth.device;
+package kjd.reactnative.bluetooth.conn;
+
+import kjd.reactnative.bluetooth.device.NativeDevice;
 
 public interface DataReceivedListener {
 

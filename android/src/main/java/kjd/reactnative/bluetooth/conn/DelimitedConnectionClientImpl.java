@@ -1,4 +1,4 @@
-package kjd.reactnative.bluetooth.device;
+package kjd.reactnative.bluetooth.conn;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -24,8 +24,14 @@ public class DelimitedConnectionClientImpl extends AbstractDelimitedConnection {
 
     private ConnectThread mConnectThread;
 
+    private boolean mSecure;
+
     @Override
     protected boolean startConnection(Properties properties) {
+        this.mSecure = properties.contains(StandardOptions.Secure)
+                ? (Boolean) properties.get(StandardOptions.Secure)
+                : StandardOptions.Secure.defaultValue();
+
         setConnectionStatus(ConnectionStatus.CONNECTING);
         mConnectThread = new ConnectThread();
         mConnectThread.run();
@@ -54,7 +60,15 @@ public class DelimitedConnectionClientImpl extends AbstractDelimitedConnection {
             BluetoothSocket tmp = null;
 
             try {
-                tmp = getDevice().getDevice().createRfcommSocketToServiceRecord(BluetoothUUID.SPP.uuid);
+                if (mSecure) {
+                    tmp = getDevice()
+                            .getDevice()
+                            .createRfcommSocketToServiceRecord(BluetoothUUID.SPP.uuid);
+                } else {
+                    tmp = getDevice()
+                            .getDevice()
+                            .createInsecureRfcommSocketToServiceRecord(BluetoothUUID.SPP.uuid);
+                }
             } catch (Exception e) {
                 setConnectionStatus(ConnectionStatus.DISCONNECTED);
                 getConnectionListener().onConnectionFailure(getDevice(), e);
@@ -75,9 +89,17 @@ public class DelimitedConnectionClientImpl extends AbstractDelimitedConnection {
                 // See https://github.com/don/RCTBluetoothSerialModule/issues/89
                 try {
                     Log.i(TAG,"Connection failed, attempting fallback method");
-                    mmSocket = (BluetoothSocket)
-                            getDevice().getClass().getMethod("createRfcommSocket",
-                                    new Class[] {int.class}).invoke(device,1);
+
+                    if (mSecure) {
+                        mmSocket = (BluetoothSocket)
+                                getDevice().getClass().getMethod("createRfcommSocket",
+                                        new Class[] {int.class}).invoke(device,1);
+                    } else {
+                        mmSocket = (BluetoothSocket)
+                                getDevice().getClass().getMethod("createInsecureRfcommSocket",
+                                        new Class[] {int.class}).invoke(device,1);
+                    }
+
                     mmSocket.connect();
                 } catch (Exception socketException) {
                     try {

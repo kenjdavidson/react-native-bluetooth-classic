@@ -5,10 +5,8 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
 import java.time.LocalDateTime;
-import java.util.Calendar;
 
-import kjd.reactnative.Mappable;
-import kjd.reactnative.bluetooth.device.NativeDevice;
+import kjd.reactnative.bluetooth.Mappable;
 
 public abstract class BluetoothEvent implements Mappable {
 

@@ -1,4 +1,4 @@
-package kjd.reactnative.bluetooth.device;
+package kjd.reactnative.bluetooth.conn;
 
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
@@ -9,6 +9,8 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Properties;
+
+import kjd.reactnative.bluetooth.device.NativeDevice;
 
 /**
  * Implements the comment features for a delimited device connection.  Delimited
