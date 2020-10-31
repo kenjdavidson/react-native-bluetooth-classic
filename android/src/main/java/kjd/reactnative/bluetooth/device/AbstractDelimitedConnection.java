@@ -16,13 +16,13 @@ import java.util.Properties;
  * by their specified delimiter.  The standard properties required for this
  * connection are:
  * <ul>
- *     <li><strong>PROP_DELIMITER</strong> string delimited for parsing messages.</li>
- *     <li><strong>PROP_CHARSET</strong> determines how bytes/Strings are parsed.  This is
+ *     <li><strong>delimiter</strong> string delimited for parsing messages.</li>
+ *     <li><strong>charset</strong> determines how bytes/Strings are parsed.  This is
  *     probably the biggest change required per connection.</li>
- *     <li><strong>PROP_READ_SIZE</strong> defines the size of the byte[] used for reading data into.
+ *     <li><strong>readSize</strong> defines the size of the byte[] used for reading data into.
  *      Recent forks have modified this, so providing a method for customization seemed
  *      logical.</li>
- *     <li><strong>PROP_READ_TIMEOUT</strong> defines the timeout between read attempts.  This was
+ *     <li><strong>readTimeout</strong> defines the timeout between read attempts.  This was
  *      from the initial project, so it was left in there as a default to the original
  *      value.</li>
  * </ul>
@@ -195,8 +195,9 @@ abstract public class AbstractDelimitedConnection
     }
 
     /**
-     * Provides a simple method for overriding how data from the device is decoded. It's preferrable
-     * that this method is overridde, but the onReceivedData is also acceptable.
+     * Provides a method for decoding data from the device.  This method is passed through before
+     * the data is written to the buffer as a string.  This implementation decodes the bytes
+     * using the provided {@link Charset}.
      *
      * @param bytes
      * @return
@@ -243,8 +244,9 @@ abstract public class AbstractDelimitedConnection
     }
 
     /**
-     * Provides a method for overriding the encoding of data.  This simple implementation expects
-     * that the client has already encoded in the correct format.
+     * Provides a method for overriding the encoding of data prior to writing to the device.  This
+     * implementation assumes that the byte[] has already been encoded correctly from the client
+     * and passes it along to the device.
      *
      * @param data the data which may be further encoded
      * @return encoded data
