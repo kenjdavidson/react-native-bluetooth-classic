@@ -6,12 +6,21 @@ import { BluetoothEventListener,
 } from './BluetoothEvent';
 import BluetoothNativeDevice from './BluetoothNativeDevice';
 
+/**
+ * kjd.reactnative.RNBluetoothClassicModule
+ * 
+ * Provides direct access to Bluetooth Adapter (Android) and External
+ * Accessory (IOS) libraries.
+ * 
+ * @author kenjdavidson
+ * 
+ */
 export default interface BluetoothNativeModule {
     
     /**
      * Requests whether or not Bluetooth is enabled.  
      * 
-     * @return Promise resolved with enabled value
+     * @return Promise<boolean> resolved based on the current Bluetooth status
      */
     isBluetoothEnabled(): Promise<boolean>;
 
@@ -19,7 +28,7 @@ export default interface BluetoothNativeModule {
      * Retrieves a list of the currently bonded devices.  This was originally
      * called list but caused some confusion.
      * 
-     * @return the bonded BluetoothNativeDevice(s)
+     * @return Promise resolved with the bonded BluetoothNativeDevice(s)
      */
     getBondedDevices(): Promise<BluetoothNativeDevice[]>;
 

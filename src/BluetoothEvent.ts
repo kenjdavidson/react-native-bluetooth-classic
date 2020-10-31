@@ -1,6 +1,10 @@
 import { EmitterSubscription } from 'react-native';
 import BluetoothNativeDevice from "../lib/BluetoothNativeDevice";
 
+/**
+ * Available Bluetooth events.  This replaces the events provided by the 
+ * NativeModule.
+ */
 export enum BluetoothEventType {
     BLUETOOTH_ENABLED = "BLUETOOTH_ENABLED",
     BLUETOOTH_DISABLED = "BLUETOOTH_DISABLED",
@@ -11,7 +15,7 @@ export enum BluetoothEventType {
 };
 
 /**
- * Standard bluetooth event
+ * BluetoothEvent
  */
 export interface BluetoothEvent {
     device: BluetoothNativeDevice;

@@ -23,7 +23,7 @@ global.Buffer = global.Buffer || require('buffer').Buffer;
  * methods are related to {@code BluetoothConnection} requests, where the response
  * must be wrapped.
  * 
- * @author kendavidson
+ * @author kenjdavidson
  */
 export default class BluetoothModule {
 

@@ -51,12 +51,20 @@ import kjd.reactnative.bluetooth.device.DeviceConnectionFactory;
  */
 public class RNBluetoothClassicPackage implements ReactPackage {
 
-    public static final RNBluetoothClassicPackage DEFAULT
+    /**
+     * Provides a default builder to allow for overriding.
+     */
+    public static final Builder DEFAULT_BUILDER
             = RNBluetoothClassicPackage.builder()
                 .withFactory(ConnectionType.CLIENT.name(), new DelimitedConnectionClientFactory())
-                .withFactory(ConnectionType.SERVER.name(), new DelimitedConnectionAcceptFactory())
-                .build();
+                .withFactory(ConnectionType.SERVER.name(), new DelimitedConnectionAcceptFactory());
 
+    /**
+     * {@link DeviceConnectionFactory} map which will be passed into the module.  The factory map
+     * is used during the connection process by passing the TYPE option into either
+     * connect or accept.  The value of this type will attempt to grab the correct type from
+     * the Factory assigned.
+     */
     private Map<String, DeviceConnectionFactory> mFactories;
 
     /**

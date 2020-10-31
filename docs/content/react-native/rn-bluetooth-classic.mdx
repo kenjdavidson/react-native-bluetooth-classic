@@ -3,10 +3,6 @@ title: Bluetooth Classic Module
 description: Access Adapter/External Accessory features
 ---
 
-import {
-  ExpansionPanel
-} from 'gatsby-theme-apollo-docs';
-
 To access the Adapter/External Accessory related features you're going to be working with the `RNBluetoothClassic` object.
 
 ```javascript
@@ -19,8 +15,9 @@ import RNBluetoothClassic, {
 
 The following are available on both Android and IOS.
 
-<a name="isBluetoothEnabled"></a>
-<ExpansionPanel title="isBluetoothEnabled(): Promise<boolean>">
+### isBluetoothEnabled
+
+`isBluetoothEnabled(): Promise<boolean>`
 
 Requests whether the device Bluetooth adapter is enabled `true` or disabled `false`.
 
@@ -32,10 +29,10 @@ try {
     // Handle accordingly
 }
 ```
-</ExpansionPanel>
 
-<a name="getBondedDevices"></a>
-<ExpansionPanel title="getBondedDevices(): Promise<BluetoothDevice[]>">
+### getBondedDevices
+
+`getBondedDevices(): Promise<BluetoothDevice[]>`
 
 Requests an array of the bonded/paired `BluetoothDevice`(s).
 
@@ -48,10 +45,10 @@ try {
     // Or there are any issues requesting paired devices
 }
 ```
-</ExpansionPanel>
 
-<a name="getConnectedDevices"></a>
-<ExpansionPanel title="getConnectedDevices(): Promise<BluetoothDevice[]>">
+### getConnectedDevices
+
+`getConnectedDevices(): Promise<BluetoothDevice[]>`
 
 Requests an array of the connected `BluetoothDevice`(s); in this context conncted means an active `Socket`.
 
@@ -64,10 +61,10 @@ try {
     // Or there are any issues requesting paired devices
 }
 ```
-</ExpansionPanel>
 
-<a name="getConnectedDevice"></a>
-<ExpansionPanel title="getConnectedDevice(address: string): Promise<BluetoothDevice>">
+### getConnectedDevice
+
+`getConnectedDevice(address: string): Promise<BluetoothDevice>`
 
 Requests whether a device `BluetoothDevice` is currently connected; in this context conncted means an active `Socket`.
 
@@ -81,10 +78,12 @@ try {
     // Or there are any issues requesting paired devices
 }
 ```
-</ExpansionPanel>
 
-<a name="onBluetoothEnabled"></a>
-<ExpansionPanel title="onBluetoothEnabled(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription">
+### onBluetoothEnabled
+
+`onBluetoothEnabled(
+  listener: BluetoothEventListener<StateChangeEvent>
+): BluetoothEventSubscription`
 
 Adds a `BluetoothEventListener<StateChangeEvent>` which is notified when the device enables Bluetooth.
 
@@ -101,10 +100,12 @@ onStateChange(event: StateChangeEvent) {
     this.setState({ enabled: event.enabled });
 }
 ```
-</ExpansionPanel>
 
-<a name="onBluetoothDisabled"></a>
-<ExpansionPanel title="onBluetoothDisabled(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription">
+### onBluetoothDisabled
+
+`onBluetoothDisabled(
+  listener: BluetoothEventListener<StateChangeEvent>
+): BluetoothEventSubscription`
 
 Adds a `BluetoothEventListener<StateChangeEvent>` which is notified when the device disables Bluetooth.
 
@@ -122,10 +123,12 @@ onStateChange(event: StateChangeEvent) {
     this.setState({ enabled: !event.enabled });
 }
 ```
-</ExpansionPanel>
 
-<a name="onStateChanged"></a>
-<ExpansionPanel title="onStateChanged(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription">
+### onStateChanged
+
+`onStateChanged(
+  listener: BluetoothEventListener<StateChangeEvent>)
+: BluetoothEventSubscription`
 
 Adds a `BluetoothEventListener<StateChangeEvent>` which is notified when the device enables or disables Bluetooth.
 
@@ -142,10 +145,12 @@ onStateChange(event: StateChangeEvent) {
     this.setState({ enabled: event.enabled });
 }
 ```
-</ExpansionPanel>
 
-<a name="onDeviceConnected"></a>
-<ExpansionPanel title="onDeviceConnected(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription">
+### onDeviceConnected
+
+`onDeviceConnected(
+  listener: BluetoothEventListener<BluetoothDeviceEvent>
+): BluetoothEventSubscription`
 
 When a device opens a new `Socket` connection.  This was a hold over from the original library and I'm not entirely sure whether it will be used with the advent of `BluetoothDevice#connect()`, but it's here.
 
@@ -162,10 +167,12 @@ onDeviceConnected(event: BluetoothDeviceEvent) {
     this.setState({ device: event.device });
 }
 ```
-</ExpansionPanel>
 
-<a name="onDeviceDisconnected"></a>
-<ExpansionPanel title="onDeviceDisconnected(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription">
+### onDeviceDisconnected
+
+`onDeviceDisconnected(
+  listener: BluetoothEventListener<BluetoothDeviceEvent>
+): BluetoothEventSubscription`
 
 Provides a listener for events fired when `Socket` connections are: closed, dropped, failed, etc.  This was a hold over from the original library, it's a little more useful as a global check on connetivity than just using the `BluetoothDevice#disconnect()` function.
 
@@ -184,10 +191,12 @@ onDeviceDisconnected(event: BluetoothDeviceEvent) {
     this.setState({ device });
 }
 ```
-</ExpansionPanel>
 
-<a name="onError"></a>
-<ExpansionPanel title="onError(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription">
+### onError
+
+`onError(
+  listener: BluetoothEventListener<BluetoothDeviceEvent>
+): BluetoothEventSubscription`
 
 Handles any and all errors that occur on the native side.  These can be from a connected `BluetoothDevice` or just from the module.   For that reason, you need to check `event.device` before attempting to use it.
 
@@ -208,14 +217,14 @@ onDeviceDisconnected(event: BluetoothDeviceEvent) {
     }
 }
 ```
-</ExpansionPanel>
 
 ## Android API
 
 The following are available only on Android.
 
-<a name="startDiscovery"></a>
-<ExpansionPanel title="startDiscovery(): Promise<BluetoothDevice[]>">
+### startDiscovery
+
+`startDiscovery(): Promise<BluetoothDevice[]>`
 
 Requests that the `BluetoothAdapter` be placed into discovery mode.  This will resolve with an array of discovered `BluetoothDevice`(s).  You'll need to ensure that you've requested [fine location permissions within Android](https://reactnative.dev/docs/permissionsandroid) prior to starting:
 
@@ -277,10 +286,8 @@ Will throw an error if:
 - Start discovery for a specific device
 - Provide a **DEVICE_DISCOVERED** event for intermediate handling
 
-</ExpansionPanel>
-
-<a name="cancelDiscovery"></a>
-<ExpansionPanel title="cancelDiscovery(): Promise<boolean>">
+### cancelDiscovery
+`cancelDiscovery(): Promise<boolean>`
 
 Cancels the discovery process.  This will automatically resolve the `startDiscovery` promise with the already found `BluetoothDevice`(s).
 
@@ -304,10 +311,9 @@ Will throw an error if:
 - The `BluetoothAdapter` is disabled
 - The `BluetoothAdapter` is not already in discovery
 
-</ExpansionPanel>
+### pairDevice
 
-<a name="pairDevice"></a>
-<ExpansionPanel title="pairDevice(address: string): Promise<BluetoothDevice>">
+`pairDevice(address: string): Promise<BluetoothDevice>`
 
 Attempts to pair the specified device.
 
@@ -317,19 +323,17 @@ Attempts to pair the specified device.
 
 `address: string` the address of the device to be paired.  This will be provided by the `BluetoothDevice.address` found from discovery.
 
-</ExpansionPanel>
+### unpairDevice
 
-<a name="unpairDevice"></a>
-<ExpansionPanel title="unpairDevice(address: string): Promise<boolean>">
+`unpairDevice(address: string): Promise<boolean>`
 
 Attempts to unpair the specified device.
 
 **Note** I haven't actually used or spent any time testing this.  It was a hold over from the original library.  Feel free to update me with information on whether this is working.
 
-</ExpansionPanel>
+### accept 
 
-<a name="accept"></a>
-<ExpansionPanel title="accept(properties: Map<string,object>): Promise<BluetoothDevice>">
+`accept(properties: Map<string,object>): Promise<BluetoothDevice>`
 
 Places the device into `accept` mode.  This is done (`DelimitedConnectionAcceptImpl`) by opening a `BluetoothServerSocket` and resolving with the first `BluetoothDevice` which connects.
 
@@ -352,10 +356,9 @@ acceptConnections = async () => {
 
 `properties: Map<string,object>` is determined by the type of connection that you are attempting.  This depends highly on the native configuration of your **ACCEPT** connection type.
 
-</ExpansionPanel>
+### cancelAccept
 
-<a name="cancelAccept"></a>
-<ExpansionPanel title="cancelAccept(): Promise<boolean>">
+`cancelAccept(): Promise<boolean>`
 
 Attempts to cancel the accept state.   This will resolve the accept promise with a null value.  I'm torn on whether this should throw instead, but both of them don't sit well with me.
 
@@ -374,23 +377,19 @@ cancelAcceptConnections = async () => {
   }
 ```
 
-</ExpansionPanel>
+### requestBluetoothEnabled
 
-<a name="requestBluetoothEnabled"></a>
-<ExpansionPanel title="requestBluetoothEnabled(): Promise<boolean>">
+`requestBluetoothEnabled(): Promise<boolean>`
 
 Request that Android enable the `BluetoothAdapter`.  This will resolve `true` if Bluetooth is already enabled or the user manually turns the adapter on. 
 
-</ExpansionPanel>
+### setBluetoothAdapterName
 
-<a name="setBluetoothAdapterName"></a>
-<ExpansionPanel title="setBluetoothAdapterName(name: string): Promise<boolean>">
+`setBluetoothAdapterName(name: string): Promise<boolean>`
 
 Attempt to change the name of the `BluetoothAdatper`.
 
 This is another hold over from the original library.  I'm not sure if it's in use, but it's marked as deprecated for now without any plans to remove it.
-
-</ExpansionPanel>
 
 ## IOS API
 

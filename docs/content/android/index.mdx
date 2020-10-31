@@ -13,24 +13,76 @@ $ npm install react-native-bluetooth-classic --save
 
 Once installed [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) will take over and all that is required is starting the application as normal.  Be sure to check out the previous link if you need to customize or disable the autolinking of this (or any) module.
 
-Auto linking performs the same initialization and module creation as the following example:
+Auto linking performs the task of dynamically adding the default package:
 
-```java
-@Override
-protected List<ReactPackage> getPackages() {
-    @SuppressWarnings("UnnecessaryLocalVariable")
-    List<ReactPackage> packages = new PackageList(this).getPackages();
-    // Packages that cannot be autolinked yet can be added manually here, for example:
-    // packages.add(new MyReactNativePackage());
-    packages.add(RNBluetoothClassicPackage.DEFAULT);
-    return packages;
-}
+`RNBluetoothClassicPackage.DEFAULT_BUILDER.build()`
+
+to your application packages.  This default configuration adds the standard delimited `DeviceConnection`(s):
+
+- **CLIENT** connection type `DelimitedConnectionClientImpl`
+- **SERVER** connection type `DelimitedConnectionAcceptImpl`
+
+## Customized connections
+
+If you need to apply your own connection types, you can do so by creating your implementations and manually linking them into the `RNBluetoothClassicPackage`.  This might be required if you need to:
+
+- Change read/write logic to allow for (a common change) `byte[]` data
+- Change the connection/communication types from `BluetoothSocket` to a custom Bluetooth profile
+
+### Manual linking
+
+In order to perform manual linking, you first need to tell your application to disable auto linking for this library.  Information on this can be found [https://github.com/react-native-community/cli/blob/master/docs/autolinking.md#how-can-i-disable-autolinking-for-unsupported-library](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md#how-can-i-disable-autolinking-for-unsupported-library):
+
+```javascript
+// react-native.config.js 
+module.exports = {
+  dependencies: {
+    'react-native-bluetooth-classic': {
+      platforms: {
+        android: null, // disable Android platform, other platforms will still autolink if provided
+      },
+    },
+  },
+};
 ```
 
-See the Android API for more details.
+Once this is done you can apply your custom configuration to your application:
 
-## Manual Linking
+```java
+// MainApplication.java 
+RNBluetoothClassicPackage customPackage = RNBluetoothClassicPackage.DEFAULT_BUILDER
+  .withFactory("BYTE_ARRAY_CLIENT", new ByteArrayConnectionFactory())
+  .build();
 
-If you need to make customizations to your Bluetooth connections you'll need to [disable auto linking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md#how-can-i-disable-autolinking-for-unsupported-library).  
+// Find me in MainApplication class
+private final ReactNativeHost mReactNativeHost =
+    new ReactNativeHost(this) {
+      @Override
+      public boolean getUseDeveloperSupport() {
+      return BuildConfig.DEBUG;
+    }
 
-You should only need to do this, if you have to provide customized `BluetoothConnectionFactory`(s) to your application.
+    @Override
+    protected List<ReactPackage> getPackages() {
+        @SuppressWarnings("UnnecessaryLocalVariable")
+        List<ReactPackage> packages = new PackageList(this).getPackages();
+        // Packages that cannot be autolinked yet can be added manually here, for example:
+        // packages.add(new MyReactNativePackage());
+        packages.add(customPackage);
+        return packages;
+    }
+
+    @Override
+    protected String getJSMainModuleName() {
+    return "index";
+  }
+};
+```
+
+You'll now be able to use your connection:
+
+```javascript 
+let device[] = await RNBluetoothClassic.getBondedDevices();
+let device = devices.find(d => d.name == 'myDevice');
+let connected = await device.connect({ TYPE: 'BYTE_ARRAY_CLIENT'});
+```
