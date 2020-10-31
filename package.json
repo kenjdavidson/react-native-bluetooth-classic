@@ -46,7 +46,8 @@
     "src",
     "android",
     "ios",
-    "react-native-bluetooth-classic.podspec"
+    "react-native-bluetooth-classic.podspec",
+    "react-native-config.js"
   ],
   "devDependencies": {
     "@types/node": "^14.14.0",
