@@ -1,5 +1,4 @@
 import { NativeEventEmitter, 
-  EmitterSubscription,
   Platform 
 } from 'react-native';
 import RNBluetoothClassicModule from './BluetoothNativeModule';
