@@ -10,6 +10,7 @@
     "tsc:watch": "tsc --watch",
     "build": "npm run clean && npm run tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "preversion": "npm run build",
     "postversion": "git push && git push --tags && npm publish"
   },
   "repository": "git://github.com/kenjdavidson/react-native-bluetooth-classic.git",
