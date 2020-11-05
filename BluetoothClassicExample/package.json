@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "@react-native-community/toolbar-android": "0.1.0-rc.2",
-    "native-base": "2.13.14",
-    "react": "16.9.0",
-    "react-native": "0.61.5"
+    "native-base": "^2.13.14",
+    "react": "16.8.6",
+    "react-native": "0.60.0"
   },
   "devDependencies": {
     "@babel/core": "7.8.3",
