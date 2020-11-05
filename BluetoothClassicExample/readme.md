@@ -112,6 +112,16 @@ Pod installation complete! There are 29 dependencies from the Podfile and 27 tot
 
 Development can now be completed within XCode and the `BluetoothClassicExample` project using `Pods/Development Pods/react-native-bluetooth-classic`.
 
+##### Vector Icons
+
+With the addition of Vector Icons the steps in the document [https://github.com/oblador/react-native-vector-icons#option-manually](https://github.com/oblador/react-native-vector-icons#option-manually) must be follows:
+
+1) Edit `Info.plist`
+a) Add `UIAppFonts`
+b) Add `Ionicons.ttf` to the list.  Continue with as many other fonts that may be in use.
+
+2) Follow your choice of the remaining steps.  The `Podfile` has already been updated to include, so it shouldn't be needed (but confirm).
+
 #### Android 
 
 Without running `react-native link` since pretty much all the documentation says not to do it, I've manually added the project in all the places that it's expected in Android:
@@ -181,7 +191,7 @@ is also successful!
 
 ## IOS MFi Protocols
 
-During the build process the application expects a `protocol-strings.plist` file to be available within the XCode project.  There is an example file `protocol-strings-example-plist` with the contents:
+During the build process the application expects a `${project}/ios/protocol-strings.plist` to be found during the build process.  The contents of this file will be applied to the projects main `info.plist` and allow MFi compliant devices to be used.  There is a sample `protocol-strings-example-plist` (with the following contents) that can be renamed for testing purposes:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
