@@ -6,12 +6,12 @@ import java.nio.charset.Charset;
  * Standard options used for initiating and managing {@link DeviceConnection}(s).
  */
 public enum StandardOptions {
-    Delimiter("delimiter", "\n"),
-    DeviceCharset("charset", Charset.forName("ascii")),
-    ReadTimeout("read_timeout", 300),
-    ReadSize("read_size", 1024),
-    Secure("secure", true),
-    ServiceName("service_name", "RNBluetoothClassic")
+    DELIMITER("delimiter", "\n"),
+    DEVICE_CHARSET("charset", Charset.forName("ascii")),
+    READ_TIMEOUT("read_timeout", 300),
+    READ_SIZE("read_size", 1024),
+    SECURE_SOCKET("secure", true),
+    SERVICE_NAME("service_name", "RNBluetoothClassic")
     ;
 
     private String code;
