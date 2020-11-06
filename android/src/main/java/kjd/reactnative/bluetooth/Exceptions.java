@@ -3,7 +3,7 @@ package kjd.reactnative.bluetooth;
 import android.util.JsonWriter;
 
 public enum Exceptions {
-    BLUETOOTH_NOT_ENABLED("Bluetooth adapter is not enabled"),
+    BLUETOOTH_NOT_ENABLED("Bluetooth mAdapter is not enabled"),
     BLUETOOTH_IN_DISCOVERY("Bluetooth already in discovery mode"),
     BLUETOOTH_IN_ACCEPTING("Bluetooth already in accepting state"),
     BLUETOOTH_NOT_ACCEPTING("Bluetooth is not currently accepting"),

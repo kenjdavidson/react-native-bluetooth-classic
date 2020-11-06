@@ -1,20 +1,12 @@
 package kjd.reactnative.bluetooth.conn;
 
-import kjd.reactnative.bluetooth.RNBluetoothClassicModule;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 
-/**
- * Provides the ability to create {@link DeviceConnection}.  The factory
- * is called by the {@link RNBluetoothClassicModule}
- * during the connection request process.
- *
- * @author kendavidson
- */
+import java.io.IOException;
+import java.util.Properties;
+
+@FunctionalInterface
 public interface DeviceConnectionFactory {
-
-    /**
-     * Creates a new {@link DeviceConnection}.
-     *
-     * @return
-     */
-    DeviceConnection create();
+    DeviceConnection create(BluetoothSocket device, Properties properties) throws IOException;
 }

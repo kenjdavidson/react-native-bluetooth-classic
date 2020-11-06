@@ -140,8 +140,8 @@ export default class DeviceListScreen extends React.Component {
     }
 
     try {
-      await RNBluetoothClassic.cancelAccept();
-      this.setState({ isAccepting: false });
+      let cancelled = await RNBluetoothClassic.cancelAccept();
+      this.setState({ accepting: !cancelled });
     } catch(error) {
       Toast.show({
         text: `Unable to cancel accept connection`,

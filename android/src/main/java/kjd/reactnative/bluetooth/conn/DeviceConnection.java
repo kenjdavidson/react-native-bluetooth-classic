@@ -1,50 +1,30 @@
 package kjd.reactnative.bluetooth.conn;
 
+import android.bluetooth.BluetoothDevice;
+
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.function.BiConsumer;
 
 import kjd.reactnative.bluetooth.device.NativeDevice;
 
 /**
- * {@link DeviceConnection} provides implemention details for a number of different connection
- * types.  Each connection type requires that the following are defined:
- * <ul>
- *     <li><strong>connect</strong> providing a {@link java.util.Properties} containing all the
- *     required information.  Missing arguments should throw {@link IllegalArgumentException}</li>
- *     otherwise the regular Bluetooth connection exceptions should be thrown.
- *     <li><strong>disconnect</strong> performs appropriate disconnection</li>
- *     <li><strong>available</strong> determines whether a manual read is available from the
- *     device.</li>
- *     <li><strong>read</strong> performs a manual read.  Automated reading is available in
- *     the form of event handling, in which case the {@link DeviceConnection} implementation is
- *     responsible for handling if required.</li>
- *     <li><strong>write</strong> performs a write.</li>
- * </ul>
+ * Provides a standardized {@link DeviceConnection} that the {@link kjd.reactnative.bluetooth.RNBluetoothClassicModule}
+ * has the ability to create, customize and interact with.
  *
  * @author kdavidson
  *
  */
-public interface DeviceConnection {
+public interface DeviceConnection extends Runnable {
 
     /**
-     * Retrieves the internal {@link NativeDevice} which is currently backing the
-     * connection.
+     * Get the current {@link BluetoothDevice} to which the {@link DeviceConnection}
+     * is connected.
      *
      * @return
      */
-    NativeDevice getDevice();
-
-    /**
-     * Connects to a device.
-     *
-     * @param device
-     * @param properties
-     * @param listener
-     * @return
-     */
-    boolean connect(NativeDevice device,
-                    Properties properties,
-                    DeviceConnectionListener listener);
+    BluetoothDevice getDevice();
 
     /**
      * Disconnects from the currently connected {@link NativeDevice}.  It's up to the
@@ -56,7 +36,7 @@ public interface DeviceConnection {
     boolean disconnect();
 
     /**
-     * Writes the supplied data to the {@link NativeDevice} {@link java.io.OutputStream}.
+     * Writes the supplied data to the {@link NativeDevice}.
      * The inbound data is in a Base64 formatted String, as this was the original type
      * that was passed from React Native, implementations are responsible for converting
      * the Base64 String into the appropriate type - most of the forks are already
@@ -90,23 +70,21 @@ public interface DeviceConnection {
      *
      * @return
      */
-    String read() throws IOException;
+    String read();
 
     /**
      * It's possible to connect to a device without a listener (manual reading) in order to switch
      * the connection a listener needs to be added.
      *
-     * @param listener
+     * @param onDataReceived
      */
-    boolean addDeviceListener(DataReceivedListener listener);
+    void onDataReceived(BiConsumer<BluetoothDevice,String> onDataReceived);
 
     /**
      * Removes the current listener.  Implementations can fail with an exception or a response.
      *
-     *
-     * @return
      */
-    boolean removeDeviceListener();
+    void clearOnDataReceived();
 
     /**
      * Return the connection status.
@@ -114,4 +92,14 @@ public interface DeviceConnection {
      * @return
      */
     ConnectionStatus getConnectionStatus();
+
+    /**
+     * Sets the onDisconnect handler for the {@link DeviceConnection}.  This will be called in
+     * all instances of a disconnection: with an Exception on error, and with Null if requested
+     * gracefully.
+     *
+     * @param onDisconnect
+     */
+    void onDisconnect(BiConsumer<BluetoothDevice,Exception> onDisconnect);
+
 }
