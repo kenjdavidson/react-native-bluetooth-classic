@@ -19,21 +19,20 @@ import Foundation
  of the dictionary to appropriately convert the data object into a String
  (or other basic React Bridge serializable object)
  */
-class BluetoothMessage<T> : NSObject {
-    
-    public private(set) var device:BluetoothDevice
+class BluetoothMessage<T> : NSObject, Mappable {
+    public private(set) var device:NativeDevice
     public private(set) var data:T
     public private(set) var timestamp:Date
     
-    init(fromDevice:BluetoothDevice, data:T) {
+    init(fromDevice:NativeDevice, data:T) {
         self.device = fromDevice
         self.data = data
         self.timestamp = Date()
     }
     
-    func asDictionary() -> Dictionary<String,Any> {
+    func map() -> NSDictionary {
         return [
-            "device": device.asDictionary(),
+            "device": device.map(),
             "data": data,
             "timestamp": timestamp
         ]

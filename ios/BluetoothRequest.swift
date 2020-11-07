@@ -8,6 +8,6 @@
 
 import Foundation
 
-enum BTRequest: Int {
+enum BluetoothRequest: Int {
     case ENABLE_BLUETOOTH = 1, PAIR_DEVICE
 }

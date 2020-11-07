@@ -70,7 +70,7 @@ public class NativeDevice implements Mappable {
         if (mDevice.getBluetoothClass() != null) {
             WritableMap deviceClass = Arguments.createMap();
             deviceClass.putInt("deviceClass", mDevice.getBluetoothClass().getDeviceClass());
-            deviceClass.putInt("", mDevice.getBluetoothClass().getMajorDeviceClass());
+            deviceClass.putInt("majorClass", mDevice.getBluetoothClass().getMajorDeviceClass());
         }
 
         mapped.putMap("extra", Arguments.makeNativeMap(mExtra));

@@ -246,7 +246,7 @@ public class RNBluetoothClassicModule
     @Nullable
     @Override
     public Map<String, Object> getConstants() {
-        return null;
+        return Collections.emptyMap();
     }
     //endregion
 
@@ -616,7 +616,7 @@ public class RNBluetoothClassicModule
             Properties properties = Utilities.mapToProperties(parameters);
 
             try {
-                String connectorType = StandardOption.get(properties, StandardOption.ACCEPTOR_TYPE);
+                String connectorType = StandardOption.ACCEPTOR_TYPE.get(properties);
                 if (!mAcceptorFactories.containsKey(connectorType))
                     throw new IllegalStateException(
                             String.format("No ConnectionAcceptorFactory configured for type %s", connectorType));
@@ -632,7 +632,7 @@ public class RNBluetoothClassicModule
                         try {
                             // Create the appropriate Connection type and add it to the connected list
 
-                            String connectionType = StandardOption.get(properties, StandardOption.CONNECTION_TYPE);
+                            String connectionType = StandardOption.CONNECTION_TYPE.get(properties);
                             DeviceConnectionFactory connectionFactory = mConnectionFactories.get(connectionType);
                             DeviceConnection connection = connectionFactory.create(bluetoothSocket, properties);
                             mConnections.put(device.getAddress(), connection);
@@ -723,7 +723,7 @@ public class RNBluetoothClassicModule
 
             try {
                 Properties properties = Utilities.mapToProperties(parameters);
-                String connectorType = StandardOption.get(properties, StandardOption.CONNECTOR_TYPE);
+                String connectorType = StandardOption.CONNECTOR_TYPE.get(properties);
                 if (!mConnectorFactories.containsKey(connectorType))
                     throw new IllegalStateException(
                             String.format("No ConnectionConnectorFactory configured for type %s", connectorType));
@@ -738,7 +738,7 @@ public class RNBluetoothClassicModule
 
                         try {
                             // Create the appropriate Connection type and add it to the connected list
-                            String connectionType = StandardOption.get(properties, StandardOption.CONNECTION_TYPE);
+                            String connectionType = StandardOption.CONNECTION_TYPE.get(properties);
                             DeviceConnectionFactory connectionFactory = mConnectionFactories.get(connectionType);
                             DeviceConnection connection = connectionFactory.create(bluetoothSocket, properties);
                             mConnections.put(address, connection);

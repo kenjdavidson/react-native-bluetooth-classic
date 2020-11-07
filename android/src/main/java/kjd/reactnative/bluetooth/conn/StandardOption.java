@@ -44,8 +44,22 @@ public enum StandardOption {
 
     /**
      * The {@link Charset} to be used during the encoding/decoding of messages from the device.
+     * Charset provides it's own conversion as it may need to perform a string conversion
+     * during processing.
      */
-    DEVICE_CHARSET("charset", Charset.class, Charset.forName("ascii")),
+    DEVICE_CHARSET("charset", Charset.class, Charset.forName("ascii")) {
+        @Override
+        public <T> T get(Properties properties) {
+            Object value = properties.get(this.name());
+            if (value == null) {
+                value = Charset.forName("ascii");
+            } else if (value instanceof String) {
+                value = Charset.forName((String) value);
+            }
+
+            return (T) value;
+        }
+    },
 
     /**
      * Provide a timeout between individual reads of the device.  This is a hold over from the
@@ -101,17 +115,16 @@ public enum StandardOption {
      * Get the current or default value of the {@link StandardOption}.
      *
      * @param properties the {@link Properties} provided by the application
-     * @param option the option for which we want to get the value
      *
      * @param <T> the Type of data this option represents.  Be careful here as this does no
      *           type checking.
      * @return the provided or default value
      */
-    public static <T> T get(Properties properties, StandardOption option) {
-        Object value = properties.get(option.name());
+    public <T> T get(Properties properties) {
+        Object value = properties.get(this.name());
 
-        if (value == null || !(option.type().isAssignableFrom(value.getClass()))) {
-            return option.defaultValue();
+        if (value == null || !(this.type().isAssignableFrom(value.getClass()))) {
+            return this.defaultValue();
         }
 
         return (T) value;
