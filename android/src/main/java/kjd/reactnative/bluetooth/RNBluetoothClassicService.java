@@ -469,7 +469,6 @@ public class RNBluetoothClassicService {
                     if (bytes > 0)
                         listener.onReceivedData(mmDevice, Arrays.copyOf(buffer, bytes));
 
-                    Thread.sleep(500);      // Pause
                 } catch (Exception e) {
                     Log.e(TAG, "Disconnected - was it cancelled? " + mmCancelled, e);
 
