@@ -15,26 +15,12 @@ enum EventType: String, CaseIterable {
     case BLUETOOTH_DISABLED = "bluetoothDisabled"
     case DEVICE_CONNECTED = "deviceConnected"
     case DEVICE_DISCONNECTED = "deviceDisconnected"
-    case READ = "read"
+    case DEVICE_READ = "read"
     case ERROR = "error"
     
-    static func asDictionary() -> NSDictionary {
-        let events:NSDictionary = NSMutableDictionary()
-        
-        for event in EventType.allCases {
-            events.setValue(event.rawValue, forKey: "\(event)")
-        }
-        
-        return events
-    }
-    
-    static func asArray() -> [String] {
-        var events:[String] = [String]()
-        
-        for event in EventType.allCases {
-            events.append(event.rawValue)
-        }
-        
-        return events;
+    var name: String {
+        let fullname = String(reflecting: self)
+        let index = fullname.lastIndex(of: ".")!
+        return String(fullname[fullname.index(after: index)...])
     }
 }

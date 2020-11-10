@@ -21,7 +21,7 @@ public class RfcommConnectorThreadImpl extends ConnectionConnector {
         this.setName(String.format("%s_%s__Thread", this.getClass().getSimpleName(), device.getAddress()));
 
         this.mCancelled = false;
-        this.mSecure = StandardOption.get(properties, StandardOption.SECURE_SOCKET);
+        this.mSecure = StandardOption.SECURE_SOCKET.get(properties);
 
         BluetoothSocket tmp = null;
 

@@ -13,6 +13,9 @@ Since there seem to be some breaking changes introduced within React Native 0.60
 | --- | --- | --- | --- | --- |
 | 0.9.x | 0.41.0 - 0.59.9 | >= 4.1 (16) | >= IOS 9 | - Accept connection mode |
 | 0.10.x | >= 0.60.0 | >= 4.1 (16) | >= IOS 9 | - Accept connection mode |
+| 1.60.x | >= 0.60.0 | >= 8 (26) | >= IOS 9 | |
+
+If this breaks in a newer version of React Native, Android or IOS please open an issue.  Not sure what the resulting versions will (or should be) since `1.0.x (0.60.0)`, `2.0.x (0.64.0)` for example seems weird.  Although maybe `1.60.0` and `1.64.0` is pretty apparent to which version needs to be used?
 
 ## Getting started
 
@@ -94,7 +97,42 @@ Windows isn't added yet - it looks like with the latest `react-native init` ther
 
 ## Contribute
 
-When setting up the project for contribution follow all the usual Git contribution best practices.
+Feel free to contribute any changes or bug fixes you see fit.  Although when doing so please try to take into account that:
+
+- Changes should be customizable where possible (especially when possibly breaking to others)
+- Changes should be documented
+
+#### @types/react-native
+
+Doesn't have the updated `NativeEventEmitter` declarations. You'll need to update those manually:
+
+- Open up `node_modules/@types/react-native/index.d.ts
+- Change the following:
+
+```js
+//////////// Plugins //////////////
+
+export const DeviceEventEmitter: DeviceEventEmitterStatic;
+
+// NativeModule needs to be added for NativeEventEmitter
+export type NativeModule = {
+    addListener(eventType: string): void;
+    removeListener(count: int): void
+}
+
+/**
+ * This is actually the primary class for dealing with Native events being emitted
+ * and should be updated.  Without this the BluetoothModule will not 'compile'
+ */
+declare class NativeEventEmitter extends EventEmitter {
+    constructor(nativeModule?: NativeModule | undefined)
+
+    /**
+     * @param eventType  name of the event whose registered listeners to remove
+     */
+    removeAllListeners(eventType: string): void;
+}
+```
 
 #### Android
 

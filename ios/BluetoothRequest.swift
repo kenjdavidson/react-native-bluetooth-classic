@@ -8,6 +8,12 @@
 
 import Foundation
 
-enum BluetoothRequest: Int {
+enum BluetoothRequest: Int, CaseIterable {
     case ENABLE_BLUETOOTH = 1, PAIR_DEVICE
+    
+    var name: String {
+        let fullname = String(reflecting: self)
+        let index = fullname.lastIndex(of: ".")!
+        return String(fullname[fullname.index(after: index)...])
+    }
 }

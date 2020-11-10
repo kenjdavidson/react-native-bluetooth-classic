@@ -94,6 +94,9 @@ Following a couple docs and looking at the already created `Podspec` file for th
 pod 'React', :path => '../node_modules/react-native/'
 pod 'React-Core', :path => '../node_modules/react-native/'
 ...
+# Required for Ionicons
+# Don't forget to add Ionicons.ttf to your Fonts Provided By Application plist
+pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 pod 'react-native-bluetooth-classic', :path => '../../'
 ```
 

@@ -17,7 +17,10 @@ public enum Exceptions {
     ACCEPTING_CANCELLED("Accept was cancelled"),
     CONNECTION_FAILED("Connection to %s failed."),
     CONNECTION_LOST("Connection to %s was lost"),
-    PAIRING_FAILED("Unable to complete pairing with %s")
+    PAIRING_FAILED("Unable to complete pairing with %s"),
+    INVALID_CONNECTOR_TYPE("Invalid connector type: %s"),
+    INVALID_ACCEPTOR_TYPE("Invalid acceptor type: %s"),
+    INVALID_CONNECTION_TYPE("Invalid connection type: %s"),
     ;
 
     private final String message;

@@ -8,6 +8,19 @@
 
 import Foundation
 
-enum BluetoothState: Int {
-    case DISABLED = 0, ENABLED;
+/**
+ * Bluetooth state - simulates Android values.
+ *
+ * @author kendavidson
+ *
+ */
+enum BluetoothState: Int, CaseIterable {
+    case DISABLED = 10
+    case ENABLED = 12;
+    
+    var name: String {
+        let fullname = String(reflecting: self)
+        let index = fullname.lastIndex(of: ".")!
+        return String(fullname[fullname.index(after: index)...])
+    }
 }

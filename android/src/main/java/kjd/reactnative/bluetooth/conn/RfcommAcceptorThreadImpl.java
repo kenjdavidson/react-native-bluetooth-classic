@@ -31,8 +31,8 @@ public class RfcommAcceptorThreadImpl extends ConnectionAcceptor {
         this.setName(String.format("%s__Thread", this.getClass().getSimpleName()));
 
         this.mCancelled = false;
-        this.mSecure = StandardOption.get(properties, StandardOption.SECURE_SOCKET);
-        this.mServiceName = StandardOption.get(properties, StandardOption.SERVICE_NAME);
+        this.mSecure = StandardOption.SECURE_SOCKET.get(properties);
+        this.mServiceName = StandardOption.SERVICE_NAME.get(properties);
         this.mNumAccept = 1;
 
         BluetoothServerSocket tmp = null;

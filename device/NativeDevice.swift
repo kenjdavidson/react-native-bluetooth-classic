@@ -12,6 +12,7 @@ import ExternalAccessory
  * Provides a common wrapping for EAAccessory objects with regards to making them
  * transferrable between RNBluetoothClassic and React Native.
  *
+ * @author kendaivvdson
  */
 class NativeDevice: NSObject, Mappable {
     

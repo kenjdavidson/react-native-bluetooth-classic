@@ -43,8 +43,8 @@ public class DelimitedStringDeviceConnectionImpl extends AbstractDeviceConnectio
         super(socket, properties);
 
         this.mBuffer = new StringBuffer();
-        this.mDelimiter = StandardOption.get(properties, StandardOption.DELIMITER);
-        this.mCharset = StandardOption.get(properties, StandardOption.DEVICE_CHARSET);
+        this.mDelimiter = StandardOption.DELIMITER.get(properties);
+        this.mCharset = StandardOption.DEVICE_CHARSET.get(properties);
     }
 
     @Override

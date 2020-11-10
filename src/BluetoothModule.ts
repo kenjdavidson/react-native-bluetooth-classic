@@ -1,5 +1,7 @@
 import { NativeEventEmitter, 
-  Platform 
+  EventSubscriptionVendor,
+  Platform,
+  EventSubscription
 } from 'react-native';
 import RNBluetoothClassicModule from './BluetoothNativeModule';
 import BluetoothDevice from './BluetoothDevice';
@@ -45,7 +47,7 @@ export default class BluetoothModule {
 
   constructor(nativeModule: RNBluetoothClassicModule) {
     this._nativeModule = nativeModule; 
-    this._eventEmitter = new NativeEventEmitter();  
+    this._eventEmitter = new NativeEventEmitter(new NativeModule())
   }
 
   /**
@@ -388,4 +390,9 @@ export default class BluetoothModule {
     return this.createBluetoothEventSubscription(BluetoothEventType.ERROR, listener);
   }
 
+}
+
+class NativeModule {
+  addListener(eventType: string) {}
+  removeListener(count: number) {}
 }

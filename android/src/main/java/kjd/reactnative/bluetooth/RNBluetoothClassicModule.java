@@ -715,18 +715,29 @@ public class RNBluetoothClassicModule
             promise.reject(Exceptions.ALREADY_CONNECTING.name(),
                     Exceptions.ALREADY_CONNECTING.message(address));
         } else if (mConnections.containsKey(address)) {
-            promise.reject(Exceptions.ALREADY_CONNECTED.name(),
-                    Exceptions.ALREADY_CONNECTED.message(address));
+            // If it's already connected just return the device now.
+            DeviceConnection connection = mConnections.get(address);
+            promise.resolve(new NativeDevice(connection.getDevice()).map());
         } else {
             final BluetoothDevice device = mAdapter.getRemoteDevice(address);
             final NativeDevice nativeDevice = new NativeDevice(device);
 
             try {
                 Properties properties = Utilities.mapToProperties(parameters);
-                String connectorType = StandardOption.CONNECTOR_TYPE.get(properties);
-                if (!mConnectorFactories.containsKey(connectorType))
-                    throw new IllegalStateException(
-                            String.format("No ConnectionConnectorFactory configured for type %s", connectorType));
+
+                final String connectorType = StandardOption.CONNECTOR_TYPE.get(properties);
+                if (!mConnectorFactories.containsKey(connectorType)) {
+                    promise.reject(Exceptions.INVALID_CONNECTOR_TYPE.name(),
+                            Exceptions.INVALID_CONNECTOR_TYPE.message(connectorType));
+                    return;
+                }
+
+                final String connectionType = StandardOption.CONNECTION_TYPE.get(properties);
+                if (!mConnectionFactories.containsKey(connectionType)) {
+                    promise.reject(Exceptions.INVALID_CONNECTION_TYPE.name(),
+                            Exceptions.INVALID_CONNECTION_TYPE.message(connectorType));
+                    return;
+                }
 
                 ConnectionConnectorFactory connectorFactory = mConnectorFactories.get(connectorType);
                 ConnectionConnector connector = connectorFactory.create(device, properties);
@@ -738,7 +749,6 @@ public class RNBluetoothClassicModule
 
                         try {
                             // Create the appropriate Connection type and add it to the connected list
-                            String connectionType = StandardOption.CONNECTION_TYPE.get(properties);
                             DeviceConnectionFactory connectionFactory = mConnectionFactories.get(connectionType);
                             DeviceConnection connection = connectionFactory.create(bluetoothSocket, properties);
                             mConnections.put(address, connection);
@@ -749,7 +759,6 @@ public class RNBluetoothClassicModule
                         } catch (IOException e) {
                             promise.reject(new ConnectionFailedException(nativeDevice, e));
                         }
-
                     }
 
                     @Override
@@ -1080,7 +1089,7 @@ public class RNBluetoothClassicModule
         }
 
         if (!EventType.eventNames().hasKey(eventType)) {
-            throw new InvalidBluetoothEventException(eventType);
+            return;
         }
 
         EventType event = EventType.valueOf(eventType);
@@ -1110,36 +1119,44 @@ public class RNBluetoothClassicModule
      * Remove all the listeners for the provided eventName.   Removing all listeners also has a
      * context (prefixed with @) which will remove all the listeners for that specified device.
      *
-     * @param eventName for which all listeners will be removed
+     * @param requestedEvent for which all listeners will be removed
      */
     @ReactMethod
     @SuppressWarnings({"unused"})
-    public void removeAllListeners(String eventName) {
-        if (!EventType.eventNames().hasKey(eventName)) {
-            throw new InvalidBluetoothEventException(eventName);
+    public void removeAllListeners(String requestedEvent) {
+        String eventType = requestedEvent,
+                eventDevice = null;
+
+        if (requestedEvent.contains("@")) {
+            String[] context = requestedEvent.split("@");
+            eventType = context[0];
+            eventDevice = context[1];
         }
 
-        String[] requestedEvent = eventName.split("@");
-        EventType event = EventType.valueOf(requestedEvent[0]);
+        if (!EventType.eventNames().hasKey(eventType)) {
+            return;
+        }
+
+        EventType event = EventType.valueOf(eventType);
 
         if (EventType.DEVICE_READ == event) {
-            if (!mConnections.containsKey(requestedEvent[1])) {
-                throw new IllegalStateException(String.format("Cannot read from %s, not currently connected", eventName));
+            if (!mConnections.containsKey(eventDevice)) {
+                throw new IllegalStateException(String.format("Cannot read from %s, not currently connected", eventType));
             }
 
-            DeviceConnection connection = mConnections.get(requestedEvent[1]);
+            DeviceConnection connection = mConnections.get(eventDevice);
             connection.clearOnDataReceived();
         }
 
         // Only remove the listener if it currently exists.  If you're attemping to remove a listener
         // which hasn't been added, just let it go.
-        if (mListenerCounts.containsKey(eventName)) {
-            AtomicInteger listenerCount = mListenerCounts.get(eventName);
+        if (mListenerCounts.containsKey(eventType)) {
+            AtomicInteger listenerCount = mListenerCounts.get(eventType);
             listenerCount.set(0);
 
             Log.d(TAG,
                     String.format("Removing listener to %s, currently have %d listeners",
-                            eventName, 0));
+                            eventType, 0));
         }
     }
     //endregion

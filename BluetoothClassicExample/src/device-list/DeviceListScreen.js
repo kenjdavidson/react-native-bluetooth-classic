@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Platform } from 'react-native';
 import { 
   Left, 
   Body, 
@@ -243,7 +244,7 @@ export default class DeviceListScreen extends React.Component {
               devices={this.state.devices}
               onPress={this.props.selectDevice}
             />         
-            <View>
+            { Platform.OS !== 'ios' ? (<View>
               <Button block
                 onPress={toggleAccept}>
                 <Text>{ this.state.accepting ? "Accepting (cancel)..." : "Accept Connection"}</Text>
@@ -252,7 +253,7 @@ export default class DeviceListScreen extends React.Component {
                 onPress={toggleDiscovery}>
                 <Text>{ this.state.discovering ? "Discovering (cancel)..." : "Discover Devices"}</Text>
               </Button> 
-            </View>
+            </View>) : undefined }
           </>
         ):(
           <Content contentContainerStyle={styles.center}>

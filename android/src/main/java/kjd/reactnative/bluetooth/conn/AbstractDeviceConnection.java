@@ -87,8 +87,8 @@ abstract public class AbstractDeviceConnection implements DeviceConnection {
 
     @Override
     public void run() {
-        int bufferSize = StandardOption.get(mProperties, StandardOption.READ_SIZE);
-        int readTimeout = StandardOption.get(mProperties, StandardOption.READ_TIMEOUT);
+        int bufferSize = StandardOption.READ_SIZE.get(mProperties);
+        int readTimeout = StandardOption.READ_TIMEOUT.get(mProperties);
 
         mConnectionStatus = ConnectionStatus.CONNECTING;
 

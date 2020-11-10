@@ -34,7 +34,7 @@ protocol DeviceConnection {
     /**
      * The accessory to which this connection references
      */
-    var accessory: EAAccessory: { get }
+    var accessory: EAAccessory { get }
     
     /**
      * Attempt to connect to the connections EAAccessory using the properties provided

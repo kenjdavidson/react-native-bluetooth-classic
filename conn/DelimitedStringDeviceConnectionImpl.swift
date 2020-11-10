@@ -21,14 +21,27 @@ import ExternalAccessory
  */
 class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDelegate {
  
-    var dataReceivedDelegate: DataReceivedDelegate?
+    private var _dataReceivedDelegate: DataReceivedDelegate?
+    var dataReceivedDelegate: DataReceivedDelegate? {
+        set(newDelegate) {
+            if let unwrapped = newDelegate {
+                while let data = read() {
+                    unwrapped.onReceivedData(fromDevice:  accessory, receivedData: data)
+                }
+            }
+            self._dataReceivedDelegate = newDelegate
+        }
+        get {
+            return self._dataReceivedDelegate
+        }
+    }
     
     private var session: EASession?
     private var inBuffer: Data
     private var outBuffer: Data
     
     private(set) var accessory: EAAccessory
-    private(set) var properties: NSDictionary
+    private(set) var properties: Dictionary<String,Any>
     
     private var readSize: Int
     private var delimiter: String
@@ -36,33 +49,39 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
     
     init(
         accessory: EAAccessory,
-        properties: NSDictionary
+        options: Dictionary<String,Any>
     ) {
         self.accessory = accessory;
-        self.properties = NSDictionary(dictionary: properties)
+        self.properties = Dictionary<String,Any>()
+        self.properties.merge(options) { $1 }
+        
         self.inBuffer = Data()
         self.outBuffer = Data()
         
-        self.readSize = (self.properties.value(forKey: "read_size") != nil)
-            ? self.properties.value(forKey: "read_size") as! Int
-            : 1024
+        if let value = self.properties["READ_SIZE"] {
+            self.readSize = value as! Int
+        } else {
+            self.readSize = 1024
+        }
         
-        self.delimiter = (self.properties.value(forKey: "delimiter") != nil)
-            ? self.properties.value(forKey: "delimiter") as! String
-            : "\n"
+        if let value = self.properties["DELIMTER"] {
+            self.delimiter = value as! String
+        } else {
+            self.delimiter = "\n"
+        }
         
-        let stringEncoding = (self.properties.value(forKey: "charset") != nil)
-            ? self.properties.value(forKey: "charset") as! CFStringEncoding
-            : CFStringBuiltInEncodings.ASCII.rawValue
-        self.encoding = String.Encoding.from(stringEncoding)
-        
+        if let value = self.properties["CHARSET"] {
+            self.encoding = String.Encoding.from(value as! CFStringEncoding)
+        } else {
+            self.encoding = String.Encoding.from(CFStringBuiltInEncodings.ASCII.rawValue)
+        }
     }
     
     /**
      * This implementation attempts to open an EASession for the provided protocol string
      */
     func connect() {
-        let protocolString: String = self.properties.value(forKey: "protocol_string") as! String
+        let protocolString: String = self.properties["PROTOCOL_STRING"] as! String
         
         NSLog("(BluetoothDevice:connect) Attempting Bluetooth connection to %@ using protocol %@", accessory.serialNumber, protocolString)
         session = EASession(accessory: accessory, forProtocol: protocolString)
@@ -116,6 +135,7 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
     /**
      * Attempts to write to the out buffer.  This intermedate step is required so that the StreamDelegate will find and read
      * the available information when more space is available on the stream.
+     * - parameter message: the encoded message which will be written
      */
     func write(_ message: String) {
         NSLog("(BluetoothDevice:writeToDevice) Writing %@ to device %@", message, accessory.serialNumber)
@@ -127,22 +147,25 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
         // If all the data cannot be fully written, then the hasSpaceAvailable will be
         // fired and we can continue.  In most cases, we shouldn't be sending that much
         // data.
-        writeData((session?.outputStream)!)
+        writeDataToStream((session?.outputStream)!)
     }
     
     /**
-     * Reads a single message from the device, using the provided delimiter.  This is done by pulling out from the
-     * start to the first instance of the delmiter, then
+     * Reads the next message from the inBuffer.  This particular implementation converse the inBuffer into a
+     * String using the provided encoding, then search for the first instance of that delimiter, and finally
+     * updates the inBuffer with the remaining data
      */
     func read() -> String? {
         NSLog("(BluetoothDevice:readFromDevice) Reading device %@ until delimiter %@",
               self.accessory.serialNumber, self.delimiter)
+        
         let content = String(data: inBuffer, encoding: self.encoding)!
         var message:String?
-        
-        if let lookTo = content.index(of: self.delimiter) {
-            message = String(content[..<lookTo])
-            inBuffer = String(content[lookTo...]).data(using: self.encoding) ?? Data()
+
+        if let index = content.index(of: self.delimiter) {
+            message = String(content[..<index])
+            inBuffer = String(content[content.index(after: index)...])
+                .data(using: self.encoding) ?? Data()
         }
         
         return message
@@ -171,14 +194,14 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
             break;
         case .hasBytesAvailable:
             NSLog("Stream %@ has bytes available", aStream)
-            readData(aStream as! InputStream)
+            readDataFromStream(aStream as! InputStream)
             break;
         case .hasSpaceAvailable:
             // As per the documents, this event occurs repeatedly as long as you're writing data
             // in the examples I've found they just assume the initial write will work (using
             // a smaller value) and then continues on doing so.
             NSLog("Stream %@ has space available", aStream)
-            writeData(aStream as! OutputStream)
+            writeDataToStream(aStream as! OutputStream)
             break;
         case .errorOccurred:
             NSLog("Stream %@ has had an error occur", aStream)
@@ -197,7 +220,7 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
      * BluetoothDevice.onDataRead listener, then it will be notified instead of appending
      * to the message string.
      */
-    private func readData(_ stream: InputStream) {
+    private func readDataFromStream(_ stream: InputStream) {
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: readSize)
         
         while (stream.hasBytesAvailable) {
@@ -211,12 +234,8 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
         }
     
         if let delegate = self.dataReceivedDelegate {
-            let count = available()
-            while (count > 0) {
-                if let message = read() {
-                    let data =
-                    delegate.onReceivedData(fromDevice:  accessory, receivedData: message)
-                }
+            while let data = read() {
+                delegate.onReceivedData(fromDevice:  accessory, receivedData: data)
             }
         }
     }
@@ -229,7 +248,7 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
      * Messages are only written to the outBuffer based on the size available or the readSize, this should probably
      * just write what is there
      */
-    private func writeData(_ stream: OutputStream) {
+    private func writeDataToStream(_ stream: OutputStream) {
         if (outBuffer.isEmpty) {
             NSLog("(BluetoothDevice:writeData) No buffer data scheduled for deliver")
             return
@@ -244,5 +263,11 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
         
         let bytesWritten = stream.write(buffer, maxLength: len)
         NSLog("(BluetoothDevice:writeData) Sent %d bytes to the device", bytesWritten)
+    }
+}
+
+class DelimitedStringDeviceConnectionFactory : DeviceConnectionFactory {
+    func create(accessory: EAAccessory, options: Dictionary<String, Any>) -> DeviceConnection {
+        return DelimitedStringDeviceConnectionImpl(accessory: accessory, options: options)
     }
 }

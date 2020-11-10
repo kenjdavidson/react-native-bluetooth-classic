@@ -30,14 +30,22 @@ import CoreBluetooth
  data is done in Javascript/client rather than in the module.
  */
 @objc(RNBluetoothClassic)
-class RNBluetoothClassic : RCTEventEmitter {
+class RNBluetoothClassic : NSObject, RCTBridgeModule {
     
-    let eaManager: EAAccessoryManager
-    let cbCentral: CBCentralManager
-    let notificationCenter: NotificationCenter
-    let supportedProtocols: [String]
+    static func moduleName() -> String! {
+        return "RNBluetoothClassic"
+    }
     
-    var peripherals: Dictionary<String,DeviceConnection>
+    @objc var bridge: RCTBridge!
+    var connectionFactories: Dictionary<String,DeviceConnectionFactory>
+    
+    private let eaManager: EAAccessoryManager
+    private let cbCentral: CBCentralManager
+    private let notificationCenter: NotificationCenter
+    private let supportedProtocols: [String]
+    
+    private var listeners: Dictionary<String,Int>
+    private var connections: Dictionary<String,DeviceConnection>
     
     /**
      * Initializes the RNBluetoothClassic module.  At this point it's not quite as customizable as the
@@ -45,13 +53,19 @@ class RNBluetoothClassic : RCTEventEmitter {
      * Swify way, but my ObjC and Swift is not strong, very very not strong.
      */
     override init() {
-        super.init()
-        
         self.eaManager = EAAccessoryManager.shared()
         self.cbCentral = CBCentralManager()
         self.notificationCenter = NotificationCenter.default
         self.supportedProtocols = Bundle.main
             .object(forInfoDictionaryKey: "UISupportedExternalAccessoryProtocols") as! [String]
+        
+        self.connectionFactories = Dictionary()
+        self.connectionFactories["rfcomm"] = DelimitedStringDeviceConnectionFactory()
+        
+        self.connections = Dictionary()
+        self.listeners = Dictionary()
+        
+        super.init()
         
         self.registerForLocalNotifications()
     }
@@ -95,35 +109,37 @@ class RNBluetoothClassic : RCTEventEmitter {
     
     /**
      * Implements the EAAccessoryDidConnect delegate observer.  Fires a DeviceConnected event
-     * to react native.  I think this has to do ony with Bonding and not Connecting in the way that we use the
-     * terms within this library.  If this is the case, we'll need to decide if this needs to be changed to
-     * a DEVICE_BONDED event and create the same on Android.
+     * to react native.  In terms of IOS connection this means that the perfipheral is ON and BONDED
+     * (which IOS calls connected, the device might actually show connected) but this does not mean
+     * that there is an active socket/stream open
      */
     @objc
     func accessoryDidConnect(_ notification:Notification) {
         // Unlike the disconnect we just need to pass the event to the application.  It
         // will decide whether or not to connect.
         if let connected: EAAccessory = notification.userInfo!["EAAccessoryKey"] as? EAAccessory {
-            sendEvent(withName: EventType.DEVICE_CONNECTED.rawValue,
+            sendEvent(EventType.DEVICE_CONNECTED.name,
                       body: NativeDevice(accessory: connected).map())
         }
     }
     
     /**
      * Received a disconnct notification from IOS.  If we are currently connected to this device, we need to disconnect it
-     * and remove it from the connected peripherals map.
+     * and remove it from the connected peripherals map. In terms of IOS connection this means that the perfipheral
+     * is OFF and BONDED (which IOS calls connected, the device might actually show connected) but this does not mean
+     * that there is an active socket/stream open
      */
     @objc
     func accessoryDidDisconnect(_ notification:Notification) {
         if let disconnected: EAAccessory = notification.userInfo!["EAAccessoryKey"] as? EAAccessory {
             // If we are currently connected to this, then we need to
             // disconnected it and remove the current peripheral
-            if let currentDevice = peripherals.removeValue(forKey: disconnected.serialNumber) {
+            if let currentDevice = connections.removeValue(forKey: disconnected.serialNumber) {
                 currentDevice.disconnect()
             }
             
             // Finally send the notification
-            sendEvent(withName: EventType.DEVICE_DISCONNECTED.rawValue,
+            sendEvent(EventType.DEVICE_DISCONNECTED.name,
                       body: NativeDevice(accessory: disconnected).map())
         }
     }
@@ -134,7 +150,7 @@ class RNBluetoothClassic : RCTEventEmitter {
      on as the ExternalAccessory event handling needs to occur on a separate thread and
      be haneled correctly.
      */
-    override static func requiresMainQueueSetup() -> Bool {
+    static func requiresMainQueueSetup() -> Bool {
         return true;
     }
     
@@ -142,7 +158,7 @@ class RNBluetoothClassic : RCTEventEmitter {
      RCTEventEmitter -
      Return the constants for BTEvents and BTCharsets specific to IOS.
      */
-    override func constantsToExport() -> [AnyHashable : Any]! {
+    func constantsToExport() -> [AnyHashable : Any]! {
         return [:];
     }
     
@@ -155,7 +171,7 @@ class RNBluetoothClassic : RCTEventEmitter {
      */
     @objc
     func isBluetoothEnabled(
-        resolver resolve: RCTPromiseResolveBlock,
+        _ resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
         resolve(checkBluetoothAdapter())
@@ -177,8 +193,8 @@ class RNBluetoothClassic : RCTEventEmitter {
     }
     
     private func rejectBluetoothDisabled(rejecter reject: RCTPromiseRejectBlock) {
-        let error = NSError(domain: "kjd.reactnative.bluetooth", code: 100)
-        reject("bluetooth_disabled", "Bluetooth is not enabled", error)
+        let error = BluetoothError.BLUETOOTH_DISABLED
+        reject(error.info.abbr, error.info.message, error.error)
     }
     
     /**
@@ -191,11 +207,12 @@ class RNBluetoothClassic : RCTEventEmitter {
      */
     @objc
     func getBondedDevices(
-        resolver resolve: RCTPromiseResolveBlock,
+        _ resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
-        guard !checkBluetoothAdapter() else {
+        guard checkBluetoothAdapter() else {
             rejectBluetoothDisabled(rejecter: reject)
+            return
         }
         
         var accessories:[NSDictionary] = [NSDictionary]()
@@ -223,27 +240,39 @@ class RNBluetoothClassic : RCTEventEmitter {
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
-        guard !checkBluetoothAdapter() else {
+        guard checkBluetoothAdapter() else {
             rejectBluetoothDisabled(rejecter: reject)
+            return
         }
         
-        guard peripherals[deviceId] != nil else {
+        guard connections[deviceId] == nil else {
+            let connection = connections[deviceId]!
+            resolve(NativeDevice(accessory: connection.accessory).map())
+            return
+        }
+        
+        var connectionOptions = Dictionary<String,Any>()
+        connectionOptions.merge(options as! [String : Any]) { $1 }
+        
+        let connectionType = connectionOptions["CONNECTION_TYPE"] ?? "delimited";
+        guard let factory = connectionFactories[connectionType as! String] else {
             let error = NSError(domain: "kjd.reactnative.bluetooth", code: 200)
-            reject("device_connected", "Device is already connected", error)
+            reject("invalid_connection_type", "Invalid connection type", error)
+            return;
         }
-        
+
         // Now check to see that the device is still connected and available
         // using the EAAccessoryManager, if found we create a new BluetoothDevice
         // which will be responsible for managing our connection
-        if let accessory = eaManager.connectedAccessories.first(where: {
-            $0.serialNumber == deviceId
-        }) {
+        if let accessory = eaManager.connectedAccessories.first(where: { $0.serialNumber == deviceId }) {
             if let protocolString:String = determineProtocolString(forDevice: accessory) {
+                connectionOptions["PROTOCOL_STRING"] = protocolString
+                
                 NSLog("(RNBluetoothClassic:connect) Connecting to %@ with %@", accessory.name, protocolString)
-                let connection = DelimitedStringDeviceConnectionImpl(accessory: accessory, properties: options)
+                let connection = factory.create(accessory: accessory, options: connectionOptions)
                 connection.connect()
                 
-                peripherals[deviceId] = connection
+                connections[deviceId] = connection
                 resolve(NativeDevice(accessory: accessory).map())
             } else {
                 let error = NSError(domain: "kjd.reactnative.bluetooth", code: 201)
@@ -273,13 +302,15 @@ class RNBluetoothClassic : RCTEventEmitter {
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
-        guard !checkBluetoothAdapter() else {
+        guard checkBluetoothAdapter() else {
             rejectBluetoothDisabled(rejecter: reject)
+            return
         }
         
-        guard let connected = peripherals.removeValue(forKey: deviceId) else {
+        guard let connected = connections.removeValue(forKey: deviceId) else {
             let error = NSError(domain: "kjd.reactnative.bluetooth", code: 203)
             reject("device_not_connected", "Device is not currently connected", error)
+            return
         }
         
         NSLog("(RNBluetoothClassic:disconnect) Disconnecting %@", connected.accessory.name)
@@ -299,16 +330,12 @@ class RNBluetoothClassic : RCTEventEmitter {
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
-        guard !checkBluetoothAdapter() else {
+        guard checkBluetoothAdapter() else {
             rejectBluetoothDisabled(rejecter: reject)
+            return
         }
         
-        NSLog("(RNBluetoothClassic:isConnected) isConnected %@", peripheral?.accessory.name ?? "nil")
-        if let connected = peripheral {
-            resolve(connected.accessory.isConnected)
-        } else {
-            resolve(false)
-        }
+        resolve(connections[deviceId] != nil)
     }
     
     /**
@@ -323,16 +350,18 @@ class RNBluetoothClassic : RCTEventEmitter {
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
-        guard !checkBluetoothAdapter() else {
+        guard checkBluetoothAdapter() else {
             rejectBluetoothDisabled(rejecter: reject)
+            return
         }
         
-        NSLog("(RNBluetoothClassic:getConnectedDevice) Determine whether %@ is connected", peripheral?.accessory.name ?? "nil")
-        if peripheral != nil {
-            resolve(peripheral?.asDictionary())
-        } else {
-            reject("error", "No bluetooth device connected", nil)
+        guard let connected = connections[deviceId] else {
+            let error = NSError(domain: "kjd.reactnative.bluetooth", code: 203)
+            reject("device_not_connected", "Device is not currently connected", error)
+            return
         }
+        
+        resolve(NativeDevice(accessory: connected.accessory).map())
     }
     
     /**
@@ -350,17 +379,19 @@ class RNBluetoothClassic : RCTEventEmitter {
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
-        guard !checkBluetoothAdapter() else {
+        guard checkBluetoothAdapter() else {
             rejectBluetoothDisabled(rejecter: reject)
+            return
         }
         
-        NSLog("(RNBluetoothClassic:writeToDevice) Writing %@ to device %@", message, peripheral?.accessory.name ?? "nil")
-        if let currentDevice = peripheral, let decoded = Data(base64Encoded: message) {
-            currentDevice.writeToDevice(String(data: decoded, encoding: .utf8)!)
-            resolve(true)
-        } else {
-            reject("error", "Not currently connected to a device", nil)
+        guard let connected = connections[deviceId] else {
+            let error = NSError(domain: "kjd.reactnative.bluetooth", code: 203)
+            reject("device_not_connected", "Device is not currently connected", error)
+            return
         }
+        
+        connected.write(message)
+        resolve(true)
     }
     
     /**
@@ -376,11 +407,18 @@ class RNBluetoothClassic : RCTEventEmitter {
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
-        guard !checkBluetoothAdapter() else {
+        guard checkBluetoothAdapter() else {
             rejectBluetoothDisabled(rejecter: reject)
+            return
         }
         
-        resolve(peripheral?.readFromDevice() ?? "")
+        guard let connected = connections[deviceId] else {
+           let error = NSError(domain: "kjd.reactnative.bluetooth", code: 203)
+           reject("device_not_connected", "Device is not currently connected", error)
+            return
+        }
+        
+        resolve(connected.read())
     }
     
     /**
@@ -395,13 +433,18 @@ class RNBluetoothClassic : RCTEventEmitter {
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) {
-        guard !checkBluetoothAdapter() else {
+        guard checkBluetoothAdapter() else {
             rejectBluetoothDisabled(rejecter: reject)
+            return
         }
         
-        if let currentDevice = peripheral {
-            currentDevice.clear()
+        guard let connected = connections[deviceId] else {
+            let error = NSError(domain: "kjd.reactnative.bluetooth", code: 203)
+            reject("device_not_connected", "Device is not currently connected", error)
+            return
         }
+       
+        connected.clear()
         resolve(true)
     }
     
@@ -419,23 +462,157 @@ class RNBluetoothClassic : RCTEventEmitter {
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) {
-        guard !checkBluetoothAdapter() else {
+        guard checkBluetoothAdapter() else {
             rejectBluetoothDisabled(rejecter: reject)
-        }
-        
-        guard let p = peripheral else {
-            let msg: String = "There is no currently connected devices from which to read data"
-            reject("error", msg, nil)
             return
         }
         
-        resolve(p.bytesAvailable())
+        guard let connected = connections[deviceId] else {
+            let error = NSError(domain: "kjd.reactnative.bluetooth", code: 203)
+            reject("device_not_connected", "Device is not currently connected", error)
+            return
+        }
+        
+        resolve(connected.available())
     }
+    
+    func sendEvent(_ eventName: String, body: Any?) {
+         guard let bridge = self.bridge else {
+             NSLog("Error when sending event \(eventName) with body \(body ?? ""); Bridge not set")
+             return
+         }
+         
+         guard (listeners[eventName] != nil || listeners[eventName] == 0) else {
+             NSLog("Sending '%@' with no listeners registered; was skipped", eventName)
+             return
+         }
+         
+         var data: [Any] = [eventName]
+         if let actualBody = body {
+             data.append(actualBody)
+         }
+         
+         bridge.enqueueJSCall("RCTDeviceEventEmitter",
+                              method: "emit",
+                              args: data,
+                              completion: nil)
+     }
+     
+     @objc
+     func addListener(
+        _ requestedEvent: String
+     ) {
+        var eventName = requestedEvent
+        var deviceId: String?
+         
+        if (requestedEvent.contains("@")) {
+            let split = requestedEvent.split(separator: "@")
+            eventName = String(split[0])
+            deviceId = String(split[1])
+        }
+         
+        guard EventType.allCases.firstIndex(where: { $0.name == eventName}) ?? -1 >= 0 else {
+            NSLog("%@ is not a supported EventType", eventName)
+            return
+        }
+         
+        // When saving the listener, we need to use the requested event now that we know
+        // it's legal, this way we maintain the DEVICE_READ@<serialNumber>
+        let listenerCount = listeners[requestedEvent] ?? 0
+        listeners[requestedEvent] = listenerCount + 1
+         
+        if let forDevice = deviceId {
+            onAddListener(eventName, deviceId: forDevice)
+        }
+     }
+     
+    @objc
+    func removeListener(_ requestedEvent: String) throws {
+        var eventName = requestedEvent
+        var eventDevice: String?
+         
+        if (requestedEvent.contains("@")) {
+            let split = requestedEvent.split(separator: "@")
+            eventName = String(split[0])
+            eventDevice = String(split[1])
+        }
+         
+        guard EventType.allCases.firstIndex(where: { $0.name == eventName}) ?? -1 >= 0 else {
+            NSLog("%@ is not a supported EventType", eventName)
+            return
+        }
+         
+        let listenerCount = listeners[eventName] ?? 0
+         
+        if listenerCount > 0 {
+            listeners[eventName] = listenerCount - 1
+             
+            if let deviceId = eventDevice {
+                onRemoveListener(eventName, deviceId: deviceId)
+            }
+        }
+    }
+     
+    @objc
+    func removeAllListeners(_ requestedEvent: String) throws {
+        var eventName = requestedEvent
+        var eventDevice: String?
+        
+        if (requestedEvent.contains("@")) {
+            let split = requestedEvent.split(separator: "@")
+            eventName = String(split[0])
+            eventDevice = String(split[1])
+        }
+         
+        guard EventType.allCases.firstIndex(where: { $0.name == eventName}) ?? -1 >= 0 else {
+            NSLog("%@ is not a supported EventType", eventName)
+            return
+        }
+         
+        let listenerCount = listeners[eventName] ?? 0
+         
+        if listenerCount > 0 {
+            listeners[eventName] = listenerCount - 1
+             
+            if let deviceId = eventDevice {
+                onRemoveListener(eventName, deviceId: deviceId)
+            }
+        }
 
+    }
+     
+    func onAddListener(_ eventName: String, deviceId: String) {
+        if var connection = connections[deviceId] {
+            connection.dataReceivedDelegate = self;
+        } else {
+            NSLog("Device %@ is not currently connected, unable to set delegate", deviceId)
+        }
+    }
+    
+    func onRemoveListener(_ eventName: String, deviceId: String) {
+        if var connection = connections[deviceId] {
+            connection.dataReceivedDelegate = nil;
+        } else {
+            NSLog("Device %@ is not currently connected, unable to remove delegate", deviceId)
+        }
+    }
+    
+    func onRemoveAllListeners(_ eventName: String, deviceId: String) {
+        if var connection = connections[deviceId] {
+            connection.dataReceivedDelegate = nil;
+        } else {
+            NSLog("Device %@ is not currently connected, unable to remove delegate", deviceId)
+        }
+    }
 }
 
 // MARK: BluetoothReceivedDelegate implementation
-
+/**
+ * Extension implementing the DataReceivedDelegate
+ *
+ * Responsible for accepting data from the device (when a listener has been requested) and passing
+ * such data through to React Native.
+ */
 extension RNBluetoothClassic : DataReceivedDelegate {
     
     /**
@@ -449,9 +626,10 @@ extension RNBluetoothClassic : DataReceivedDelegate {
     func onReceivedData(fromDevice: EAAccessory, receivedData: String) {
         // Need to gaurd against whether to send this information.  But for now
         // we'll just send it anyhow.
-        NSLog("(RNBluetoothClassic:onReceiveData) Sending READ with data: %@", receivedData)
-        let bluetoothMessage:BluetoothMessage = BluetoothMessage<String>(fromDevice: <#<<error type>>#>)
-        sendEvent(withName: EventType.READ.rawValue, body: bluetoothMessage.asDictionary())
-        
+        NSLog("(RNBluetoothClassic:onReceiveData) Sending DEVICE_READ with data: %@", receivedData)
+        let bluetoothMessage:BluetoothMessage = BluetoothMessage<String>(
+            fromDevice: NativeDevice(accessory: fromDevice), data: receivedData)
+        sendEvent("\(EventType.DEVICE_READ.name)@\(fromDevice.serialNumber)", body: bluetoothMessage.map())
     }
+
 }
