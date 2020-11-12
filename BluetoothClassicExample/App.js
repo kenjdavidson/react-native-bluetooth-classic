@@ -116,7 +116,8 @@ class ConnectionScreen extends React.Component {
 
   sendData = async () => {
     let message = this.state.text + '\r'; // For commands
-    await RNBluetoothClassic.write(message);
+    let written = await RNBluetoothClassic.write(message);
+    console.log(`Attempt to write successful: ${written}`);
 
     let scannedData = this.state.scannedData;
     scannedData.unshift({

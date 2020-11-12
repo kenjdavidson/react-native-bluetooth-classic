@@ -112,7 +112,7 @@ class RNBluetoothClassic extends NativeEventEmitter {
     if (typeof data === 'string') {
       data = new Buffer(data);
     }
-    this._nativeModule.writeToDevice(data.toString('base64'));
+    return this._nativeModule.writeToDevice(data.toString('base64'));
   }
 }
 
