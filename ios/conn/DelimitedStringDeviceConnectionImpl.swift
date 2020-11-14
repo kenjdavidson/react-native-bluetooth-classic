@@ -17,7 +17,7 @@ import ExternalAccessory
  * Note that charset in IOS is a UInt32, unlike Java, which will need to somehow be managed on the Javascript side
  * to make life easier.
  *
- *@author kendavidson
+ * @author kendavidson
  */
 class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDelegate {
  
@@ -80,14 +80,15 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
     /**
      * This implementation attempts to open an EASession for the provided protocol string
      */
-    func connect() {
+    func connect() throws {
         let protocolString: String = self.properties["PROTOCOL_STRING"] as! String
         
         NSLog("(BluetoothDevice:connect) Attempting Bluetooth connection to %@ using protocol %@", accessory.serialNumber, protocolString)
-        session = EASession(accessory: accessory, forProtocol: protocolString)
-        
-        if let currentSession = session {
-            if let inStream = currentSession.inputStream, let outStream = currentSession.outputStream {
+        if let connected = EASession(accessory: accessory, forProtocol: protocolString) {
+            self.session = connected
+            
+            if let inStream = connected.inputStream,
+                let outStream = connected.outputStream {
                 inStream.delegate = self
                 outStream.delegate = self
                 inStream.schedule(in: .main, forMode: .commonModes)
@@ -95,6 +96,8 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
                 inStream.open()
                 outStream.open()
             }
+        } else {
+            throw BluetoothError.CONNECTION_FAILED            
         }
     }
     
@@ -137,10 +140,12 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
      * the available information when more space is available on the stream.
      * - parameter message: the encoded message which will be written
      */
-    func write(_ message: String) {
-        NSLog("(BluetoothDevice:writeToDevice) Writing %@ to device %@", message, accessory.serialNumber)
-        if let sending = message.data(using: self.encoding) {
-            outBuffer.append(sending)
+    func write(_ data: Data) -> Bool {
+        if let sending = String(data: data, encoding: self.encoding) {
+            NSLog("(BluetoothDevice:writeToDevice) Writing %@ to device %@", sending, accessory.serialNumber)
+            outBuffer.append(sending.data(using: self.encoding)!)
+        } else {
+            return false
         }
         
         // If there is space available for writing then we want to kick off the process.
@@ -148,6 +153,7 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
         // fired and we can continue.  In most cases, we shouldn't be sending that much
         // data.
         writeDataToStream((session?.outputStream)!)
+        return true
     }
     
     /**

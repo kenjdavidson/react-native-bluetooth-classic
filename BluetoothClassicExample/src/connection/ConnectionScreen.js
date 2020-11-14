@@ -195,7 +195,8 @@ export default class ConnectionScreen extends React.Component {
 
     return (
       <Container>
-        <Header>
+        <Header
+          iosBarStyle="dark-content">
           <Left>
             <Button transparent
                 onPress={this.props.onBack}>

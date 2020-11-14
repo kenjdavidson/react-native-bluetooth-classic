@@ -394,5 +394,5 @@ export default class BluetoothModule {
 
 class NativeModule {
   addListener(eventType: string) {}
-  removeListener(count: number) {}
+  removeListeners(count: number) {}
 }

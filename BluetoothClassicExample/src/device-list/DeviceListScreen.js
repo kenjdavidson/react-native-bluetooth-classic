@@ -225,7 +225,8 @@ export default class DeviceListScreen extends React.Component {
 
     return (
       <Container>
-        <Header>
+        <Header
+          iosBarStyle="dark-content">
           <Body>
             <Title>Devices</Title>
           </Body>

@@ -57,7 +57,7 @@ PODS:
     - React-cxxreact (= 0.60.0)
     - React-jsi (= 0.60.0)
   - React-jsinspector (0.60.0)
-  - react-native-bluetooth-classic (1.0.0-rc.2):
+  - react-native-bluetooth-classic (1.60.0-rc.2):
     - React
   - React-RCTActionSheet (0.60.0):
     - React-Core (= 0.60.0)
@@ -112,7 +112,7 @@ DEPENDENCIES:
   - React-RCTText (from `../node_modules/react-native/Libraries/Text`)
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - React-RCTWebSocket (from `../node_modules/react-native/Libraries/WebSocket`)
-  - RNVectorIcons (from `../node_modules/react-native-vector-icons/RNVectorIcons.podspec`)
+  - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - "toolbar-android (from `../node_modules/@react-native-community/toolbar-android`)"
   - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -166,7 +166,7 @@ EXTERNAL SOURCES:
   React-RCTWebSocket:
     :path: "../node_modules/react-native/Libraries/WebSocket"
   RNVectorIcons:
-    :podspec: "../node_modules/react-native-vector-icons/RNVectorIcons.podspec"
+    :path: "../node_modules/react-native-vector-icons"
   toolbar-android:
     :path: "../node_modules/@react-native-community/toolbar-android"
   yoga:
@@ -185,7 +185,7 @@ SPEC CHECKSUMS:
   React-jsi: 8e128c4d0d8febc2977ef617d1c09bb54326069c
   React-jsiexecutor: 7a3554f703a58963ec80b860144ea0f0e9b910e1
   React-jsinspector: d4ed52225912efe0019bb7f1a225aec20f23049a
-  react-native-bluetooth-classic: 92fd959a774588499d950ef205793bf0351c8612
+  react-native-bluetooth-classic: cb1dc856d541162a0032aeb1fbc4e504e95b0401
   React-RCTActionSheet: b27ff3cf3a68f917c46d2b94abf938b625b96570
   React-RCTAnimation: 9e4708e5bd65fca8285ce7c0aa076f3f4fa5c2f8
   React-RCTBlob: 6eafcc3a24f33785692a7be24918ade607bc8719
@@ -200,6 +200,6 @@ SPEC CHECKSUMS:
   toolbar-android: 404f4450b203597e7b417f714ff417bed562a1be
   yoga: 616fde658be980aa60a2158835170f3f9c2d04b4
 
-PODFILE CHECKSUM: 4ee1de44628c178f05b7b9da7fa704da2da7646c
+PODFILE CHECKSUM: 434d6063596aabf98c41532ff625b57e8477862b
 
 COCOAPODS: 1.10.0

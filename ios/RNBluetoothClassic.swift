@@ -60,7 +60,7 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
             .object(forInfoDictionaryKey: "UISupportedExternalAccessoryProtocols") as! [String]
         
         self.connectionFactories = Dictionary()
-        self.connectionFactories["rfcomm"] = DelimitedStringDeviceConnectionFactory()
+        self.connectionFactories["delimited"] = DelimitedStringDeviceConnectionFactory()
         
         self.connections = Dictionary()
         self.listeners = Dictionary()
@@ -270,10 +270,16 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
                 
                 NSLog("(RNBluetoothClassic:connect) Connecting to %@ with %@", accessory.name, protocolString)
                 let connection = factory.create(accessory: accessory, options: connectionOptions)
-                connection.connect()
                 
-                connections[deviceId] = connection
-                resolve(NativeDevice(accessory: accessory).map())
+                do {
+                    try connection.connect()
+                    
+                    self.connections[deviceId] = connection
+                    resolve(NativeDevice(accessory: accessory).map())
+                } catch {
+                    let error = BluetoothError.CONNECTION_FAILED
+                    reject(error.info.abbr, error.info.message, error.error)
+                }
             } else {
                 let error = NSError(domain: "kjd.reactnative.bluetooth", code: 201)
                 reject("connect_failed", "Device could not establish connection", error)
@@ -375,7 +381,7 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
     @objc
     func writeToDevice(
         _ deviceId: String,
-        _ message: String,
+        withMessage message: String,
         resolver resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
@@ -390,8 +396,12 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
             return
         }
         
-        connected.write(message)
-        resolve(true)
+        if let decoded = Data(base64Encoded: message) {
+            resolve(connected.write(decoded))
+        } else {
+            let error = NSError(domain: "kjd.reactnative.bluetooth", code: 204)
+            reject("cannot_decode_data", "Cannot decode data", error)
+        }
     }
     
     /**

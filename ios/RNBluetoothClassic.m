@@ -97,7 +97,7 @@ RCT_EXTERN_METHOD(getConnectedDevice: (NSString *)deviceId
  * @param rejecter
  */
 RCT_EXTERN_METHOD(writeToDevice: (NSString *)deviceId
-                  message: (NSString *)message
+                  withMessage: (NSString *)message
                   resolver: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 

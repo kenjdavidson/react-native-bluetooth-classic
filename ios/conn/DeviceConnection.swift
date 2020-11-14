@@ -10,6 +10,8 @@ import ExternalAccessory
 
 /**
  * Provides handling of received data when requesting that new data/messages be provided automatically.
+ *
+ * @author kendavidson
  */
 protocol DataReceivedDelegate {
     
@@ -22,12 +24,17 @@ protocol DataReceivedDelegate {
 }
 
 /**
+ * Provides the required protocol for communication between the RNBluetoothClassic (module) and the EAAccessory.  This
+ * is a little more interactive on Android, where different types of connectors, acceptors and connections are available for
+ * interacting with a BluetoothSocket.
  *
+ * @author kendavidson
  */
 protocol DeviceConnection {
     
     /**
-     * The delegate which will receive new data messages if available
+     * Provides a method for the RNBluetoothClassic (module) to receive incoming data from the EAAccessory.
+     * Also allows the listening to be turned on/off as required.
      */
     var dataReceivedDelegate: DataReceivedDelegate? { get set }
     
@@ -40,7 +47,7 @@ protocol DeviceConnection {
      * Attempt to connect to the connections EAAccessory using the properties provided
      * using initialization.
      */
-    func connect()
+    func connect() throws
     
     /**
      * Disconnect from the device
@@ -56,7 +63,7 @@ protocol DeviceConnection {
     /**
      * Write data to the device
      */
-    func write(_ message:String)
+    func write(_ data:Data) -> Bool
     
     /**
      * Read from the device buffer.  The amount of data read should match what would

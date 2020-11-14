@@ -117,7 +117,7 @@ export const DeviceEventEmitter: DeviceEventEmitterStatic;
 // NativeModule needs to be added for NativeEventEmitter
 export type NativeModule = {
     addListener(eventType: string): void;
-    removeListener(count: int): void
+    removeListeners(count: int): void
 }
 
 /**
