@@ -17,10 +17,7 @@ Auto linking performs the task of dynamically adding the default package:
 
 `new RNBluetoothClassicPackage()`
 
-to your application packages.  This default configuration adds the standard delimited `DeviceConnection`(s):
-
-- **CLIENT** connection type `DelimitedConnectionClientImpl`
-- **SERVER** connection type `DelimitedConnectionAcceptImpl`
+to your application packages.
 
 ## API Overview
 
@@ -32,31 +29,33 @@ The primary classes that you may need to work with are:
 
 #### RNBluetoothClassicPackage.Builder
 
-[RNBluetoothClassicPackage.Builder](/android/rn-bluetooth-classic-package/#Builder) provides a fluent method for creating the `RNBluetoothClassicPackage`.
+[RNBluetoothClassicPackage.Builder](/android/rn-bluetooth-classic-package/#rnbluetoothclassicpackagebuilder) provides a fluent method for creating the `RNBluetoothClassicPackage`.  The builder is used to provide customized `ConnectionAcceptor`(s), `ConnectionConnector`(s) and `DeviceConnection`(s) to the [RNBluetoothClassicModule](/android/rn-bluetooth-classic-module/)
+
+### RNBluetoothClassicModule
+
+[RNBluetoothClassicModule](/android/rn-bluetooth-classic-module/) manages all communication between Android and React Native.
+
+### ConnectionAcceptor
+
+[ConnectionAcceptor](/android/connection-acceptor/) provides a standard interface for accepting connections with the `BluetoothAdapter`.  A single implementation [RfcommAcceptorThreadImpl](/android/connection-acceptor/#rfcommconnectionacceptorthreadimpl) is provided by the default package.
+
+### ConnectionConnector
+
+[ConnectionConnector](/android/connection-connector/) provides a standard interface for performing connection to individual devices.  A single implementation [RfcommConnectorThreadImpl](/android/conncetion-connector/#rfcommconnectorthreadimpl) is provided by the default package.
 
 ### DeviceConnection
 
-[DeviceConnection](/android/device-connection/) the base interface used to manage connections.
+[DeviceConnection](/android/device-connection/) is responsible for all the communication between Android and the device.  This is where most of the customization will be made:
 
-#### DelimitedConnectionClientImpl
+- Providing different event handling, middleware
+- Handling different message types and formats
+- Etc.
 
-[DelimitedConnectionClientImpl](/android/delimited-client-impl/) the default implementation for **TYPE = CLIENT** connections.  This `DeviceConnection` manages data by storing it in a `Buffer` providing access based on a specfieid **delimiter**.  The `StandardOptions` used for the client connections are:
+There are two current implementations available:
 
-- `secure` default `true`
-- `delimiter` default `\n`
-- `charset` default `ascii`
-- `read_timeout` default `300ms`
-- `read_size` default `1024`
+- [DelimitedStringDeviceConnectionImpl](/android/device-connection/#delimitedstringdeviceconnectionimpl)
+- [HexDeviceConnectionImpl](/android/device-connection/#hexdeviceconnectionimpl)
 
-#### DelimitedConnectionAcceptImpl
+## Customization
 
-[DelimitedConnectionAcceptImpl](/android/delimited-accept-impl/) the default implementation for **TYPE = SERVER** connections.  This `DeviceConnection` manages data by storing it in a `Buffer` providing access based on a specfieid **delimiter**.
-
-The `StandardOptions` used for the client connections are:
-
-- `service_name` default `RNBluetoothClassic
-- `secure` default `true`
-- `delimiter` default `\n`
-- `charset` default `ascii`
-- `read_timeout` default `300ms`
-- `read_size` default `1024`
+Customization of the native module is done through implementation of your own `RNBluetoothClassicPackage`.  For more information take a look at the [package documentation](/android/rn-bluetooth-classic-package) or some of the guides available.

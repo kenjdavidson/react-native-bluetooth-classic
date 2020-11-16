@@ -18,7 +18,12 @@ module.exports = {
             'react-native/rn-bluetooth-device'
           ],
           'Android': [
-            'android/index'
+            'android/index',
+            'android/rn-bluetooth-classic-package',
+            'android/rn-bluetooth-classic-module',
+            'android/connection-acceptor',
+            'android/connection-connector',
+            'android/device-connection'
           ],
           'IOS': [
             'ios/index'

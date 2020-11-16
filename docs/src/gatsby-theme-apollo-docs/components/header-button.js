@@ -38,7 +38,7 @@ export default function HeaderButton() {
         target="_blank"
         rel="noopener noreferrer"
       >
-        Report a Bug
+        Bug(s) or Feature(s)
         <StyledIcon weight="thin" />
       </StyledLink>
     </Container>

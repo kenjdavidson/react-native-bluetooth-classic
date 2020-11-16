@@ -22,7 +22,7 @@ public abstract class ConnectionAcceptor extends Thread {
 
     private Set<AcceptorListener<BluetoothSocket>> mListeners;
 
-    public ConnectionAcceptor(BluetoothAdapter adapter, Properties properties) throws IOException {
+    protected ConnectionAcceptor(BluetoothAdapter adapter, Properties properties) throws IOException {
         this.mAdapter = adapter;
         this.mProperties = new Properties(properties);
         this.mListeners = Collections.synchronizedSet(new HashSet<>());
@@ -56,7 +56,7 @@ public abstract class ConnectionAcceptor extends Thread {
 
     protected void notifyListeners(BluetoothSocket result) { mListeners.stream().forEach(l -> l.success(result));}
 
-    private void notifyListeners(Exception e) {
+    protected void notifyListeners(Exception e) {
         mListeners.stream().forEach(l -> l.failure(e));
     }
 

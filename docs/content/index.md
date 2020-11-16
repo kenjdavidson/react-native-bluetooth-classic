@@ -17,22 +17,36 @@ are both fantastic implementations but they fall back to BLE on IOS.
 
 The hardware in which my company was working would only communicate over Bluetooth Classic and required communication through the [External Accessory](https://developer.apple.com/documentation/externalaccessory) framework.  Please note that while working with this library on IOS, you'll need to become accustomed with the Apple and their [MFi program](https://en.wikipedia.org/wiki/MFi_Program).  Here are some links to check out:
 
-- [https://en.wikipedia.org/wiki/MFi_Program](https://en.wikipedia.org/wiki/MFi_Program)
-- [https://developer.apple.com/library/archive/samplecode/EADemo/Introduction/Intro.html](https://developer.apple.com/library/archive/samplecode/EADemo/Introduction/Intro.html)
+- [MFi_Program](https://en.wikipedia.org/wiki/MFi_Program)
+- [EA Demo Introduction](https://developer.apple.com/library/archive/samplecode/EADemo/Introduction/Intro.html)
 
 ### Android 
 
-The Android functionality is pretty common and well documented, there are a number of examples which can be reviewed.
+The Android functionality is pretty common and well documented, there are a number of examples which can be reviewed:
+
+- [Android Bluetooth](https://developer.android.com/guide/topics/connectivity/bluetooth)
 
 ## Working Versions
 
-The goal is to make this library work with as many devices as possible.  For that reason I've tried to keep the Android and IOS versions as low as their respective stores will allow.
+The project doesn't follow [semantic versioning](https://semver.org/).  It started with just some random versioning in order for me to determine the actual best way to do this.  The final product moving forward is going to be:
+
+`<bluetooth-classic-version>.<lowest-react-native-version>.<release-version>`
+
+so for example:
+
+`1.60.5` would be:
+
+- React Native Bluetooth Classic v1 (breaking changes will increase)
+- React Native v60.x - which will remain the current version until React Native provides breaking changes.  When this occurs the next version would be `1.72.x` for example.
+- 5 releases within the previous grouping
+
+### Versions
 
 | Version | React Native | Android | IOS | Branch |
 | --- | --- | --- | --- | --- | --- |
 | 0.9.x | 0.59.9 | 4.1 (16) | IOS 9 | releases/0.9.x |
 | 0.10.x | 0.60.0 | 4.1 (16) | IOS 9 | releases/0.10.x |
-| 1.0.x | 0.60.0 | 8.0 (24) | IOS 9 | master |
+| 1.60.x | 0.60.0 | 8.0 (24) | IOS 9 | master |
 
 #### Caveat
 
