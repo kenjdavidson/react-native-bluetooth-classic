@@ -274,14 +274,14 @@ startDiscovery = async () => {
 }
 ```
 
-#### Errors:
+###### Errors:
 
 Will throw an error if:
 
 - The `BluetoothAdapter` is disabled
 - The `BluetoothAdapter` is already in discovery
 
-#### Requests:
+###### Requests:
 
 - Start discovery for a specific device
 - Provide a **DEVICE_DISCOVERED** event for intermediate handling
@@ -304,7 +304,7 @@ cancelDiscovery = async () => {
 }  
 ```
 
-#### Error:
+###### Error:
 
 Will throw an error if:
 
@@ -319,7 +319,7 @@ Attempts to pair the specified device.
 
 **Note** I haven't actually used or spent any time testing this.  It was a hold over from the original library.  Feel free to update me with information on whether this is working.
 
-#### Parameters
+###### Parameters
 
 `address: string` the address of the device to be paired.  This will be provided by the `BluetoothDevice.address` found from discovery.
 
@@ -352,7 +352,7 @@ acceptConnections = async () => {
   }
 ```
 
-#### Parameters
+###### Parameters
 
 `properties: Map<string,object>` is determined by the type of connection that you are attempting.  This depends highly on the native configuration of your **ACCEPT** connection type.
 

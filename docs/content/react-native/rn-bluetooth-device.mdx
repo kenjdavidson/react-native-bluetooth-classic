@@ -22,7 +22,7 @@ The following are available on both Android and IOS.
 
 Whether or not the current device is connected - note that like everywhere else **connected** means that there is an active `BluetoothSocket` and not just paired.
 
-#### Requests
+###### Requests
 
 - Look into adding an `isPaired()` request that does the same
 
@@ -48,14 +48,34 @@ async connect() {
 }
 ```
 
-#### Parameters
+###### Parameters
 
-`options: map<string,object>` is an arbitrary set of properties that are passed into the `BluetoothConnection` that is created and managed. 
+`options: map<string,object>` provides a definition of connection properties used at different levels of the library.  The following describe the default implementations:
 
-The default connection type is `DelimitedConnectionClientImpl`, provided by the default options:
+**RNBluetoothClassicModule**
+
+`CONNECTOR_TYPE` - specify the connector; defaults to `rfcomm`
+
+**RfcommConnectorThreadImpl**
+
+`SECURE_SOCKET` - whether to initiate connection with secure or insecure socket; defaults to `true`.
+
+**DelimitedStringDeviceConnectionImpl**
+
+`DELIMITER` - delimiter used to split messages; defaults to `\n`.  Providing no delimiter will cause `read` and `onReceivedData` to stream all available information with no segmentation.
+
+`DEVICE_CHARSET` - the character set for encoding String data; defaults to `ascii`.  Android uses `Charset` values, while IOS uses integer values for determining character sets.  See the specific implementation for details.
+
+`READ_SIZE` - provides the ability to increase the amount of data read per cycle; defaults to `1024`.  A number of forks have determined that increasing this value improves performance.
+
+`READ_TIMEOUT` - adds an extra timeout to the read cycle; defaults to `0`.  This is a hold over from the original implementation with a value of `300`, it was removed as the read method is already blocking and had a large number of requests/forks.
 
 ```javascript
-let connected = await connect({ TYPE: "CLIENT" });
+let connected = await connect({ 
+  CONNECTOR_TYPE: "rfcomm",
+  DELIMITER: "\n",
+  DEVICE_CHARSET: Platform.OS === 'ios' ? 1536 : "utf-8" 
+});
 ```
 
 ### disconnect
@@ -113,7 +133,7 @@ try {
 }
 ```
 
-#### Errors
+###### Errors
 
 - Any errors occur during reading
 
@@ -123,11 +143,11 @@ try {
 
 Attempts to write to the device.   Like the `read` function, this is completely dependant on the `DeviceConnection` on how this data is written. 
 
-#### Parameters
+###### Parameters
 
 `data: string|buffer` must be in the format that your `DeviceConnection` is expecting.  Upon request, the content will be sent to the native side as after being `Base64` encoded.  This means that if you wish to send `byte[]` or `hex` you need to ensure the data is already encoded as such.
 
-#### Errors
+###### Errors
 
 - If the `Socket` is closed
 - Any other errors occur while writing
@@ -145,6 +165,14 @@ Provide a listener for incoming data.  Without adding a listener data will be ap
 
 > This is controlled by an augmented `RCTDeviceEmitter` and a ported Android version that is based specifically on the `BluetoothEventType` instead of just a rough estimate.
 
+###### Parameters
+
+`listener: BluetoothEventListener<BluetoothDeviceReadEvent>` called when new `BluetoothReadEvent` is fired.
+
+###### Returns
+
+`BluetoothEventSubscription` which must be used to `remove()` the listener.
+
 ```javascript 
 initializeRead() {
   this.readSubscription = this.props.device.onDataReceived((data) => this.onReceivedData(data));
@@ -158,15 +186,6 @@ async onReceivedData(event: BluetoothReadEvent) {
     });
   }
 ```
-
-#### Parameters
-
-`listener: BluetoothEventListener<BluetoothDeviceReadEvent>` called when new `BluetoothReadEvent` is fired.
-
-#### Returns
-
-`BluetoothEventSubscription` which must be used to `remove()` the listener.
-
 
 ## Android API
 
