@@ -191,3 +191,15 @@ import RNBluetoothClassic, { BTEvents, BTCharsets } from 'react-native-bluetooth
 In all cases the following API/Events are available within Javascript for both Android and IOS (no code splitting) if there are any native calls that are not available on the native side, the promise will be rejected with an appropriate message (kind of like UnssupportedOperationException since I'm used to Java) - I found this important as I see no point in duplicating code as the whole purpose of React Native was for me not to.
 
 for more information see the [documentation](https://kenjdavidson.github.io/react-native-bluetooth-classic).
+
+## Testing
+
+The following devices are used for testing:
+
+### Universal Worldscan Reader
+
+The [Universal Worldscan Reader](https://microchip.homeagain.com/starter-kit.html) provides both Android and IOS (Mfi) reading and writing functionality.
+
+### Eyoyo Barcode Scanner
+
+The [Eyoyo Barcode Scanner](https://www.amazon.ca/Eyoyo-Portable-Handheld-compatible-Computers/dp/B01DVTC4R8) is only available for testing on Android as it's not MFi compliant.  It has both a classic and BLE mode.
