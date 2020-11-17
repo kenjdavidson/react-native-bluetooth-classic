@@ -754,7 +754,7 @@ public class RNBluetoothClassicModule
   }
 
   @Override
-  public void onConnectionSuccess(BluetoothDevice device) {
+  synchronized public void onConnectionSuccess(BluetoothDevice device) {
     // Global device connection events have been moved to the BLUETOOTH_CONNECTED event which is
     // now a module registration.  I don't see it making sense to return a module event as well
     // as a resolved promise, since this should only ever be called after a request to a specific
@@ -772,7 +772,7 @@ public class RNBluetoothClassicModule
   }
 
   @Override
-  public void onConnectionFailed(BluetoothDevice device, Throwable reason) {
+  synchronized public void onConnectionFailed(BluetoothDevice device, Throwable reason) {
     String msg = String.format("Connection to device %s has failed", device.getName());
     Log.d(this.getClass().getSimpleName(),  msg, reason);
 
@@ -783,7 +783,7 @@ public class RNBluetoothClassicModule
   }
 
   @Override
-  public void onConnectionLost (BluetoothDevice device, Throwable reason) {
+  synchronized public void onConnectionLost (BluetoothDevice device, Throwable reason) {
     String msg = String.format("Connection to device %s was lost", device.getName());
     Log.d(this.getClass().getSimpleName(),  msg, reason);
 
@@ -795,7 +795,7 @@ public class RNBluetoothClassicModule
   }
 
   @Override
-  public void onError (Throwable e) {
+  synchronized public void onError (Throwable e) {
     Log.e(this.getClass().getSimpleName(), e.getMessage(), e);
 
     WritableMap params = Arguments.createMap();
@@ -821,7 +821,7 @@ public class RNBluetoothClassicModule
    * @param data Message
    */
   @Override
-  public void onReceivedData(BluetoothDevice device, byte[] data) {
+  synchronized public void onReceivedData(BluetoothDevice device, byte[] data) {
     String msg = String.format("Received %d bytes from device %s", data.length, device.getName());
     Log.d(TAG, msg);
 

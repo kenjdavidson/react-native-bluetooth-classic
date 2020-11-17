@@ -116,7 +116,8 @@ class ConnectionScreen extends React.Component {
 
   sendData = async () => {
     let message = this.state.text + '\r'; // For commands
-    await RNBluetoothClassic.write(message);
+    let written = await RNBluetoothClassic.write(message);
+    console.log(`Attempt to write successful: ${written}`);
 
     let scannedData = this.state.scannedData;
     scannedData.unshift({
@@ -447,7 +448,7 @@ export default class App extends React.Component {
                 devices={this.state.deviceList}
                 onPress={this.selectDevice}
               />
-              <TouchableOpacity
+              {Platform.OS !== 'ios' ? (<TouchableOpacity
                 style={styles.startAcceptButton}
                 onPress={acceptFn}
               >
@@ -458,23 +459,22 @@ export default class App extends React.Component {
                 </Text>
                 <ActivityIndicator
                   size={"small"}
-                  animating={this.state.isAccepting}
-                />
-              </TouchableOpacity>    
-              <TouchableOpacity
-                style={styles.startAcceptButton}
-                onPress={discoverFn}
-              >
-                <Text style={[{ color: "#fff" }]}>
-                  {this.state.isDiscovering
-                    ? "Discovering (cancel)..."
-                    : "Discover Devices"}
-                </Text>
-                <ActivityIndicator
-                  size={"small"}
-                  animating={this.state.isDiscovering}
-                />
-              </TouchableOpacity>                         
+                  animating={this.state.isAccepting}/>
+              </TouchableOpacity>) : undefined}
+              {Platform.OS !== 'ios' ? (<TouchableOpacity
+                  style={styles.startAcceptButton}
+                  onPress={discoverFn}
+                >
+                  <Text style={[{ color: "#fff" }]}>
+                    {this.state.isDiscovering
+                      ? "Discovering (cancel)..."
+                      : "Discover Devices"}
+                  </Text>
+                  <ActivityIndicator
+                    size={"small"}
+                    animating={this.state.isDiscovering}
+                  />
+                </TouchableOpacity>) : undefined}                
             </Container>
           )}
         </Root>

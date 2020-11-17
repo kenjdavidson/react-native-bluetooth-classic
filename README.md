@@ -1,4 +1,32 @@
 
+# Breaking Changes Incoming
+
+Just as an FYI, there will be some major breaking changes coming in the next little while, specifically if you're installing directly from Github. Some of the changes will be:
+
+- **release-0.9** will be renamed to **release/0.9.x**
+- **master** will be branched to **release/0.10.x** but will remain v0.10.10 stream for now
+- **release/1.0.x** will be pushed
+
+## release/0.9.x
+
+Is now and will stay maintenence only (on a very limited basis)
+
+## release/0.10.x
+
+Will go to maintenence only (but will accept feature pull requests)
+
+## release/1.0.x
+
+Will contain some major changes:
+
+- Updated to have Android 8.0 minimum following Google Play guidelines
+- Converted to Typescript
+- Ideology updated to match Polidea BLE
+- Modified event structure and formats
+- Connecting to multiple devices is now allowed
+
+Release candidates will target Android initially while I continue work on IOS.  Once satisfied **master** will be updated to continue development as normal.
+
 # react-native-bluetooth-classic
 
 React Native Bluetooth Classic is meand to bridge the gap found with regards to IOS Bluetooth Classic using the External Accessory framework. 
