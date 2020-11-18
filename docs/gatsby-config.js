@@ -8,6 +8,7 @@ module.exports = {
         siteName: 'React Native Bluetooth Classic',
         description: "Communicate with Bluetooth Classic devices on Android and IOS",
         defaultVersion: '1.0.0-rc.1',
+        logoLink: '/react-native-bluetooth-classic',
         sidebarCategories: {
           null: [
             'index',
