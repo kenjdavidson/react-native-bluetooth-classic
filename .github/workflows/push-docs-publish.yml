@@ -35,3 +35,4 @@ jobs:
           access-token: ${{ secrets.ACCESS_TOKEN }}
           deploy-branch: gh-pages
           working-dir: ./docs
+          gatsby-args: --prefix-paths
