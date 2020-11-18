@@ -52,7 +52,7 @@
   "devDependencies": {
     "@types/jest": "^26.0.15",
     "@types/node": "^14.14.0",
-    "@types/react-native": "^0.63.33",
+    "@types/react-native": "^0.63.35",
     "jest": "^26.6.1",
     "npm-version": "^1.1.0",
     "react": "^16.8.6",
