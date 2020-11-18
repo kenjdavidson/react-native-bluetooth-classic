@@ -109,9 +109,8 @@ abstract public class AbstractDeviceConnection implements DeviceConnection {
                     Thread.sleep(readTimeout);
             }
         } catch (Exception e) {
-            if (mConnectionStatus != ConnectionStatus.DISCONNECTING) {
-                mOnDisconnect.accept(mSocket.getRemoteDevice(), null);
-            } else {
+            if (mConnectionStatus != ConnectionStatus.DISCONNECTING
+                    && mOnDisconnect != null) {
                 mOnDisconnect.accept(mSocket.getRemoteDevice(), e);
             }
         } finally {

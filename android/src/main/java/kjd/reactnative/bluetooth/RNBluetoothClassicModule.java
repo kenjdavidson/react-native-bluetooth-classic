@@ -635,6 +635,7 @@ public class RNBluetoothClassicModule
                             String connectionType = StandardOption.CONNECTION_TYPE.get(properties);
                             DeviceConnectionFactory connectionFactory = mConnectionFactories.get(connectionType);
                             DeviceConnection connection = connectionFactory.create(bluetoothSocket, properties);
+                            connection.onDisconnect(onDisconnect);
                             mConnections.put(device.getAddress(), connection);
 
                             // Now start the connection and let React Native know
@@ -751,6 +752,7 @@ public class RNBluetoothClassicModule
                             // Create the appropriate Connection type and add it to the connected list
                             DeviceConnectionFactory connectionFactory = mConnectionFactories.get(connectionType);
                             DeviceConnection connection = connectionFactory.create(bluetoothSocket, properties);
+                            connection.onDisconnect(onDisconnect);
                             mConnections.put(address, connection);
 
                             // Now start the connection and let React Native know
@@ -1011,6 +1013,14 @@ public class RNBluetoothClassicModule
         }
     }
 
+    private BiConsumer<BluetoothDevice,Exception> onDisconnect = (BluetoothDevice device, Exception e) -> {
+            Log.d(TAG, String.format("Disconnected from device %s due to %s", device.getName(), e.getMessage()));
+
+            // At this point just remove the connection, the DEVICE_DISCONNECTED should have been
+            // sent from the ACL message already.
+            mConnections.remove(device.getAddress());
+        };
+
     private BiConsumer<BluetoothDevice,String> onReceivedData = (BluetoothDevice device, String data) -> {
             Log.d(TAG, String.format("Received translated data from the device: %s", data));
 
@@ -1247,7 +1257,7 @@ public class RNBluetoothClassicModule
      * @param device the {@link NativeDevice} which caused/receiving the event
      * @param body the event content
      */
-    private void sendEvent(EventType event, NativeDevice device, WritableMap body) {
+    synchronized private void sendEvent(EventType event, NativeDevice device, WritableMap body) {
         ReactContext context = getReactApplicationContext();
 
         if (context.hasActiveCatalystInstance()) {
