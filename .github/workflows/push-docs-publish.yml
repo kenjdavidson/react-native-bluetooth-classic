@@ -1,0 +1,37 @@
+# Publish Gatsby
+name: push-docs-publish
+
+# Controls when the action will run. Triggers the workflow on push or pull request 
+# events but only for the master branch
+on:
+  push:
+    branches:
+      - master
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner on which this job will run
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['12.16.3']
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    # - Checkout gatsby branch
+    # - Update authentication for Github Package Registry @kenjdavidson/base16-scss
+    # - Build gh-pages using action
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Authenticate with GitHub package registry
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.ACCESS_TOKEN }}" > ~/.npmrc
+      - uses: enriikke/gatsby-gh-pages-action
+        with:
+          access-token: ${{ secrets.ACCESS_TOKEN }}
+          deploy-branch: gh-pages
+          working-dir: ./docs
