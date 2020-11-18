@@ -7,7 +7,6 @@ The largest number of issues and forks are created around how to change the enco
 
 - Reading HEX data [https://github.com/kenjdavidson/react-native-bluetooth-classic/issues/50](https://github.com/kenjdavidson/react-native-bluetooth-classic/issues/50)
 - Sending HEX data [https://github.com/kenjdavidson/react-native-bluetooth-classic/issues/51](https://github.com/kenjdavidson/react-native-bluetooth-classic/issues/51)
-- Using the Korean charset [https://github.com/kenjdavidson/react-native-bluetooth-classic/issues/62](https://github.com/kenjdavidson/react-native-bluetooth-classic/issues/62)
 
 which have been solved by the community.  One of the most important features was the ability for you to create and customize these within your own application, without needing to fork/modify/install locally the project.  The following describes how to implement the request from issues 50 and 51 in order to work with HEX data.
 
@@ -36,27 +35,22 @@ Next you'll want to sanity check that things are working.  Once you've installed
 
 ### Create your Implementations
 
-There are a number of custom classes that are required, I'm not entirely happy with it as is, but it works and can be further absracted for a future release.
+There are a number of custom classes that are required, I'm not entirely happy with it as is, but it works and can be further absracted for a future release.  This assumes that the `rfcomm` connector/acceptor are going to be used to perform connections.  This means we only need to:
 
 #### Implement `DeviceConnection` 
 
-If the rest of the `DelimitedConnection*Impl` classes is acceptable, the easiest method for providing hex data is by extending the two classes and overriding the encode/decode methods.  There are a number of ways to do this, based on what and how you need things done:
-
-- Build your client and accept `DeviceConnection` from scratch
-- Extend the current `DelimitedConnection*Impl` classes and override the `encodeData` and `decodeData` methods
-
-Choosing the latter would result in something like this:
+Since we're not changing how the device communicates, only how the incoming and outgoing data is encoded/decoded, we should just need to extend the `AbstractDeviceConnection` and override the required methods.  Since Hex data is more of a stream, we don't need to worry about the deliminater.
 
 ```java
-// com.example.bluetooth.conn.DelimitedHexConnectionClientImpl extends DelimitedConnectionClientImpl
+// com.example.bluetooth.conn.HexStreamDeviceConnectionImpl extends AbstractDeviceConnection
 
 private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
 /**
- * Incoming data is encoded into HEX prior to writing it to the Buffer.
+ * Incoming bytes are in hex form, they need to be 
  */
 @Override
-public String decodeData(byte[] bytes) {
+protected void receivedData(byte[] bytes) {
   char[] hexChars = new char[bytes.length * 2];
   for (int j = 0; j < bytes.length; j++) {
     int v = bytes[j] & 0xFF;
@@ -64,7 +58,10 @@ public String decodeData(byte[] bytes) {
     hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
   }
 
-  return new String(hexChars);
+  String data = new String(hexChars);
+  
+  // Add them to the buffer or send directly to the onReceivedData listener based on
+  // the requirements.  Most likely the latter.
 }
 ```
 
@@ -80,12 +77,13 @@ Finally you'll need to customize the package so that you create the appropriate 
 
 ```java
 public abstract class CustomBluetoothPackage {
-  public static RNBluetoothClassicPackage PACKAGE = RNBluetoothClassicPackage.builder() 
-    .withFactory('CLIENT', () -> new DelimitedHexConnectionClientImpl())
-    .withFactory('SERVER', () -> new DelimitedHexConnectionAcceptImpl())
+  public static RNBluetoothClassicPackage PACKAGE = RNBluetoothClassicPackage.DEFAULT_BUILDER
+    .withConnectionFactory('hex', () -> new HexStreamDeviceConnectionImpl())  // Does not override 'delimited' so it's also available as a CONNECTION_TYPE
     .build();
 }
 ```
+
+> It's wise to start with `RNBluetoothClassicPackage.DEFAULT_BUILDER` if you're not changing the connectors/acceptors.
 
 ### React Native Modules
 
