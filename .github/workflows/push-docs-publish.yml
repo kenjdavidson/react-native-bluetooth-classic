@@ -30,7 +30,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Authenticate with GitHub package registry
         run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.ACCESS_TOKEN }}" > ~/.npmrc
-      - uses: enriikke/gatsby-gh-pages-action
+      - uses: enriikke/gatsby-gh-pages-action@main
         with:
           access-token: ${{ secrets.ACCESS_TOKEN }}
           deploy-branch: gh-pages
