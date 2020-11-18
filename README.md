@@ -71,15 +71,22 @@ An example of what this looks like is:
 
 #### Android
 
-1. Open up `android/app/src/main/java/[...]/MainApplication.java`
+As of React Native 0.60.0 **autolinking** should take over.  This library has been updated to provide default autolinking configuration, along with the ability to easily override when you require your own implementations.
+
+###### Disable Autolinking
+
+If you want to skip autolinking please follow the documentation provided:
+
+1. Disable auto linking in `react-native.config.js`
+2. Open up `android/app/src/main/java/[...]/MainApplication.java`
   - Add `import kjd.reactnative.bluetooth.RNBluetoothClassicPackage;` to the imports at the top of the file
   - Add `new RNBluetoothClassicPackage()` to the list returned by the `getPackages()` method
-2. Append the following lines to `android/settings.gradle`:
+3. Append the following lines to `android/settings.gradle`:
   	```
   	include ':react-native-bluetooth-classic'
   	project(':react-native-bluetooth-classic').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-bluetooth-classic/android')
   	```
-3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
+4. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
   	```
       implementation project(':react-native-bluetooth-classic')
   	```
@@ -101,38 +108,6 @@ Feel free to contribute any changes or bug fixes you see fit.  Although when doi
 
 - Changes should be customizable where possible (especially when possibly breaking to others)
 - Changes should be documented
-
-#### @types/react-native
-
-Doesn't have the updated `NativeEventEmitter` declarations. You'll need to update those manually:
-
-- Open up `node_modules/@types/react-native/index.d.ts
-- Change the following:
-
-```js
-//////////// Plugins //////////////
-
-export const DeviceEventEmitter: DeviceEventEmitterStatic;
-
-// NativeModule needs to be added for NativeEventEmitter
-export type NativeModule = {
-    addListener(eventType: string): void;
-    removeListeners(count: int): void
-}
-
-/**
- * This is actually the primary class for dealing with Native events being emitted
- * and should be updated.  Without this the BluetoothModule will not 'compile'
- */
-declare class NativeEventEmitter extends EventEmitter {
-    constructor(nativeModule?: NativeModule | undefined)
-
-    /**
-     * @param eventType  name of the event whose registered listeners to remove
-     */
-    removeAllListeners(eventType: string): void;
-}
-```
 
 #### Android
 
@@ -185,7 +160,7 @@ Check out the [BluetoothClassicExample](https://github.com/kenjdavidson/react-na
 Import the module using the following (forgive the pluralization, it just happened and it's come to far now):
 
 ```javascript
-import RNBluetoothClassic, { BTEvents, BTCharsets } from 'react-native-bluetooth-classic';
+import RNBluetoothClassic, { BluetoothEventType } from 'react-native-bluetooth-classic';
 ```
 
 In all cases the following API/Events are available within Javascript for both Android and IOS (no code splitting) if there are any native calls that are not available on the native side, the promise will be rejected with an appropriate message (kind of like UnssupportedOperationException since I'm used to Java) - I found this important as I see no point in duplicating code as the whole purpose of React Native was for me not to.
