@@ -76,7 +76,7 @@ public class RNBluetoothClassicPackage implements ReactPackage {
                 StandardOption.ACCEPTOR_TYPE.defaultValue(),
                 RfcommAcceptorThreadImpl::new);
         this.mConnectorFactories = Collections.singletonMap(
-                StandardOption.CONNECTION_TYPE.defaultValue(),
+                StandardOption.CONNECTOR_TYPE.defaultValue(),
                 RfcommConnectorThreadImpl::new);
     }
 
