@@ -27,10 +27,6 @@ $ npm install react-native-bluetooth-classic --save
 
 React Native 0.60.0 [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md).
 
-#### Local Install
-
-Local installation can be used for contribution or customization using the instructions in [BluetoothClassicExample](./BluetoothClassicExample/README.md).
-
 ### Manual installation
 
 Manual installation should really only need to be used for contribution, or if there are issues with autolinking that I'm not aware of.  Follow the old steps for manually linking.
@@ -151,9 +147,11 @@ The MIT License (MIT) - see full [license file](LICENSE)
 
 ## Example(s)
 
-Check out the [BluetoothClassicExample](https://github.com/kenjdavidson/react-native-bluetooth-classic/tree/master/BluetoothClassicExample) for details on getting the project setup and performing some generic tasks.   If you've got a released app that you'd like / be ok with showcasing here please let me know (or submit a pull request) - I'd love to see how the library is getting used.
+The development app [BluetoothClassicExample](https://github.com/kenjdavidson/react-native-bluetooth-classic-apps/tree/main/BluetoothClassicExample) has been moved out of this repository into [react-native-bluetooth-classic-apps](https://github.com/kenjdavidson/react-native-bluetooth-classic-apps) to allow for a little less head ache while attempting to replicate and debug issues with the different versions.  This will also allow me to maintain a repository of example applications or showcase applications for those that wish.
 
-#### Showcase
+### Showcase
+
+Feel free to submit a pull request to the [react-native-bluetooth-classic-apps](https://github.com/kenjdavidson/react-native-bluetooth-classic-apps) project if you've got a sample (or production) which you believe might help others.
 
 ## Usage
 
