@@ -15,7 +15,10 @@ export enum BluetoothEventType {
 };
 
 /**
- * BluetoothEvent
+ * BluetoothEvent wraps the message content coming from the native module.  In most cases it will
+ * contain a data {string} element, although it's now possible (more easy) for applications
+ * to expand upon the content.  It will be up to the developer to ensure that native and javascript
+ * are using the same content type.
  */
 export interface BluetoothEvent {
     device: BluetoothNativeDevice;
@@ -32,7 +35,8 @@ export interface StateChangeEvent extends BluetoothEvent {
 }
 
 /**
- * Device events used for connection/disconnection
+ * Device events used for connection/disconnection.  This looks like it's duplicating
+ * the device and can probably be removed.
  */
 export interface BluetoothDeviceEvent extends BluetoothEvent {
     device: BluetoothNativeDevice;
@@ -46,9 +50,9 @@ export interface BluetoothDeviceReadEvent extends BluetoothDeviceEvent {
 }
 
 /**
- * Event listener
+ * BluetoothDevice and RNBluetoothModule use event listeners for communication with javascript.
  */
-export type BluetoothEventListener<T extends BluetoothEvent> = (event: T) => undefined;
+export type BluetoothEventListener<T extends BluetoothEvent> = (event: T) => void;
 
 /**
  * Used to wrap EmitterSubscription or EventSubscription 

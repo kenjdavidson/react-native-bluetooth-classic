@@ -4,7 +4,8 @@ module.exports = {
   },
   "globals": {
     "ts-jest": {
-      "tsconfig": "tsconfig.jest.json"
+      "tsconfig": "tsconfig.jest.json",
+      "compiler": "ttypescript"
     }
   },
   "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",

@@ -3,7 +3,7 @@ import { NativeEventEmitter,
   Platform,
   EventSubscription
 } from 'react-native';
-import RNBluetoothClassicModule from './BluetoothNativeModule';
+import RNBluetoothClassicModule, { StandardOptions } from './BluetoothNativeModule';
 import BluetoothDevice from './BluetoothDevice';
 import BluetoothNativeDevice from './BluetoothNativeDevice';
 import { BluetoothEventListener, 
@@ -155,8 +155,8 @@ export default class BluetoothModule {
    * @param address the address to which we are connecting
    * @param properties extra properties required for the connection.
    */
-  async connectToDevice(address: string, properties: Map<string,Object> = new Map<string,Object>()): Promise<BluetoothDevice> {
-    let connected = await this._nativeModule.connectToDevice(address, properties);
+  async connectToDevice<T extends StandardOptions>(address: string, options?: T): Promise<BluetoothDevice> {
+    let connected = await this._nativeModule.connectToDevice(address, options);
     return new BluetoothDevice(connected, this);
   }
 

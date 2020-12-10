@@ -20,21 +20,21 @@ public enum StandardOption {
      * a {@code connectToDevice} request.  The default is {@code rfcomm} which is provided by
      * the {@link RfcommConnectorThreadImpl}.
      */
-    CONNECTOR_TYPE("connector_type", String.class, "rfcomm"),
+    CONNECTOR_TYPE("connectorType", String.class, "rfcomm"),
 
     /**
      * Allows React Native app to specify the {@link ConnectionAcceptor} to use when performing
      * a {@code accept} request.  The default is {@code rfcomm} which is provided by
      * the {@link RfcommAcceptorThreadImpl}.
      */
-    ACCEPTOR_TYPE("acceptor_type", String.class, "rfcomm"),
+    ACCEPTOR_TYPE("acceptorType", String.class, "rfcomm"),
 
     /**
      * Allows React Native app to specify the {@link DeviceConnection} to be used after a
      * successful {@code accept} or {@code connectToDevice} request.  The default is {@code delimtied}
      * which supplies the {@link DelimitedStringDeviceConnectionImpl}.
      */
-    CONNECTION_TYPE("connection_type", String.class, "delimited"),
+    CONNECTION_TYPE("connectionType", String.class, "delimited"),
 
     /**
      * Provide a {@code delimiter} String to your {@link DeviceConnection}.  This will really only
@@ -50,7 +50,9 @@ public enum StandardOption {
     DEVICE_CHARSET("charset", Charset.class, Charset.forName("ascii")) {
         @Override
         public <T> T get(Properties properties) {
-            Object value = properties.get(this.name());
+            Object value = properties.containsKey(this.name())
+                    ? properties.get(this.name()) : properties.containsKey(this.name().toLowerCase())
+                        ? properties.get(this.name().toLowerCase()) : properties.get(this.code());
             if (value == null) {
                 value = Charset.forName("ascii");
             } else if (value instanceof String) {
@@ -68,13 +70,13 @@ public enum StandardOption {
      * slowdowns.
      *
      */
-    READ_TIMEOUT("read_timeout", Integer.class, 0   ),
+    READ_TIMEOUT("readTimeout", Integer.class, 0   ),
 
     /**
      * Another hold over from the original was the max size of the buffer.  This defaults to {@code 1024}
      * but in some forks has been increased to allow for more data in a single read.
      */
-    READ_SIZE("read_size", Integer.class, 1024),
+    READ_SIZE("readSize", Integer.class, 1024),
 
     /**
      * Used by {@link ConnectionAcceptor} and {@link ConnectionConnector} to determine whether to
@@ -85,7 +87,7 @@ public enum StandardOption {
     /**
      * Used by {@link ConnectionAcceptor} to set a name when other devices find this.
      */
-    SERVICE_NAME("service_name", String.class, "RNBluetoothClassic"),
+    SERVICE_NAME("serviceName", String.class, "RNBluetoothClassic"),
 
     /**
      * Currently the default {@link ConnectionAcceptor} allows a single connection then returns
@@ -93,7 +95,7 @@ public enum StandardOption {
      * this requires a bit of addition to make it worth while, like notifying of a connected device
      * upon each accept.   It needs more testing and work so it's just here for reference.
      */
-    ACCEPT_CONNECTION_NUM("accept_connection_num", Integer.class, 1);
+    ACCEPT_CONNECTION_NUM("acceptConnectionNumber", Integer.class, 1);
 
     private String code;
     private Class clazz;
@@ -114,7 +116,16 @@ public enum StandardOption {
     }
 
     /**
-     * Get the current or default value of the {@link StandardOption}.
+     * Get the current or default value of the {@link StandardOption}.  The property key is checked
+     * in order:
+     * <ul>
+     *     <li>StandardOption name</li>
+     *     <li>StandardOption name as lowercase</li>
+     *     <li>StandardOption code</li>
+     * </ul>
+     * which I'm not a huge fan of, but this will allow for a number of different methodologies
+     * with regards to properties and naming conventions.  In the end hopefully we can
+     * stick with one.
      *
      * @param properties the {@link Properties} provided by the application
      *
@@ -123,7 +134,9 @@ public enum StandardOption {
      * @return the provided or default value
      */
     public <T> T get(Properties properties) {
-        Object value = properties.get(this.name());
+        Object value = properties.containsKey(this.name())
+            ? properties.get(this.name()) : properties.containsKey(this.name().toLowerCase())
+                ? properties.get(this.name().toLowerCase()) : properties.get(this.code());
 
         if (value == null || !(this.type().isAssignableFrom(value.getClass()))) {
             return this.defaultValue();

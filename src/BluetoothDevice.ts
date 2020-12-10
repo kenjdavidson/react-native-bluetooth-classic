@@ -1,6 +1,7 @@
 import BluetoothModule from "./BluetoothModule";
 import BluetoothNativeDevice from "./BluetoothNativeDevice";
 import { BluetoothEvent, BluetoothEventListener, BluetoothDeviceReadEvent, BluetoothEventSubscription } from "./BluetoothEvent";
+import { StandardOptions } from "./BluetoothNativeModule";
 
 /**
  * Implements the BluetoothNativeDevice which is used to communicate with the Android
@@ -47,7 +48,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
 	 * 					DeviceConnector and DeviceConnection.
 	 * @return Promise resolving true|false whether the connetion was established
 	 */
-	async connect(options: Map<string, object>): Promise<boolean> {
+	async connect<T extends StandardOptions>(options?: T): Promise<boolean> {
 		return new Promise(async (resolve, reject) => {
 			try {
 				let connected = await this._bluetoothModule.connectToDevice(this.address, options);

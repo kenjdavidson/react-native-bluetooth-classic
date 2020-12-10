@@ -2,6 +2,9 @@
   "extends": "./tsconfig",
   "compilerOptions": {
     "jsx": "react",
-    "module": "commonjs"
+    "module": "commonjs",
+    "plugins": [
+      { "transform": "ts-auto-mock/transformer", "cacheBetweenTests": false }
+    ]
   }
 }

@@ -35,7 +35,7 @@ export default interface BluetoothNativeModule {
      * @param properties for requesting special connecting/connection settings
      * @return Promise resolved with BluetoothDevice which is now connected
      */
-    connectToDevice(address: string, properties: Map<string, Object>): Promise<BluetoothNativeDevice>;
+    connectToDevice<T extends StandardOptions>(address: string, properties?: T): Promise<BluetoothNativeDevice>;
     /**
      * Attempts to disconnect from the requested address.
      *
@@ -184,4 +184,83 @@ export default interface BluetoothNativeModule {
      * @param eventType
      */
     removeAllListeners(eventType: string): void;
+}
+export interface StandardOptions {
+    /**
+     * Instructs the module on which type of connector to use to
+     * initiate a connection.  The default for this is rfcomm which
+     * uses the connetor RfcommConnectorThreadImpl.
+     *
+     * Also accepts connector_type and CONNETOR_TYPE.
+     */
+    connectorType?: string;
+    /**
+     * Instructs the module on which type of acceptor to use while
+     * waiting for a device connection.  The default for this is rfcomm
+     * which uses the acceptor RfcommAcceptorThreadImpl.
+     *
+     * Also accepts acceptor_type and ACCEPTOR_TYPE/
+     */
+    acceptorType?: string;
+    /**
+     * Instructs the module on what type of connection will be
+     * used during connection.  The default for this delimited, which
+     * uses the connection type DelimitedStringDeviceConnectionImpl.
+     *
+     * Also accepts connection_type and CONNECTION_TYPE.
+     */
+    connectionType?: string;
+    /**
+     * Sets the delimiter used for parsing messages.  The default is
+     * '\n'.
+     *
+     * Also accepts DELIMITER
+     */
+    delimiter?: string;
+    /**
+     * Sets the appropriate character set for communication.  The default
+     * is ascii for both Android and IOS.  When setting this you must use
+     * the string representation of Android Charset and the integer value
+     * supporting IOS (which I forget what it is, but it's in the
+     * documentation so check that out).
+     *
+     * Also accepts DEVICE_CHARSET and device_charset.
+     */
+    charset?: string | number;
+    /**
+     * This is a hold over from the original library (defaulted to 300), as
+     * of now it's defaulted to 0 and ignored.  Since reading (on Android)
+     * is already a blocking method, having an added timeout was just
+     * causing too much slowdown.
+     *
+     * This is ignored on IOS.
+     */
+    readTimeout?: number;
+    /**
+     * Configures the read buffer size, this defaults to 1024.  Increasing
+     * this will increase your throughput while working with streaming
+     * connections.
+     *
+     * This is ignored on IOS.
+     *
+     * Also accepts READ_SIZE and read_size
+     */
+    readSize?: number;
+    /**
+     * Whether or not the connector/acceptor should be created using
+     * an insecure or secure socket.  Defaults to true.
+     *
+     * Also accepts SECURE_SOCKET and secure_socket.
+     */
+    secureSocket?: boolean;
+    /**
+     * Provide a service name while accepting connections.  This name
+     * will be display to discovering devices, defaults to
+     * RNBluetoothClassic.
+     *
+     * This is ignored on IOS.
+     *
+     * Also accepts SERVICE_NAME and service_name.
+     */
+    serviceName?: string;
 }

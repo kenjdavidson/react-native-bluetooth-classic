@@ -1,6 +1,7 @@
 import BluetoothModule from "./BluetoothModule";
 import BluetoothNativeDevice from "./BluetoothNativeDevice";
 import { BluetoothEventListener, BluetoothDeviceReadEvent, BluetoothEventSubscription } from "./BluetoothEvent";
+import { StandardOptions } from "./BluetoothNativeModule";
 /**
  * Implements the BluetoothNativeDevice which is used to communicate with the Android
  * and IOS native module.  Provides access to the BluetoothDevice (Android) and
@@ -29,7 +30,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
      * 					DeviceConnector and DeviceConnection.
      * @return Promise resolving true|false whether the connetion was established
      */
-    connect(options: Map<string, object>): Promise<boolean>;
+    connect<T extends StandardOptions>(options?: T): Promise<boolean>;
     /**
      * Determine whether the device is currently connected.   Again it's important to note that
      * **connected** means that there is an active BluetoothSocket/Stream available.
