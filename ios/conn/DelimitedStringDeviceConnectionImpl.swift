@@ -58,23 +58,20 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
         self.inBuffer = Data()
         self.outBuffer = Data()
         
-        if let value = self.properties["READ_SIZE"] {
-            self.readSize = value as! Int
-        } else {
-            self.readSize = 1024
-        }
+        // For lack of knowing how to actually do this properly, Swift (I can't stand) doesn't like
+        // the enumeration method from Java.  If someone can figure this one out, let me know.
+        if let value = self.properties["READ_SIZE"] { self.readSize = value as! Int }
+        if let value = self.properties["read_size"] { self.readSize = value as! Int }
+        else { self.readSize = 1024 }
         
-        if let value = self.properties["DELIMTER"] {
-            self.delimiter = value as! String
-        } else {
-            self.delimiter = "\n"
-        }
+        if let value = self.properties["DELIMITER"] { self.delimiter = value as! String }
+        else if let value = self.properties["delimiter"] { self.delimiter = value as! String }
+        else { self.delimiter = "\n" }
         
-        if let value = self.properties["CHARSET"] {
-            self.encoding = String.Encoding.from(value as! CFStringEncoding)
-        } else {
-            self.encoding = String.Encoding.from(CFStringBuiltInEncodings.ASCII.rawValue)
-        }
+        if let value = self.properties["DEVICE_CHARSET"] { self.encoding = String.Encoding.from(value as! CFStringEncoding) }
+        else if let value = self.properties["device_charset"] { self.encoding = String.Encoding.from(value as! CFStringEncoding) }
+        else if let value = self.properties["charset"] { self.encoding = String.Encoding.from(value as! CFStringEncoding) }
+        else { self.encoding = String.Encoding.from(CFStringBuiltInEncodings.ASCII.rawValue) }
     }
     
     /**
