@@ -39,19 +39,24 @@ There are also a number of other IOS security related items that are required:
 ```xml
 <key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Access bluetooth device over serial connection to document connection features</string>
+
 ```
 
 ## F.A.Q
 
 #### Why isn't my protocol working?
 
-Remember these are MFi protocols, they are not communication protocols.  I've received a number of issues based on this confusion.  
+Remember these are MFi protocols, they are not communication protocols.  This is the primary reason or issue that gets asked with regards to IOS, the example above `com.apple.m1` is **not a real protocol** and will not provide you with access to devices.
 
 #### Where do I get MFi protocols?
 
 You either need to find the protocols listed on the companies website (Zebra for example has some posted) but in most cases these are kept super secret; like Fight Club secret!
 
 Getting devices MFi compliant costs companies a boat load of money, so they don't generally give these out for free.  You'll need to work with a vendor constantly (as you'll find there are some super annoying things to do for releasing). 
+
+#### I Can See my Device in Bluetooth Screen
+
+The IOS Bluetooth screen will always display your devices.  The MFi layer that provides the functionality `ExternalAccessory` library is where the issue is.  You need to provide a valid set of protocol strings that match your devices MFi compliance in order to get access to them in your app.
 
 #### How to I change Encoding?
 
