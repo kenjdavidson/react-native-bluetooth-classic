@@ -1,16 +1,11 @@
 
 package kjd.reactnative.bluetooth;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
@@ -20,7 +15,6 @@ import com.facebook.react.bridge.JavaScriptModule;
 
 import kjd.reactnative.bluetooth.conn.ConnectionAcceptorFactory;
 import kjd.reactnative.bluetooth.conn.ConnectionConnectorFactory;
-import kjd.reactnative.bluetooth.conn.ConnectionType;
 import kjd.reactnative.bluetooth.conn.DelimitedStringDeviceConnectionImpl;
 import kjd.reactnative.bluetooth.conn.DeviceConnectionFactory;
 import kjd.reactnative.bluetooth.conn.RfcommAcceptorThreadImpl;

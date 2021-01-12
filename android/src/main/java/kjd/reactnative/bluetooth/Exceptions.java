@@ -1,7 +1,14 @@
 package kjd.reactnative.bluetooth;
 
-import android.util.JsonWriter;
-
+/**
+ * This needs to be cleaned up:
+ * - Based off MessageFormat instead of String.format to allow for object passing and typed
+ *  errors/parameters
+ * - Clean up unused
+ * - Add missing
+ *
+ * All in all the Error handling needs a bunch of love
+ */
 public enum Exceptions {
     BLUETOOTH_NOT_ENABLED("Bluetooth mAdapter is not enabled"),
     BLUETOOTH_IN_DISCOVERY("Bluetooth already in discovery mode"),

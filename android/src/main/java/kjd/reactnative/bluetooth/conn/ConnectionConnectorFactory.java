@@ -1,6 +1,5 @@
 package kjd.reactnative.bluetooth.conn;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
 import java.io.IOException;

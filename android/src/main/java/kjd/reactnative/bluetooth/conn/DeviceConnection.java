@@ -3,10 +3,8 @@ package kjd.reactnative.bluetooth.conn;
 import android.bluetooth.BluetoothDevice;
 
 import java.io.IOException;
-import java.util.Properties;
-import java.util.concurrent.Callable;
-import java.util.function.BiConsumer;
 
+import kjd.reactnative.android.BiConsumer;
 import kjd.reactnative.bluetooth.device.NativeDevice;
 
 /**

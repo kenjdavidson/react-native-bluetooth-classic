@@ -8,7 +8,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Properties;
-import java.util.function.BiConsumer;
+
+import kjd.reactnative.android.BiConsumer;
+
 
 /**
  * Implements the comment features for a delimited device connection.  Delimited
@@ -61,7 +63,8 @@ abstract public class AbstractDeviceConnection implements DeviceConnection {
      * just build up data in the buffer until requested.  When a listener is added, the buffer
      * is read for all delimiters and all messages will be sent.
      */
-    protected BiConsumer<BluetoothDevice, String> mOnDataReceived;
+    protected BiConsumer<BluetoothDevice, String> mOnDataReceived
+            ;
 
     /**
      * The connection has been cancelled and/or disconnected by the user.
@@ -118,9 +121,9 @@ abstract public class AbstractDeviceConnection implements DeviceConnection {
 
             // Finally clean up the streams, because we could have already done this during the
             // disconnect() it's possible they were already closed
-            try { mInStream.close(); } catch (IOException e) { }
-            try { mOutStream.close(); } catch (IOException e) { }
-            try { mSocket.close(); } catch (IOException e) { }
+            try { mInStream.close(); } catch (IOException ignored) { }
+            try { mOutStream.close(); } catch (IOException ignored) { }
+            try { mSocket.close(); } catch (IOException ignored) { }
         }
     }
 
@@ -144,9 +147,9 @@ abstract public class AbstractDeviceConnection implements DeviceConnection {
     public synchronized boolean disconnect() {
         mConnectionStatus = ConnectionStatus.DISCONNECTING;
 
-        try { mInStream.close(); } catch (IOException e) { }
-        try { mOutStream.close(); } catch (IOException e) { }
-        try { mSocket.close(); } catch (IOException e) { }
+        try { mInStream.close(); } catch (IOException ignored) { }
+        try { mOutStream.close(); } catch (IOException ignored) { }
+        try { mSocket.close(); } catch (IOException ignored) { }
 
         return true;
     }

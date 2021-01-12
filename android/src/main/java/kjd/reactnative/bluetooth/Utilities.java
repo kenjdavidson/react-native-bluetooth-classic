@@ -1,23 +1,32 @@
 package kjd.reactnative.bluetooth;
 
-import android.bluetooth.BluetoothDevice;
-
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableMap;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * Random utility classes and variables used for consistency.
+ */
 public class Utilities {
 
-    public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
-    public static String parseDate(Date date) {
-        return sdf.format(date);
+    public static DateFormat dateFormat() {
+        return new SimpleDateFormat(DATE_PATTERN, Locale.getDefault());
+    }
+
+    public static String formatDate(Date date) {
+        return dateFormat().format(date);
+    }
+
+    public static Date parseDate(String date) throws ParseException {
+        return dateFormat().parse(date);
     }
 
     public static Properties mapToProperties(ReadableMap readableMap) {

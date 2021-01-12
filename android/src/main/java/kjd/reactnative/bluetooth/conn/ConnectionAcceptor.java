@@ -20,7 +20,7 @@ public abstract class ConnectionAcceptor extends Thread {
     protected BluetoothAdapter mAdapter;
     protected Properties mProperties;
 
-    private Set<AcceptorListener<BluetoothSocket>> mListeners;
+    private final Set<AcceptorListener<BluetoothSocket>> mListeners;
 
     protected ConnectionAcceptor(BluetoothAdapter adapter, Properties properties) throws IOException {
         this.mAdapter = adapter;
@@ -34,7 +34,7 @@ public abstract class ConnectionAcceptor extends Thread {
      *
      * @param properties the connection {@link Properties} from the app
      * @return the {@link BluetoothSocket} of the app connected.
-     * @throws IOException
+     * @throws IOException if an error occurs during connection
      */
     protected abstract BluetoothSocket connect(Properties properties) throws IOException;
 
@@ -54,10 +54,16 @@ public abstract class ConnectionAcceptor extends Thread {
         }
     }
 
-    protected void notifyListeners(BluetoothSocket result) { mListeners.stream().forEach(l -> l.success(result));}
+    protected void notifyListeners(BluetoothSocket result) {
+        for (AcceptorListener<BluetoothSocket> listener : mListeners) {
+            listener.success(result);
+        }
+    }
 
     protected void notifyListeners(Exception e) {
-        mListeners.stream().forEach(l -> l.failure(e));
+        for (AcceptorListener<BluetoothSocket> listener : mListeners) {
+            listener.failure(e);
+        }
     }
 
     public void addListener(AcceptorListener<BluetoothSocket> listener) {

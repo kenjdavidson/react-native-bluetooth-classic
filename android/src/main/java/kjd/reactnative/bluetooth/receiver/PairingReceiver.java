@@ -1,6 +1,5 @@
 package kjd.reactnative.bluetooth.receiver;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;

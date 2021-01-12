@@ -21,7 +21,7 @@ public abstract class ConnectionConnector extends Thread {
     protected BluetoothDevice device;
     protected Properties properties;
 
-    private Set<ConnectorListener<BluetoothSocket>> listeners;
+    private final Set<ConnectorListener<BluetoothSocket>> listeners;
 
     public ConnectionConnector(BluetoothDevice device, Properties properties) throws IOException {
         this.device = device;
@@ -34,7 +34,7 @@ public abstract class ConnectionConnector extends Thread {
      *
      * @param properties the {@link Properties} provided by the app
      * @return the {@link BluetoothSocket} which will be provided to the module
-     * @throws IOException
+     * @throws IOException if an error occurs during read
      */
     protected abstract BluetoothSocket connect(Properties properties) throws IOException;
 
@@ -55,11 +55,15 @@ public abstract class ConnectionConnector extends Thread {
     }
 
     private void notifyListeners(BluetoothSocket result) {
-        listeners.stream().forEach(l -> l.success(result));
+        for (ConnectorListener<BluetoothSocket> listener : listeners) {
+            listener.success(result);
+        }
     }
 
     private void notifyListeners(Exception e) {
-        listeners.stream().forEach(l -> l.failure(e));
+        for (ConnectorListener<BluetoothSocket> listener : listeners) {
+            listener.failure(e);
+        }
     }
 
     public void addListener(ConnectorListener<BluetoothSocket> listener) {

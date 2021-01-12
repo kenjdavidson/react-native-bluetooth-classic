@@ -56,14 +56,18 @@ public class RfcommConnectorThreadImpl extends ConnectionConnector {
                 }
 
                 mSocket.connect();
-            } catch (IOException e2) {
+            } catch (IOException e1) {
                 // If the mSocket wasn't closed due to it being mCancelled then rethrow then
                 // close the connection and rethrow
                 if (!mCancelled) {
                     try { this.mSocket.close(); } catch(IOException ignored) {}
-                    throw e2;
+                    throw e1;
                 }
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e2) {
+            } catch (IllegalAccessException e1) {
+                throw new IOException(e);
+            } catch (InvocationTargetException e1) {
+                throw new IOException(e);
+            } catch (NoSuchMethodException e1) {
                 throw new IOException(e);
             }
         }

@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import kjd.reactnative.bluetooth.BuildConfig;
 import kjd.reactnative.bluetooth.device.NativeDevice;
 
 /**

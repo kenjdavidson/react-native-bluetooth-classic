@@ -37,21 +37,19 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 
 import javax.annotation.Nullable;
 
+import kjd.reactnative.android.BiConsumer;
 import kjd.reactnative.bluetooth.conn.AcceptFailedException;
 import kjd.reactnative.bluetooth.conn.ConnectionAcceptor;
 import kjd.reactnative.bluetooth.conn.ConnectionAcceptorFactory;
 import kjd.reactnative.bluetooth.conn.ConnectionConnector;
 import kjd.reactnative.bluetooth.conn.ConnectionConnectorFactory;
 import kjd.reactnative.bluetooth.conn.ConnectionFailedException;
-import kjd.reactnative.bluetooth.conn.ConnectionLostException;
 import kjd.reactnative.bluetooth.conn.StandardOption;
 import kjd.reactnative.bluetooth.event.BluetoothStateEvent;
 import kjd.reactnative.bluetooth.event.EventType;
-import kjd.reactnative.bluetooth.conn.ConnectionType;
 import kjd.reactnative.bluetooth.conn.DeviceConnection;
 import kjd.reactnative.bluetooth.conn.DeviceConnectionFactory;
 import kjd.reactnative.bluetooth.device.NativeDevice;
@@ -640,7 +638,7 @@ public class RNBluetoothClassicModule
 
                             // Now start the connection and let React Native know
                             Thread ct = new Thread(connection);
-                            ct.run();
+                            ct.start();
 
                             promise.resolve(nativeDevice.map());
                         } catch (IOException e) {
@@ -699,7 +697,7 @@ public class RNBluetoothClassicModule
      * active the Cancellable request will be found in the connecting map; once completed the
      * connection will be moved to the connections map.
      * <p>
-     * The default {@link ConnectionType#CLIENT} will be used.  If you've provided
+     * The default client connection type will be used.  If you've provided
      * customized {@link DeviceConnection}(s) then it'll be used.
      *
      * @param address the address to which we want to connect
@@ -772,7 +770,7 @@ public class RNBluetoothClassicModule
                 });
 
                 mConnecting.put(address, connector);
-                connector.run();
+                connector.start();
             } catch (IOException e) {
                 promise.reject(new ConnectionFailedException(nativeDevice, e));
             } catch (IllegalStateException e) {
