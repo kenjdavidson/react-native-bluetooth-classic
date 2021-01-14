@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Edited
 
 - Reverted all the sdk 24 version functionality (streams, BiConsumer, etc) to their original.  This will allow correct installation and functionality on minSdk 16 which was requested.
+- Resolved issue with `accept()` not returning the device once completed - therefore not letting the client/app know things were good
 
 ### Removed
 
