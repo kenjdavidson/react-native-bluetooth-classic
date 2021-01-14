@@ -9,7 +9,8 @@ export declare enum BluetoothEventType {
     DEVICE_CONNECTED = "DEVICE_CONNECTED",
     DEVICE_DISCONNECTED = "DEVICE_DISCONNECTED",
     DEVICE_READ = "DEVICE_READ",
-    ERROR = "ERROR"
+    ERROR = "ERROR",
+    DEVICE_DISCOVERED = "DEVICE_DISCOVERED"
 }
 /**
  * BluetoothEvent wraps the message content coming from the native module.  In most cases it will

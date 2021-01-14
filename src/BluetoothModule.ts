@@ -1,69 +1,72 @@
-import { NativeEventEmitter, 
+import {
+  NativeEventEmitter,
   EventSubscriptionVendor,
   Platform,
-  EventSubscription
-} from 'react-native';
-import RNBluetoothClassicModule, { StandardOptions } from './BluetoothNativeModule';
-import BluetoothDevice from './BluetoothDevice';
-import BluetoothNativeDevice from './BluetoothNativeDevice';
-import { BluetoothEventListener, 
-  StateChangeEvent, 
+  EventSubscription,
+} from "react-native";
+import RNBluetoothClassicModule, {
+  StandardOptions,
+} from "./BluetoothNativeModule";
+import BluetoothDevice from "./BluetoothDevice";
+import BluetoothNativeDevice from "./BluetoothNativeDevice";
+import {
+  BluetoothEventListener,
+  StateChangeEvent,
   BluetoothEventType,
-  BluetoothDeviceEvent,   
+  BluetoothDeviceEvent,
   BluetoothEventSubscription,
-  BluetoothEvent
-} from './BluetoothEvent';
-import { BluetoothDeviceReadEvent } from './BluetoothEvent';
+  BluetoothEvent,
+} from "./BluetoothEvent";
+import { BluetoothDeviceReadEvent } from "./BluetoothEvent";
 
-global.Buffer = global.Buffer || require('buffer').Buffer;
+global.Buffer = global.Buffer || require("buffer").Buffer;
 
 /**
  * Provides access to native module.  In general the methods will be direct calls
- * through to {@code NativeModules.RNBluetoothClassc}, although there are instances 
+ * through to {@code NativeModules.RNBluetoothClassc}, although there are instances
  * where methods are overwritten where additional information is required.  These
  * methods are related to {@code BluetoothConnection} requests, where the response
  * must be wrapped.
- * 
+ *
  * @author kenjdavidson
  */
 export default class BluetoothModule {
-
   /**
    * Native RNBluetoothClassicModule provided from Java and IOS through
    * the NativeModules.
-   * 
+   *
    * @private
    */
   _nativeModule: RNBluetoothClassicModule;
 
   /**
    * NativeEventEmitter - the BluetoothModule used to extend this, but it became
-   * apparent that I needed more customizable messaging between JS and Native that 
+   * apparent that I needed more customizable messaging between JS and Native that
    * the RCTEventEmitter couldn't manage.
-   * 
+   *
    * @private
    */
   _eventEmitter: NativeEventEmitter;
 
   constructor(nativeModule: RNBluetoothClassicModule) {
-    this._nativeModule = nativeModule; 
-    this._eventEmitter = new NativeEventEmitter(new NativeModule())
+    this._nativeModule = nativeModule;
+    this._eventEmitter = new NativeEventEmitter(new NativeModule());
   }
 
   /**
    * Requests enabled status from the BluetoothAdapter.
-   * 
+   *
    * @return Promise resolved with whether Bluetooth is enabled
    */
   isBluetoothEnabled(): Promise<boolean> {
     return this._nativeModule.isBluetoothEnabled();
-  }    
+  }
 
   /**
    * Requests whether there is data availabled on the Device.  At this point
    * this is a yes/no, it may be wise to turn it into number of bytes based
    * on devices that send messages of set size with no delimiter.
-   * 
+   *
    * @param address of the Device we wish to check
    * @return Promise resolved with whether data is available
    */
@@ -71,21 +74,20 @@ export default class BluetoothModule {
     return this._nativeModule.availableFromDevice(address);
   }
 
-
   /**
-   * Read from the specified device.  This uses the configured device read 
+   * Read from the specified device.  This uses the configured device read
    * functionality - see the Native documentation for how that is configured.
-   * 
+   *
    * @param address address from which to read
    * @return Promise resovled with individual read
    */
   readFromDevice(address: string): Promise<string> {
     return this._nativeModule.readFromDevice(address);
-  }    
+  }
 
   /**
    * Clears the device buffer.
-   * 
+   *
    * @param address for which device we will clear
    * @return Promise resolved with whether clear was successful
    */
@@ -95,18 +97,18 @@ export default class BluetoothModule {
 
   /**
    * Disconnect from device.
-   * 
+   *
    * @param address of Device we will disconnect
    * @return Promise resolved with disconnection success status
    */
   disconnectFromDevice(address: string): Promise<boolean> {
     return this._nativeModule.disconnectFromDevice(address);
-  }    
+  }
 
   /**
    * Determines whether device is currently connected.  Connected means that there
    * is an actual Socket open (not just pairing)
-   * 
+   *
    * @param address of which we are checking for connection
    * @returns Promise resolved with whether there is a connection
    */
@@ -117,7 +119,7 @@ export default class BluetoothModule {
   /**
    * Wraps the bonded native devices with a BluetoothDevice to allow for
    * event management.
-   * 
+   *
    * @return Promise containing array of pair devices
    */
   async getBondedDevices(): Promise<BluetoothDevice[]> {
@@ -134,7 +136,7 @@ export default class BluetoothModule {
   /**
    * Wraps the connected native devices with a BluetoothDevice to allow for
    * event management.
-   * 
+   *
    * @return Promise resolved with array of connected devices
    */
   async getConnectedDevices(): Promise<BluetoothDevice[]> {
@@ -149,20 +151,23 @@ export default class BluetoothModule {
   }
 
   /**
-   * Attempts to connect to the requested device.  Defaults the properties to an empty 
+   * Attempts to connect to the requested device.  Defaults the properties to an empty
    * map.
-   * 
+   *
    * @param address the address to which we are connecting
    * @param properties extra properties required for the connection.
    */
-  async connectToDevice<T extends StandardOptions>(address: string, options?: T): Promise<BluetoothDevice> {
+  async connectToDevice<T extends StandardOptions>(
+    address: string,
+    options?: T
+  ): Promise<BluetoothDevice> {
     let connected = await this._nativeModule.connectToDevice(address, options);
     return new BluetoothDevice(connected, this);
   }
 
   /**
    * Wraps connected NativeDevice.
-   * 
+   *
    * @param address the address to check for connection
    */
   async getConnectedDevice(address: string): Promise<BluetoothDevice> {
@@ -171,33 +176,33 @@ export default class BluetoothModule {
   }
 
   /**
-   * Write data to the device.  Eventually this will be updated to accept data and type, 
+   * Write data to the device.  Eventually this will be updated to accept data and type,
    * allowing the sending of different data elements to the device.  From the issues on
    * bluetooth-serial it seems like images and hex values are the top priorties, but method
    * to send any data would be preferable.
-   * 
+   *
    * @param address the address to which we will send data
    * @param message String or Buffer which will be sent
    */
   writeToDevice(address: string, message: any): Promise<boolean> {
     let data: Buffer = message;
 
-    if ('string' === typeof message) {
+    if ("string" === typeof message) {
       data = Buffer.from(message);
     } else {
       data = Buffer.from(message.toString());
     }
-    
-    return this._nativeModule.writeToDevice(address, data.toString('base64'));
+
+    return this._nativeModule.writeToDevice(address, data.toString("base64"));
   }
 
   /**
    * Starts discovery on the bluetooth adatper.
-   * 
+   *
    * This is an Anroid only function.
    */
   async startDiscovery(): Promise<BluetoothDevice[]> {
-    if (Platform.OS == 'ios') throw new Error("Method not implemented.");
+    if (Platform.OS == "ios") throw new Error("Method not implemented.");
     let discoveredDevices: BluetoothNativeDevice[] = await this._nativeModule.startDiscovery();
 
     let devices: BluetoothDevice[] = [];
@@ -207,189 +212,251 @@ export default class BluetoothModule {
 
     return devices;
   }
-  
+
   /**
    * Cancels discovery.  If discovery was alreayd stopped, this will end gracefully
    * by resolving the promise.
-   * 
+   *
    * This is an Android only feature.
    */
   cancelDiscovery(): Promise<boolean> {
-    if (Platform.OS == 'ios') throw new Error("Method not implemented.");
+    if (Platform.OS == "ios") throw new Error("Method not implemented.");
     return this._nativeModule.cancelDiscovery();
   }
 
   /**
    * Pair the device request.
-   * 
+   *
    * This is an Android only feature.
-   * 
+   *
    * @param address address of the device we wish to pair
    */
   async pairDevice(address: string): Promise<BluetoothDevice> {
-    if (Platform.OS == 'ios') throw new Error("Method not implemented.");
-    let paired: BluetoothNativeDevice = await this._nativeModule.pairDevice(address);
+    if (Platform.OS == "ios") throw new Error("Method not implemented.");
+    let paired: BluetoothNativeDevice = await this._nativeModule.pairDevice(
+      address
+    );
     return new BluetoothDevice(paired, this);
-  } 
+  }
 
   /**
    * Unpair the device request.
-   * 
+   *
    * This is an Android only feature.
-   * 
+   *
    * @param address address of the device we wish to unpair
-   */      
+   */
   unpairDevice(address: string): Promise<boolean> {
-    if (Platform.OS == 'ios') throw new Error("Method not implemented.");
+    if (Platform.OS == "ios") throw new Error("Method not implemented.");
     return this._nativeModule.cancelDiscovery();
   }
 
   /**
    * Attempt to start accepting connections.   Accepts only one connection at a time,
    * once this has been established the device is returned and accepting is disabled.
-   * 
+   *
    * This is an Android only feature.
-   * 
+   *
    * @param properties used during the connection and connected process(es)
    */
-  async accept(properties: Map<string,object>): Promise<BluetoothDevice> {        
-    if (Platform.OS == 'ios') throw new Error("Method not implemented.");
-    let paired: BluetoothNativeDevice = await this._nativeModule.accept(properties);
+  async accept(properties: Map<string, object>): Promise<BluetoothDevice> {
+    if (Platform.OS == "ios") throw new Error("Method not implemented.");
+    let paired: BluetoothNativeDevice = await this._nativeModule.accept(
+      properties
+    );
     return new BluetoothDevice(paired, this);
   }
   /**
    * Attempt to cancel the accepting state.
-   * 
+   *
    * This is an Android only feature.
    */
   cancelAccept(): Promise<boolean> {
-    if (Platform.OS == 'ios') throw new Error("Method not implemented.");
+    if (Platform.OS == "ios") throw new Error("Method not implemented.");
     return this._nativeModule.cancelAccept();
   }
 
   /**
    * Request user to turn on Bluetooth Adapter
-   * 
+   *
    * This is an Android only feature.
-   * 
-   * @param state 
+   *
+   * @param state
    */
   requestBluetoothEnabled(): Promise<boolean> {
-    if (Platform.OS == 'ios') throw new Error("Method not implemented.");
+    if (Platform.OS == "ios") throw new Error("Method not implemented.");
     return this._nativeModule.requestBluetoothEnabled();
   }
 
   /**
    * Attempts to set the bluetooth adapter name.
-   * 
+   *
    * This is an Android only feature.
-   * 
+   *
    * @param name the name to which we will change BluetoothAdapter
    */
   setBluetoothAdapterName(name: string): Promise<boolean> {
-    if (Platform.OS == 'ios') throw new Error("Method not implemented.");
+    if (Platform.OS == "ios") throw new Error("Method not implemented.");
     return this._nativeModule.setBluetoothAdapterName(name);
   }
 
   private createBluetoothEventSubscription<T extends BluetoothEvent>(
     eventType: BluetoothEventType,
-    listener: BluetoothEventListener<T>): BluetoothEventSubscription {
-      this._nativeModule.addListener(eventType);
+    listener: BluetoothEventListener<T>
+  ): BluetoothEventSubscription {
+    this._nativeModule.addListener(eventType);
 
-      let subscription = this._eventEmitter.addListener(eventType, listener);
+    let subscription = this._eventEmitter.addListener(eventType, listener);
 
-      return {
-        remove: () => {
-          this._nativeModule.removeListener(eventType);
-          subscription.remove();
-        }
-      };
-    }
-  
+    return {
+      remove: () => {
+        this._nativeModule.removeListener(eventType);
+        subscription.remove();
+      },
+    };
+  }
+
   /**
-   * Creates an EventSubscription which calls the provided listener when the native 
+   * Creates an EventSubscription which calls the provided listener when the native
    * device is notified of the BluetoothAdapter being enabled.
-   * 
-   * @param listener 
+   *
+   * @param listener
    */
-  onBluetoothEnabled(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription {
-    return this.createBluetoothEventSubscription(BluetoothEventType.BLUETOOTH_ENABLED, listener);
+  onBluetoothEnabled(
+    listener: BluetoothEventListener<StateChangeEvent>
+  ): BluetoothEventSubscription {
+    return this.createBluetoothEventSubscription(
+      BluetoothEventType.BLUETOOTH_ENABLED,
+      listener
+    );
   }
 
   /**
    * Creates an EventSubscription which calls the provided listener when the native
    * device is notified of the BluetoothAdapter being disabled.
-   * 
-   * @param listener 
+   *
+   * @param listener
    */
-  onBluetoothDisabled(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription {
-    return this.createBluetoothEventSubscription(BluetoothEventType.BLUETOOTH_DISABLED, listener);
+  onBluetoothDisabled(
+    listener: BluetoothEventListener<StateChangeEvent>
+  ): BluetoothEventSubscription {
+    return this.createBluetoothEventSubscription(
+      BluetoothEventType.BLUETOOTH_DISABLED,
+      listener
+    );
   }
 
   /**
    * Creates an EventSubscription which wraps both enabled and disabled.
-   * 
-   * @param listener 
+   *
+   * @param listener
    */
-  onStateChanged(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription {
-    let enabledSubscription = this._eventEmitter.addListener(BluetoothEventType.BLUETOOTH_ENABLED, listener);
-    let disabledSubscription = this._eventEmitter.addListener(BluetoothEventType.BLUETOOTH_DISABLED, listener);
+  onStateChanged(
+    listener: BluetoothEventListener<StateChangeEvent>
+  ): BluetoothEventSubscription {
+    let enabledSubscription = this._eventEmitter.addListener(
+      BluetoothEventType.BLUETOOTH_ENABLED,
+      listener
+    );
+    let disabledSubscription = this._eventEmitter.addListener(
+      BluetoothEventType.BLUETOOTH_DISABLED,
+      listener
+    );
 
     return {
       remove() {
         enabledSubscription.remove();
         disabledSubscription.remove();
-      }
+      },
     };
   }
 
   /**
    * Creates an EventSubscription which wraps the DEVICE_CONNECTED event type.
-   * 
-   * @param listener 
+   *
+   * @param listener
    */
-  onDeviceConnected(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription {
-    return this.createBluetoothEventSubscription(BluetoothEventType.DEVICE_CONNECTED, listener);
+  onDeviceConnected(
+    listener: BluetoothEventListener<BluetoothDeviceEvent>
+  ): BluetoothEventSubscription {
+    return this.createBluetoothEventSubscription(
+      BluetoothEventType.DEVICE_CONNECTED,
+      listener
+    );
   }
 
   /**
-   * Creates an EventSubscription which wraps the DEVICE_DISCONNECTED event type.
-   * 
-   * @param listener 
+   * Creates an EventSubscription which wraps the DEVICE_DISCONNECTED event type.  Device disconnected events
+   * can be thrown for the following:
+   * - During a read the DeviceConnection receives an un-cancelled exception (generally a closure)
+   * - The AclReceiver receives an on disconnect (this seems less informative as it will still fire a disconnect
+   * event if the connect had been cancelled.  So at this point it may need to be removed.)
+   *
+   * @param listener
    */
-  onDeviceDisconnected(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription {
-    return this.createBluetoothEventSubscription(BluetoothEventType.DEVICE_DISCONNECTED, listener);
+  onDeviceDisconnected(
+    listener: BluetoothEventListener<BluetoothDeviceEvent>
+  ): BluetoothEventSubscription {
+    return this.createBluetoothEventSubscription(
+      BluetoothEventType.DEVICE_DISCONNECTED,
+      listener
+    );
   }
 
   /**
-   * Creates an EventSubscription based on the read event from a specified device.  If the device 
+   * Creates an EventSubscription based on the read event from a specified device.  If the device
    * is not currently connected an exception will be thrown, although I'm not sure if
    * this is required, since it may be annoying to continually add/remove subscriptions.
-   * 
-   * @param listener 
+   *
+   * @param listener
    */
-  onDeviceRead(address: string, listener: BluetoothEventListener<BluetoothDeviceReadEvent>): BluetoothEventSubscription {
+  onDeviceRead(
+    address: string,
+    listener: BluetoothEventListener<BluetoothDeviceReadEvent>
+  ): BluetoothEventSubscription {
     let eventType = `${BluetoothEventType.DEVICE_READ}@${address}`;
     this._nativeModule.addListener(eventType);
-    
+
     let subscription = this._eventEmitter.addListener(eventType, listener);
 
     return {
       remove() {
         subscription.remove();
-      }
-    }
+      },
+    };
   }
 
   /**
    * Creates an EventSubscription which wraps the ERROR event.
-   * 
-   * @param listener 
+   *
+   * @param listener
    */
-  onError(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription {
-    return this.createBluetoothEventSubscription(BluetoothEventType.ERROR, listener);
+  onError(
+    listener: BluetoothEventListener<BluetoothDeviceEvent>
+  ): BluetoothEventSubscription {
+    return this.createBluetoothEventSubscription(
+      BluetoothEventType.ERROR,
+      listener
+    );
   }
 
+  /**
+   * Creates an event subscription wrapping the DEVICE_DISCOVERED events.  DEVICE_DISCOVERED is fired during the
+   * discovery process, when a new device is found.  Note this is only fired on the first discovery, it will not
+   * be fired (at this point) with the updated RSSI value on the next device discovery.
+   *
+   * Remember to remove the subscription when you've found your device, or you stop discovery.
+   *
+   * @param listener
+   */
+  onDeviceDiscovered(
+    listener: BluetoothEventListener<BluetoothDeviceEvent>
+  ): BluetoothEventSubscription {
+    return this.createBluetoothEventSubscription(
+      BluetoothEventType.DEVICE_DISCOVERED,
+      listener
+    );
+  }
 }
 
 class NativeModule {

@@ -1,8 +1,8 @@
-import { NativeEventEmitter } from 'react-native';
-import RNBluetoothClassicModule, { StandardOptions } from './BluetoothNativeModule';
-import BluetoothDevice from './BluetoothDevice';
-import { BluetoothEventListener, StateChangeEvent, BluetoothDeviceEvent, BluetoothEventSubscription } from './BluetoothEvent';
-import { BluetoothDeviceReadEvent } from './BluetoothEvent';
+import { NativeEventEmitter } from "react-native";
+import RNBluetoothClassicModule, { StandardOptions } from "./BluetoothNativeModule";
+import BluetoothDevice from "./BluetoothDevice";
+import { BluetoothEventListener, StateChangeEvent, BluetoothDeviceEvent, BluetoothEventSubscription } from "./BluetoothEvent";
+import { BluetoothDeviceReadEvent } from "./BluetoothEvent";
 /**
  * Provides access to native module.  In general the methods will be direct calls
  * through to {@code NativeModules.RNBluetoothClassc}, although there are instances
@@ -200,7 +200,11 @@ export default class BluetoothModule {
      */
     onDeviceConnected(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription;
     /**
-     * Creates an EventSubscription which wraps the DEVICE_DISCONNECTED event type.
+     * Creates an EventSubscription which wraps the DEVICE_DISCONNECTED event type.  Device disconnected events
+     * can be thrown for the following:
+     * - During a read the DeviceConnection receives an un-cancelled exception (generally a closure)
+     * - The AclReceiver receives an on disconnect (this seems less informative as it will still fire a disconnect
+     * event if the connect had been cancelled.  So at this point it may need to be removed.)
      *
      * @param listener
      */
@@ -219,4 +223,14 @@ export default class BluetoothModule {
      * @param listener
      */
     onError(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription;
+    /**
+     * Creates an event subscription wrapping the DEVICE_DISCOVERED events.  DEVICE_DISCOVERED is fired during the
+     * discovery process, when a new device is found.  Note this is only fired on the first discovery, it will not
+     * be fired (at this point) with the updated RSSI value on the next device discovery.
+     *
+     * Remember to remove the subscription when you've found your device, or you stop discovery.
+     *
+     * @param listener
+     */
+    onDeviceDiscovered(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription;
 }

@@ -436,7 +436,9 @@ public class RNBluetoothClassicModule
             mDiscoveryReceiver = new DiscoveryReceiver(new DiscoveryReceiver.DiscoveryCallback() {
                 @Override
                 public void onDeviceDiscovered(NativeDevice device) {
+                    // This wasn't previously an event, but now we can send out and request them
                     Log.d(TAG, String.format("Discovered device %s", device.getAddress()));
+                    sendEvent(EventType.DEVICE_DISCOVERED, device.map());
                 }
 
                 @Override
@@ -653,6 +655,7 @@ public class RNBluetoothClassicModule
                 });
 
                 this.mAcceptor = acceptor;
+                this.mAcceptor.start();
 
             } catch(IOException e) {
                 promise.reject(new AcceptFailedException(e.getMessage(), e));
@@ -1017,6 +1020,7 @@ public class RNBluetoothClassicModule
             // At this point just remove the connection, the DEVICE_DISCONNECTED should have been
             // sent from the ACL message already.
             mConnections.remove(device.getAddress());
+            sendEvent(EventType.DEVICE_DISCONNECTED, new NativeDevice(device), new BluetoothException(e.getMessage()).map());
         };
 
     private BiConsumer<BluetoothDevice,String> onReceivedData = (BluetoothDevice device, String data) -> {
@@ -1215,9 +1219,7 @@ public class RNBluetoothClassicModule
         Log.d(TAG, "onACLDisconnected to " + device.getAddress());
 
         mConnections.remove(device.getAddress());
-
         sendEvent(EventType.DEVICE_DISCONNECTED, device.map());
-        sendEvent(EventType.DEVICE_DISCONNECTED, device, Arguments.createMap());
     }
 
     /**

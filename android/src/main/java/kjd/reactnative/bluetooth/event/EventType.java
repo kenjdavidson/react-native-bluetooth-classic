@@ -42,7 +42,15 @@ public enum EventType {
     /**
      * A general error occurs during processing.
      */
-    ERROR("error");
+    ERROR("error"),
+
+    /**
+     * A number of requests/questions have come in asking if is possible to search for a specific
+     * device.  This will give users the ability to listen for individual device(s) discovered
+     * and manage that process.   For example, they could start discovery and then listen for
+     * a specific device, once that device is found discovery can be stopped.
+     */
+    DEVICE_DISCOVERED("deviceDiscovered");
 
     public final String code;
     EventType(String code) {

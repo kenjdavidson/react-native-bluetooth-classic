@@ -45,12 +45,17 @@ public class DiscoveryReceiver extends BroadcastReceiver {
             Log.d(this.getClass().getSimpleName(),
                     String.format("Discovery found device %s", device.getAddress()));
 
+            // Devices can be found multiple times, we don't want to duplicate the process if
+            // we've found one.  Although, we can update the RSSI value I guess.  But that's for
+            // another time.
             if (!unpairedDevices.containsKey(device.getAddress())) {
                 NativeDevice found = new NativeDevice(device);
                 found.putExtra("rssi", intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE));
 
                 mCallback.onDeviceDiscovered(found);
                 unpairedDevices.put(device.getAddress(), found);
+
+                mCallback.onDeviceDiscovered(found);
             }
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
             Log.d(this.getClass().getSimpleName(),
