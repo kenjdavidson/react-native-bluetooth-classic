@@ -19,11 +19,13 @@ import {
 } from "./BluetoothEvent";
 import { BluetoothDeviceReadEvent } from "./BluetoothEvent";
 
+export type BufferEncoding = "ascii" | "utf8" | "utf-8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex";
+
 global.Buffer = global.Buffer || require("buffer").Buffer;
 
 /**
  * Provides access to native module.  In general the methods will be direct calls
- * through to {@code NativeModules.RNBluetoothClassc}, although there are instances
+ * through to {@code NativeModules.RNBluetoothClassic}, although there are instances
  * where methods are overwritten where additional information is required.  These
  * methods are related to {@code BluetoothConnection} requests, where the response
  * must be wrapped.
@@ -183,8 +185,9 @@ export default class BluetoothModule {
    *
    * @param address the address to which we will send data
    * @param message String or Buffer which will be sent
+   * @param encoding Buffer character encoding to use
    */
-  writeToDevice(address: string, message: any): Promise<boolean> {
+  writeToDevice(address: string, message: any, encoding: BufferEncoding = "base64"): Promise<boolean> {
     let data: Buffer = message;
 
     if ("string" === typeof message) {
@@ -193,7 +196,7 @@ export default class BluetoothModule {
       data = Buffer.from(message.toString());
     }
 
-    return this._nativeModule.writeToDevice(address, data.toString("base64"));
+    return this._nativeModule.writeToDevice(address, data.toString(encoding));
   }
 
   /**
