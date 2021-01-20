@@ -725,7 +725,10 @@ public class RNBluetoothClassicModule
             final NativeDevice nativeDevice = new NativeDevice(device);
 
             try {
-                Properties properties = Utilities.mapToProperties(parameters);
+                // Issue/84 just in case the React Native side gets circumvented somehow
+                // this matches the IOS side of a new parameters being added to a NSDictionary
+                Properties properties = parameters == null
+                        ? new Properties() : Utilities.mapToProperties(parameters);
 
                 final String connectorType = StandardOption.CONNECTOR_TYPE.get(properties);
                 if (!mConnectorFactories.containsKey(connectorType)) {

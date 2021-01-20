@@ -161,7 +161,13 @@ export default class BluetoothModule {
     address: string,
     options?: T
   ): Promise<BluetoothDevice> {
-    let connected = await this._nativeModule.connectToDevice(address, options);
+    // Comming from the Java world this is nuts - not being able to assign anything to
+    // options because it's a <T extends StandardOptions> even with something that matches
+    // the StandardOptions interface
+    let connected = await this._nativeModule.connectToDevice(
+      address,
+      options || {}
+    );
     return new BluetoothDevice(connected, this);
   }
 
@@ -459,6 +465,10 @@ export default class BluetoothModule {
   }
 }
 
+/**
+ * Internal `NativeModule` to get around the fact that React doesn't actually make this
+ * type available, but we need it in order to create our BluetoothModule.
+ */
 class NativeModule {
   addListener(eventType: string) {}
   removeListeners(count: number) {}

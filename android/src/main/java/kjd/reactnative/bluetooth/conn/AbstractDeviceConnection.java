@@ -63,8 +63,7 @@ abstract public class AbstractDeviceConnection implements DeviceConnection {
      * just build up data in the buffer until requested.  When a listener is added, the buffer
      * is read for all delimiters and all messages will be sent.
      */
-    protected BiConsumer<BluetoothDevice, String> mOnDataReceived
-            ;
+    protected BiConsumer<BluetoothDevice, String> mOnDataReceived;
 
     /**
      * The connection has been cancelled and/or disconnected by the user.
