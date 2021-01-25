@@ -3,13 +3,13 @@ title: Bluetooth Device
 description: Connect and communicate with device(s)
 ---
 
-The `BluetoothDevice` is where the magic of communicating with your actual devices takes place.  You're always going to be requesting your `BluetoothDevice` from one of the `RNBluetoothClassic` functions.  Once you've got that device (or a saved address which which you can simulate an address) you're good to go.
+The `BluetoothDevice` is where the magic of communicating with your actual devices takes place. You're always going to be requesting your `BluetoothDevice` from one of the `RNBluetoothClassic` functions. Once you've got that device (or a saved address which which you can simulate an address) you're good to go.
 
 ```javascript
 import RNBluetoothClassic, {
   BluetoothEventType,
-  BluetoothDevice
-} from 'react-native-bluetooth-classic';
+  BluetoothDevice,
+} from "react-native-bluetooth-classic";
 ```
 
 ## Common API
@@ -26,11 +26,11 @@ Whether or not the current device is connected - note that like everywhere else 
 
 - Look into adding an `isPaired()` request that does the same
 
-### connect 
+### connect
 
 `connect(options: Map<string,object>): Promise<boolean>`
 
-Connect to the device.  This will attempt to open a `BluetoothSocket` (or some other connection type based on configuration) using the options provided.
+Connect to the device. This will attempt to open a `BluetoothSocket` (or some other connection type based on configuration) using the options provided.
 
 ```javascript
 async connect() {
@@ -50,7 +50,7 @@ async connect() {
 
 ###### Parameters
 
-`options: map<string,object>` provides a definition of connection properties used at different levels of the library.  The following describe the default implementations:
+`options: map<string,object>` provides a definition of connection properties used at different levels of the library. The following describe the default implementations:
 
 **RNBluetoothClassicModule**
 
@@ -62,19 +62,19 @@ async connect() {
 
 **DelimitedStringDeviceConnectionImpl**
 
-`DELIMITER` - delimiter used to split messages; defaults to `\n`.  Providing no delimiter will cause `read` and `onReceivedData` to stream all available information with no segmentation.
+`DELIMITER` - delimiter used to split messages; defaults to `\n`. Providing no delimiter will cause `read` and `onReceivedData` to stream all available information with no segmentation.
 
-`DEVICE_CHARSET` - the character set for encoding String data; defaults to `ascii`.  Android uses `Charset` values, while IOS uses integer values for determining character sets.  See the specific implementation for details.
+`DEVICE_CHARSET` - the character set for encoding String data; defaults to `ascii`. Android uses `Charset` values, while IOS uses integer values for determining character sets. See the specific implementation for details.
 
-`READ_SIZE` - provides the ability to increase the amount of data read per cycle; defaults to `1024`.  A number of forks have determined that increasing this value improves performance.
+`READ_SIZE` - provides the ability to increase the amount of data read per cycle; defaults to `1024`. A number of forks have determined that increasing this value improves performance.
 
-`READ_TIMEOUT` - adds an extra timeout to the read cycle; defaults to `0`.  This is a hold over from the original implementation with a value of `300`, it was removed as the read method is already blocking and had a large number of requests/forks.
+`READ_TIMEOUT` - adds an extra timeout to the read cycle; defaults to `0`. This is a hold over from the original implementation with a value of `300`, it was removed as the read method is already blocking and had a large number of requests/forks.
 
 ```javascript
-let connected = await connect({ 
+let connected = await connect({
   CONNECTOR_TYPE: "rfcomm",
   DELIMITER: "\n",
-  DEVICE_CHARSET: Platform.OS === 'ios' ? 1536 : "utf-8" 
+  DEVICE_CHARSET: Platform.OS === "ios" ? 1536 : "utf-8",
 });
 ```
 
@@ -99,7 +99,7 @@ async disconnect() {
 
 `available(): Promise<number>`
 
-Requests how much data is available for read.   Resolves with a number based on the connection type, for example the `DelimitedConnection*Impl`(Java) connections return the number of delimited messages **not the number of bytes** as you might expect.
+Requests how much data is available for read. Resolves with a number based on the connection type, for example the `DelimitedConnection*Impl`(Java) connections return the number of delimited messages **not the number of bytes** as you might expect.
 
 ```javascript
 try {
@@ -107,7 +107,7 @@ try {
   if (messages.length > 0) {
     performRead();
   }
-} catch(error) {
+} catch (error) {
   // Handle accordingly
 }
 ```
@@ -116,20 +116,20 @@ try {
 
 `clear(): Promise<boolean>`
 
-Clear all the messages currently in the buffer.  This is really only used for manual reads, as listening to received data would automatically clear.
+Clear all the messages currently in the buffer. This is really only used for manual reads, as listening to received data would automatically clear.
 
 ### read
 
 `read(): Promise<BluetoothMessage>`
 
-Reads from the device buffer and returns a `BluetoothMessage` containing information regarding the data.  The amount and type of data is dependant on the native `DeviceConnection`.  The default `DelimitedConnection*Impl` connections return plain strings, encoded/decoded using the requested `Charset`
+Reads from the device buffer and returns a `BluetoothMessage` containing information regarding the data. The amount and type of data is dependant on the native `DeviceConnection`. The default `DelimitedConnection*Impl` connections return plain strings, encoded/decoded using the requested `Charset`
 
 ```javascript
 try {
   let message = await this.props.device.read();
   this.setState({ data: message.data });
-} catch(error) {
-  // Handle error accordingly 
+} catch (error) {
+  // Handle error accordingly
 }
 ```
 
@@ -139,13 +139,16 @@ try {
 
 ### write
 
-`write(data: string|Buffer): Promise<boolean>`
+`write(data: string|Buffer, encoding?: string): Promise<boolean>`
 
-Attempts to write to the device.   Like the `read` function, this is completely dependant on the `DeviceConnection` on how this data is written. 
+Attempts to write to the device. Like the `read` function, this is completely dependant on the `DeviceConnection` on how this data is written.
 
 ###### Parameters
 
-`data: string|buffer` must be in the format that your `DeviceConnection` is expecting.  Upon request, the content will be sent to the native side as after being `Base64` encoded.  This means that if you wish to send `byte[]` or `hex` you need to ensure the data is already encoded as such.
+`data: string|buffer` must be in the format that your `DeviceConnection` is expecting. Upon request, the content will be sent to the native side as after being `Base64` encoded. This means that if you wish to send `byte[]` or `hex` you need to ensure the data is already encoded as such.
+`encoding?: "utf-8" | "ascii" | "utf8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex" | undefined` used to specify encoding of non Buffer data prior to sending to native
+
+The default remains to encode `strings` as `utf-8` when not specified.
 
 ###### Errors
 
@@ -154,11 +157,9 @@ Attempts to write to the device.   Like the `read` function, this is completely 
 
 ### onDataReceived
 
-`onDataReceived(
-  listener: BluetoothEventListener<BluetoothDeviceReadEvent>
-): BluetoothEventSubscription`
+`onDataReceived( listener: BluetoothEventListener<BluetoothDeviceReadEvent> ): BluetoothEventSubscription`
 
-Provide a listener for incoming data.  Without adding a listener data will be appended to the buffer and made available for:
+Provide a listener for incoming data. Without adding a listener data will be appended to the buffer and made available for:
 
 - `read()`
 - the next `onReceivedData()`
@@ -173,7 +174,7 @@ Provide a listener for incoming data.  Without adding a listener data will be ap
 
 `BluetoothEventSubscription` which must be used to `remove()` the listener.
 
-```javascript 
+```javascript
 initializeRead() {
   this.readSubscription = this.props.device.onDataReceived((data) => this.onReceivedData(data));
 }
@@ -181,7 +182,7 @@ initializeRead() {
 async onReceivedData(event: BluetoothReadEvent) {
     this.addData({
       ...event,
-      timestamp: new Date(),  // Add the current date 
+      timestamp: new Date(),  // Add the current date
       type: 'receive'         // Add a type for UI
     });
   }
@@ -190,7 +191,6 @@ async onReceivedData(event: BluetoothReadEvent) {
 ## Android API
 
 There are no current Android only API.
-
 
 ## IOS API
 

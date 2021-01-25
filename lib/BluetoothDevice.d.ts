@@ -67,8 +67,9 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
      * Native module.
      *
      * @param data to be written to the device.
+     * @param encoding the encoding used when wrapping non Buffer data
      */
-    write(data: string | Buffer): Promise<boolean>;
+    write(data: string | Buffer, encoding?: "utf-8" | "ascii" | "utf8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex" | undefined): Promise<boolean>;
     /**
      * Adds a listener to the device.  Once completed this will:
      * - send queued data already read from the device (if implemented by DeviceConnection)

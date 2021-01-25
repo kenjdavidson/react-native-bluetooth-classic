@@ -114,9 +114,24 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
    * Native module.
    *
    * @param data to be written to the device.
+   * @param encoding the encoding used when wrapping non Buffer data
    */
-  async write(data: string | Buffer): Promise<boolean> {
-    return this._bluetoothModule.writeToDevice(this.address, data);
+  async write(
+    data: string | Buffer,
+    encoding?:
+      | "utf-8"
+      | "ascii"
+      | "utf8"
+      | "utf16le"
+      | "ucs2"
+      | "ucs-2"
+      | "base64"
+      | "latin1"
+      | "binary"
+      | "hex"
+      | undefined
+  ): Promise<boolean> {
+    return this._bluetoothModule.writeToDevice(this.address, data, encoding);
   }
 
   /**
