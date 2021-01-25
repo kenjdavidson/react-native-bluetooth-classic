@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import BluetoothModule from "./BluetoothModule";
 import BluetoothNativeDevice from "./BluetoothNativeDevice";
 import { BluetoothEventListener, BluetoothDeviceReadEvent, BluetoothEventSubscription } from "./BluetoothEvent";
@@ -67,7 +68,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
      *
      * @param data to be written to the device.
      */
-    write(data: any): Promise<boolean>;
+    write(data: string | Buffer): Promise<boolean>;
     /**
      * Adds a listener to the device.  Once completed this will:
      * - send queued data already read from the device (if implemented by DeviceConnection)

@@ -869,9 +869,9 @@ public class RNBluetoothClassicModule
             promise.reject(Exceptions.NOT_CURRENTLY_CONNECTED.name(),
                     Exceptions.NOT_CURRENTLY_CONNECTED.message(address));
         } else {
-            // At this point the data should be encoded correctly.  The original version did some
-            // weird decoding and encoding but it didn't seem right.  At this point leaving it
-            // as is and required to be set at the client level.
+            // Decode the Base64 value provided by React Native module.  At this point it gets
+            // left in it's raw byte[] and it's up to the DeviceConnection to handle/write
+            // accordingly
             byte[] data = Base64.decode(message, Base64.DEFAULT);
 
             try {

@@ -182,23 +182,37 @@ export default class BluetoothModule {
   }
 
   /**
-   * Write data to the device.  Eventually this will be updated to accept data and type,
-   * allowing the sending of different data elements to the device.  From the issues on
-   * bluetooth-serial it seems like images and hex values are the top priorties, but method
-   * to send any data would be preferable.
+   * Write the provided message to the device.  The `message` can be provided
+   * as either:
+   * - A String which will be encoded (using the optional `encoding`)
+   * - A Buffer
+   *
+   * Both of which will eventually be base64 encoded in order to ensure that the data
+   * is transferred in a common format through React Natives allowed parameter types.
    *
    * @param address the address to which we will send data
-   * @param message String or Buffer which will be sent
+   * @param message string|Buffer which will be sent.
+   * @param encoding "utf-8" | "ascii" | "utf8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex" | undefined
    */
-  writeToDevice(address: string, message: any): Promise<boolean> {
-    let data: Buffer = message;
-
-    if ("string" === typeof message) {
-      data = Buffer.from(message);
-    } else {
-      data = Buffer.from(message.toString());
-    }
-
+  writeToDevice(
+    address: string,
+    message: string | Buffer,
+    encoding?:
+      | "utf-8"
+      | "ascii"
+      | "utf8"
+      | "utf16le"
+      | "ucs2"
+      | "ucs-2"
+      | "base64"
+      | "latin1"
+      | "binary"
+      | "hex"
+      | undefined
+  ): Promise<boolean> {
+    let data = Buffer.isBuffer(message)
+      ? (message as Buffer)
+      : Buffer.from(message, encoding);
     return this._nativeModule.writeToDevice(address, data.toString("base64"));
   }
 
