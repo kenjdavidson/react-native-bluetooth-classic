@@ -27,6 +27,7 @@ public class BluetoothMessage<T> {
 
     public WritableMap asMap() {
         WritableMap map = Arguments.createMap();
+        map.putMap("device", device);
         map.putString("data", String.valueOf(data));
         map.putString("timestamp", Utilities.formatDate(timestamp));
         return map;
