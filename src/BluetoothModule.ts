@@ -440,7 +440,8 @@ export default class BluetoothModule {
     let subscription = this._eventEmitter.addListener(eventType, listener);
 
     return {
-      remove() {
+      remove: () => {
+        this._nativeModule.removeListener(eventType);
         subscription.remove();
       },
     };
