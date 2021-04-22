@@ -178,7 +178,7 @@ Provides a listener for events fired when `Socket` connections are: closed, drop
 
 ```javascript
 componentDidMount() {
-    this.subscription = RNBluetoothClassic.onDeviceDisconnected(this.onDeviceConnected);
+    this.subscription = RNBluetoothClassic.onDeviceDisconnected(this.onDeviceDisconnected);
 }
 
 componetWillUnmount() {    
