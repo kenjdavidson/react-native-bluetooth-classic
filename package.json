@@ -1,6 +1,6 @@
 {
   "name": "react-native-bluetooth-classic",
-  "version": "1.60.0-rc.13",
+  "version": "1.60.0-rc.15",
   "description": "Implement bluetooth classic (serial) on Android (Bluetooth Adapter) and IOS (External Accessory)",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -31,7 +31,8 @@
     "iamandiradustefan@gmail.com (https://github.com/iamandiradu)",
     "Andrew Krugliak (https://github.com/andreykrugliak)",
     "Anton Petrov (https://github.com/tpettrov)",
-    "Stephen Woodruff (https://github.com/woodrufs)"
+    "Stephen Woodruff (https://github.com/woodrufs)",
+    "Phil Pettican (https://github.com/philpettican)"
   ],
   "license": "MIT",
   "bugs": {

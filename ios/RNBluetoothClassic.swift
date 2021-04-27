@@ -371,6 +371,29 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
     }
     
     /**
+     Resolve with a list of connected devices.
+     - parameter resolver: resolve with the connected device list
+     - parameter rejecter: reject if Bluetooth is disabled or there are issues with the list
+     */
+    @objc
+    func getConnectedDevices(
+        resolver resolve: RCTPromiseResolveBlock,
+        rejecter reject: RCTPromiseRejectBlock
+    ) -> Void {
+        guard checkBluetoothAdapter() else {
+            rejectBluetoothDisabled(rejecter: reject)
+            return
+        }
+        
+        var accessories:[NSDictionary] = [NSDictionary]()
+        for (_, device) in connections {
+            let device = NativeDevice(accessory: device.accessory)
+            accessories.append(device.map())
+        }
+        resolve(accessories)
+    }
+    
+    /**
      Writes the supplied message to the device - the message should be Base64
      encoded.
      - parameter _: device Id to check for connection
