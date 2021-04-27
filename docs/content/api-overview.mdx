@@ -23,32 +23,43 @@ import RNBluetoothClassic from 'react-native-bluetooth-classic';
 
 Provides access to the following:
 
-| API | Description | Platforms |
-| --- | --- | --- | 
-| [isBluetoothEnabled](/react-native/rn-bluetooth-classic/#isbluetoothenabled) | Determine whether device has enabled Bluetooth | <IoLogoAndroid/> <IoLogoApple/> |
-| [getBondedDevices](/react-native/rn-bluetooth-classic/#getbondeddevices) | List currently paired/bonded devices | <IoLogoAndroid/> <IoLogoApple/> |
-| [getConnectedDevices](/react-native/rn-bluetooth-classic/#getconnecteddevices) | List currently connected devices | <IoLogoAndroid/> <IoLogoApple/> |
-| [getConnectedDevice](/react-native/rn-bluetooth-classic/#getconnecteddevice) | Retrieves a connected `BluetoothDevice` | <IoLogoAndroid/> <IoLogoApple/> |
-| [onBluetoothEnabled](/react-native/rn-bluetooth-classic/#onbluetoothenabled) | Provide a listener for Bluetooth enabled events | <IoLogoAndroid/> <IoLogoApple/> |
-| [onBluetoothDisabled](/react-native/rn-bluetooth-classic/#onbluetoothdisabled) | Provide a listener for Bluetooth disabled events | <IoLogoAndroid/> <IoLogoApple/> |
-| [onStateChanged](/react-native/rn-bluetooth-classic/#onstatechanged) | Provides a listener for Bluetooth state change events | <IoLogoAndroid/> <IoLogoApple/> |
-| [onDeviceConnected](/react-native/rn-bluetooth-classic/#ondeviceconnected) | Provide a listener for when a device connection is initiated | <IoLogoAndroid/> <IoLogoApple/> |
-| [onDeviceDisconnected](/react-native/rn-bluetooth-classic/#ondevicedisconnected) | Provide a listener for when a device connection has dropped | <IoLogoAndroid/> <IoLogoApple/> |
-| [onError](/react-native/rn-bluetooth-classic/#onerror) | Provide a listener for any generic errors from Adapter or Device | <IoLogoAndroid/> <IoLogoApple/> |
-| [startDiscovery](/react-native/rn-bluetooth-classic/#startdiscovery) | Initiate the discovery process | <IoLogoAndroid/> |
-| [cancelDiscovery](/react-native/rn-bluetooth-classic/#canceldiscovery) | Cancel the discovery process | <IoLogoAndroid/> |
-| [pairDevice](/react-native/rn-bluetooth-classic/#pairdevice) | Request to pair with a device | <IoLogoAndroid/> |
-| [unpairDevice](/react-native/rn-bluetooth-classic/#unpairdevice) | Request to unapir a device | <IoLogoAndroid/> |
-| [accept](/react-native/rn-bluetooth-classic/#accept) | Attempt to accept a device connection | <IoLogoAndroid/> |
-| [cancelAccept](/react-native/rn-bluetooth-classic/#cancelaccept) | Cancels accepting a device connection | <IoLogoAndroid/> |
-| [requestBluetoothEnabled](/react-native/rn-bluetooth-classic/#requestbluetoothenabled) | Request that the system enable Bluetooth | <IoLogoAndroid/> |
-| [setBluetoothAdapterName](/react-native/rn-bluetooth-classic/#setbluetoothadaptername) | Attempt to rename the `BluetoothAdapter` | <IoLogoAndroid/> |
+| API                                                                                    | Description                                                      | Platforms                       |
+| -------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------- |
+| [isBluetoothAvailable](/react-native/rn-bluetooth-classic/#isbluetoothavailable)       | Determine whether device has Bluetooth as a feature              | <IoLogoAndroid/> <IoLogoApple/> |
+| [isBluetoothEnabled](/react-native/rn-bluetooth-classic/#isbluetoothenabled)           | Determine whether device has enabled Bluetooth                   | <IoLogoAndroid/> <IoLogoApple/> |
+| [getBondedDevices](/react-native/rn-bluetooth-classic/#getbondeddevices)               | List currently paired/bonded devices                             | <IoLogoAndroid/> <IoLogoApple/> |
+| [getConnectedDevices](/react-native/rn-bluetooth-classic/#getconnecteddevices)         | List currently connected devices                                 | <IoLogoAndroid/> <IoLogoApple/> |
+| [getConnectedDevice](/react-native/rn-bluetooth-classic/#getconnecteddevice)           | Retrieves a connected `BluetoothDevice`                          | <IoLogoAndroid/> <IoLogoApple/> |
+| [onBluetoothEnabled](/react-native/rn-bluetooth-classic/#onbluetoothenabled)           | Provide a listener for Bluetooth enabled events                  | <IoLogoAndroid/> <IoLogoApple/> |
+| [onBluetoothDisabled](/react-native/rn-bluetooth-classic/#onbluetoothdisabled)         | Provide a listener for Bluetooth disabled events                 | <IoLogoAndroid/> <IoLogoApple/> |
+| [onStateChanged](/react-native/rn-bluetooth-classic/#onstatechanged)                   | Provides a listener for Bluetooth state change events            | <IoLogoAndroid/> <IoLogoApple/> |
+| [onDeviceConnected](/react-native/rn-bluetooth-classic/#ondeviceconnected)             | Provide a listener for when a device connection is initiated     | <IoLogoAndroid/> <IoLogoApple/> |
+| [onDeviceDisconnected](/react-native/rn-bluetooth-classic/#ondevicedisconnected)       | Provide a listener for when a device connection has dropped      | <IoLogoAndroid/> <IoLogoApple/> |
+| [onError](/react-native/rn-bluetooth-classic/#onerror)                                 | Provide a listener for any generic errors from Adapter or Device | <IoLogoAndroid/> <IoLogoApple/> |
+| [startDiscovery](/react-native/rn-bluetooth-classic/#startdiscovery)                   | Initiate the discovery process                                   | <IoLogoAndroid/>                |
+| [cancelDiscovery](/react-native/rn-bluetooth-classic/#canceldiscovery)                 | Cancel the discovery process                                     | <IoLogoAndroid/>                |
+| [pairDevice](/react-native/rn-bluetooth-classic/#pairdevice)                           | Request to pair with a device                                    | <IoLogoAndroid/>                |
+| [unpairDevice](/react-native/rn-bluetooth-classic/#unpairdevice)                       | Request to unapir a device                                       | <IoLogoAndroid/>                |
+| [accept](/react-native/rn-bluetooth-classic/#accept)                                   | Attempt to accept a device connection                            | <IoLogoAndroid/>                |
+| [cancelAccept](/react-native/rn-bluetooth-classic/#cancelaccept)                       | Cancels accepting a device connection                            | <IoLogoAndroid/>                |
+| [requestBluetoothEnabled](/react-native/rn-bluetooth-classic/#requestbluetoothenabled) | Request that the system enable Bluetooth                         | <IoLogoAndroid/>                |
+| [setBluetoothAdapterName](/react-native/rn-bluetooth-classic/#setbluetoothadaptername) | Attempt to rename the `BluetoothAdapter`                         | <IoLogoAndroid/>                |
+| [openBluetoothSettings](/react-native/rn-bluetooth-classic/#openbluetoothsettings)     | Opens Android's Bluetooth Settings programmatically              | <IoLogoAndroid/>                |
 
 > The term **connection** refers to an active `socket`; not just being paired/bonded.  Please be aware of this prior to opening any issues.
 
 ## Bluetooth Device
 
-`BluetoothDevice`(s) are available from a number of `RNBluetoothClassic` functions.  These are the functions available while working with `BluetoothDevice`(s):
+| API                | Description                                           | Platforms                       |
+| ------------------ | ----------------------------------------------------- | ------------------------------- |
+| [isConnected]()    | Determine whether the device has an active connection | <IoLogoAndroid/> <IoLogoApple/> |
+| [connect]()        | Attempt connection to the device                      | <IoLogoAndroid/> <IoLogoApple/> |
+| [disconnect]()     | Attempt to disconnect from the device                 | <IoLogoAndroid/> <IoLogoApple/> |
+| [available]()      | Whether and how much data is available for read       | <IoLogoAndroid/> <IoLogoApple/> |
+| [clear]()          | Clear the current read buffer                         | <IoLogoAndroid/> <IoLogoApple/> |
+| [read]()           | Read data from the device (if available)              | <IoLogoAndroid/> <IoLogoApple/> |
+| [write]()          | Write to the device                                   | <IoLogoAndroid/> <IoLogoApple/> |
+| [onDataReceived]() | Add a listener to handle read events                  | <IoLogoAndroid/> <IoLogoApple/> |
 
 | API | Description | Platforms |
 | --- | --- | --- | 
