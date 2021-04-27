@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added
 
-- `isBluetoothAvailable` method for Android devices. This can be used to ensure Bluetooth is a feature on the device.
+- `isBluetoothAvailable` method used to ensure Bluetooth is a feature on the device.
 - `openBluetoothSettings` method for Android devices. This will open Android's Bluetooth Setting's activity.
 
 ## [1.60.0-rc8]

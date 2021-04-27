@@ -11,6 +11,9 @@ import BluetoothNativeDevice from './BluetoothNativeDevice';
 export default interface BluetoothNativeModule {
     /**
      * Opens Android's Bluetooth Settings activity.
+     *
+     * This is an Android only function.
+     *
      */
     openBluetoothSettings(): void;
     /**

@@ -59,6 +59,7 @@ export default class BluetoothModule {
    * @return Promise resolved with whether Bluetooth is available for the current device.
    */
   isBluetoothAvailable(): Promise<boolean> {
+    if (Platform.OS == "ios") return Promise.resolve(true);
     return this._nativeModule.isBluetoothAvailable();
   }
 
@@ -491,6 +492,7 @@ export default class BluetoothModule {
    * Opens Android's Bluetooth Settings activity.
    */
   openBluetoothSettings(): void {
+    if (Platform.OS == "ios") throw new Error("Method not implemented.");
     return this._nativeModule.openBluetoothSettings();
   }
 }
