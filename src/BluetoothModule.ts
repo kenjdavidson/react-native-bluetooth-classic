@@ -486,6 +486,13 @@ export default class BluetoothModule {
       listener
     );
   }
+
+  /**
+   * Opens Android's Bluetooth Settings activity.
+   */
+  openBluetoothSettings(): void {
+    return this._nativeModule.openBluetoothSettings();
+  }
 }
 
 /**

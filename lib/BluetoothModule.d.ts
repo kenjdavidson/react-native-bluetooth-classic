@@ -244,4 +244,8 @@ export default class BluetoothModule {
      * @param listener
      */
     onDeviceDiscovered(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription;
+    /**
+     * Opens Android's Bluetooth Settings activity.
+     */
+    openBluetoothSettings(): void;
 }

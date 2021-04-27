@@ -222,6 +222,16 @@ onDeviceDisconnected(event: BluetoothDeviceEvent) {
 
 The following are available only on Android.
 
+### openBluetoothSettings
+
+`openBluetoothSettings(): void`
+
+Opens Android's Bluetooth Settings activity.
+
+```javascript
+RNBluetoothClassic.openBluetoothSettings();
+```
+
 ### isBluetoothAvailable
 
 `isBluetoothAvailable(): Promise<boolean>`
