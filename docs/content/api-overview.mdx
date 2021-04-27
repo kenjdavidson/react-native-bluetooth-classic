@@ -50,6 +50,8 @@ Provides access to the following:
 
 ## Bluetooth Device
 
+`BluetoothDevice`(s) are available from a number of `RNBluetoothClassic` functions. These are the functions available while working with `BluetoothDevice`(s):
+
 | API                | Description                                           | Platforms                       |
 | ------------------ | ----------------------------------------------------- | ------------------------------- |
 | [isConnected]()    | Determine whether the device has an active connection | <IoLogoAndroid/> <IoLogoApple/> |
@@ -61,17 +63,6 @@ Provides access to the following:
 | [write]()          | Write to the device                                   | <IoLogoAndroid/> <IoLogoApple/> |
 | [onDataReceived]() | Add a listener to handle read events                  | <IoLogoAndroid/> <IoLogoApple/> |
 
-| API | Description | Platforms |
-| --- | --- | --- | 
-| [isConnected]() | Determine whether the device has an active connection | <IoLogoAndroid/> <IoLogoApple/> |
-| [connect]() | Attempt connection to the device | <IoLogoAndroid/> <IoLogoApple/> |
-| [disconnect]() | Attempt to disconnect from the device | <IoLogoAndroid/> <IoLogoApple/> |
-| [available]() | Whether and how much data is available for read | <IoLogoAndroid/> <IoLogoApple/> |
-| [clear]() | Clear the current read buffer | <IoLogoAndroid/> <IoLogoApple/> |
-| [read]() | Read data from the device (if available) | <IoLogoAndroid/> <IoLogoApple/> |
-| [write]() | Write to the device | <IoLogoAndroid/> <IoLogoApple/> |
-| [onDataReceived]() | Add a listener to handle read events | <IoLogoAndroid/> <IoLogoApple/> |
+> **onDataReceived** and **read** shouldn't really be used at the same time as you could end up with half filled data or random errors. I suggest sticking to one method `setInterval` or `onRead` in order to continuously get data
 
-> **onDataReceived** and **read** shouldn't really be used at the same time as you could end up with half filled data or random errors.  I suggest sticking to one method `setInterval` or `onRead` in order to continuously get data
-
-> A number of the previous functions are also available directly from `RNBluetoothClassic`.  But in most cases it's wise to use the `BluetoothDevice` returned from one of the prior functions in order to manage directly
+> A number of the previous functions are also available directly from `RNBluetoothClassic`. But in most cases it's wise to use the `BluetoothDevice` returned from one of the prior functions in order to manage directly
