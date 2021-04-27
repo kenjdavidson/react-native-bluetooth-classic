@@ -363,6 +363,18 @@ public class RNBluetoothClassicModule
     }
 
     /**
+     * Determine whether Bluetooth is available.  The promise is never rejected, only resolved with the
+     * appropriate boolean flag.
+     *
+     * @param promise resolve based on Bluetooth being available on the device.
+     */
+    @ReactMethod
+    @SuppressWarnings("unused")
+    public void isBluetoothAvailable(Promise promise) {
+        promise.resolve(mAdapter != null);
+    }
+
+    /**
      * Determine whether Bluetooth is enabled.  The promise is never rejected, only resolved with the
      * appropriate boolean flag.
      *

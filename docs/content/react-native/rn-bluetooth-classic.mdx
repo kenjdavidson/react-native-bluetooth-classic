@@ -222,6 +222,21 @@ onDeviceDisconnected(event: BluetoothDeviceEvent) {
 
 The following are available only on Android.
 
+### isBluetoothAvailable
+
+`isBluetoothAvailable(): Promise<boolean>`
+
+Requests whether the device supports Bluetooth. If Bluetooth is supported, returns true. Otherwise, returns false.
+
+```javascript
+try {
+  await available = RNBluetoothClassic.isBluetoothAvailable();
+  this.setState({ available });
+} catch (err) {
+  // Handle accordingly
+}
+```
+
 ### startDiscovery
 
 `startDiscovery(): Promise<BluetoothDevice[]>`

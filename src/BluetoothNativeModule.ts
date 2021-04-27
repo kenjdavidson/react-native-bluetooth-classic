@@ -17,6 +17,15 @@ import BluetoothNativeDevice from './BluetoothNativeDevice';
  */
 export default interface BluetoothNativeModule {
     
+  /**
+   * Requests whether or not Bluetooth is a feature of the device.
+   *
+   * This is an Android only function.
+   *
+   * @return Promise<boolean> resolved based on if the current device has Bluetooth.
+   */
+  isBluetoothAvailable(): Promise<boolean>;
+
     /**
      * Requests whether or not Bluetooth is enabled.  
      * 

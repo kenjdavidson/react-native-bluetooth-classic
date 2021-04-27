@@ -31,6 +31,12 @@ export default class BluetoothModule {
     _eventEmitter: NativeEventEmitter;
     constructor(nativeModule: RNBluetoothClassicModule);
     /**
+     * Requests availability status of Bluetooth for the device.
+     *
+     * @return Promise resolved with whether Bluetooth is available for the current device.
+     */
+    isBluetoothAvailable(): Promise<boolean>;
+    /**
      * Requests enabled status from the BluetoothAdapter.
      *
      * @return Promise resolved with whether Bluetooth is enabled
