@@ -428,7 +428,8 @@ export default class BluetoothModule {
    * is not currently connected an exception will be thrown, although I'm not sure if
    * this is required, since it may be annoying to continually add/remove subscriptions.
    *
-   * @param listener
+   * @param address device address to which we will start listening
+   * @param listener onReadListener
    */
   onDeviceRead(
     address: string,
