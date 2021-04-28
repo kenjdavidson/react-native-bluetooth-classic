@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Pending changes
+
+## Added
+
+- `isBluetoothAvailable` method used to ensure Bluetooth is a feature on the device.
+- `openBluetoothSettings` method for Android devices. This will open Android's Bluetooth Setting's activity.
+
 ## [1.60.0-rc8]
 
 ## Edited

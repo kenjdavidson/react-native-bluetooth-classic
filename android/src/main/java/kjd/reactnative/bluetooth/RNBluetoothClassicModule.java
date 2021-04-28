@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
+import android.provider.Settings;
 import android.util.Base64;
 import android.util.Log;
 
@@ -363,6 +364,18 @@ public class RNBluetoothClassicModule
     }
 
     /**
+     * Determine whether Bluetooth is available.  The promise is never rejected, only resolved with the
+     * appropriate boolean flag.
+     *
+     * @param promise resolve based on Bluetooth being available on the device.
+     */
+    @ReactMethod
+    @SuppressWarnings("unused")
+    public void isBluetoothAvailable(Promise promise) {
+        promise.resolve(mAdapter != null);
+    }
+
+    /**
      * Determine whether Bluetooth is enabled.  The promise is never rejected, only resolved with the
      * appropriate boolean flag.
      *
@@ -464,6 +477,19 @@ public class RNBluetoothClassicModule
                     DiscoveryReceiver.intentFilter());
 
             mAdapter.startDiscovery();
+        }
+    }
+
+    /**
+     * Opens Android's Bluetooth Settings activity.
+     */
+    @ReactMethod
+    @SuppressWarnings("unused")
+    public void openBluetoothSettings(){
+        Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
+        if (intent.resolveActivity(getReactApplicationContext().getPackageManager()) != null) {
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getReactApplicationContext().startActivity(intent);
         }
     }
 
