@@ -107,6 +107,16 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
   async read(): Promise<String> {
     return this._bluetoothModule.readFromDevice(this.address);
   }
+  
+  /**
+   * Clear the current device buffer - this will generally only be required when using
+   * manual reads (as `onRead` should continually keep the buffer clean).
+   *
+   * @return Promise resolving whether the clear was successful
+   */
+  async clear(): Promise<number> {
+    return this._bluetoothModule.clearFromDevice(this.address);
+  }
 
   /**
    * Writes the provided data to the device.  This accepts String or Buffer data, if String
