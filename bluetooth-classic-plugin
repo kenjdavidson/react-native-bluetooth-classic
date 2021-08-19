@@ -1,0 +1,23 @@
+/*
+Title: Expo Bluetooth Classic Config Plugin
+Description: Expo Config Plugin for using react-native-bluetooth-classic with Expo Dev Clients.
+Usage: If using Expo Dev Clients, add "./bluetooth-classic-plugin" to your project's app.json.
+*/
+
+const withBLC = (config) => {
+    // Ensure the objects exist
+    if (!config.ios) {
+        config.ios = {};
+    }
+    if (!config.ios.infoPlist) {
+        config.ios.infoPlist = {};
+    }
+    // Creates necessary permissions and usage descriptions
+    config.ios.infoPlist.UISupportedExternalAccessoryProtocols = ['com.apple.m1'];
+    config.ios.infoPlist.NSBluetoothPeripheralUsageDescription = "Ex: This application needs to connect to Bluetooth peripherals.";
+    config.ios.infoPlist.NSBluetoothAlwaysUsageDescription = "Ex: This application needs to connect to your devices Bluetooth interface.";
+
+    return config;
+};
+
+module.exports = withBLC;
