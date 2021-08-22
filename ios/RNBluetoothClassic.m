@@ -94,8 +94,8 @@ RCT_EXTERN_METHOD(getConnectedDevice: (NSString *)deviceId
  * @param resolve
  * @param rejecter 
  */
-RCT_EXTERN_METHOD(getConnectedDevices: (RCTPromiseResolveBlock)resolve
-                  rejecter: (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getConnectedDevices: (RCTPromiseResolveBlock)resolver
+                  rejecter: (RCTPromiseRejectBlock)reject)  
 
 /**
  * Attempt to write data to the device
