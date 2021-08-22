@@ -54,6 +54,16 @@ export default class BluetoothModule {
   }
 
   /**
+   * Requests availability status of Bluetooth for the device.
+   *
+   * @return Promise resolved with whether Bluetooth is available for the current device.
+   */
+  isBluetoothAvailable(): Promise<boolean> {
+    if (Platform.OS == "ios") return Promise.resolve(true);
+    return this._nativeModule.isBluetoothAvailable();
+  }
+
+  /**
    * Requests enabled status from the BluetoothAdapter.
    *
    * @return Promise resolved with whether Bluetooth is enabled
@@ -478,6 +488,14 @@ export default class BluetoothModule {
       BluetoothEventType.DEVICE_DISCOVERED,
       listener
     );
+  }
+
+  /**
+   * Opens Android's Bluetooth Settings activity.
+   */
+  openBluetoothSettings(): void {
+    if (Platform.OS == "ios") throw new Error("Method not implemented.");
+    return this._nativeModule.openBluetoothSettings();
   }
 }
 

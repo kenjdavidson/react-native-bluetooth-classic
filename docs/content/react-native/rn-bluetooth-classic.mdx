@@ -15,6 +15,21 @@ import RNBluetoothClassic, {
 
 The following are available on both Android and IOS.
 
+### isBluetoothAvailable
+
+`isBluetoothAvailable(): Promise<boolean>`
+
+Requests whether the device supports Bluetooth. If Bluetooth is supported, returns true. Otherwise, returns false.
+
+```javascript
+try {
+  await available = RNBluetoothClassic.isBluetoothAvailable();
+  this.setState({ available });
+} catch (err) {
+  // Handle accordingly
+}
+```
+
 ### isBluetoothEnabled
 
 `isBluetoothEnabled(): Promise<boolean>`
@@ -221,6 +236,16 @@ onDeviceDisconnected(event: BluetoothDeviceEvent) {
 ## Android API
 
 The following are available only on Android.
+
+### openBluetoothSettings
+
+`openBluetoothSettings(): void`
+
+Opens Android's Bluetooth Settings activity.
+
+```javascript
+RNBluetoothClassic.openBluetoothSettings();
+```
 
 ### startDiscovery
 
