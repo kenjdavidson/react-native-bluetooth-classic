@@ -6,9 +6,12 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "clean": "rm -rf lib",
+    "clean-2": "rd /s /q lib",
     "tsc": "tsc",
+    "tsc-2": "npx tsc",
     "tsc:watch": "tsc --watch",
     "build": "npm run clean && npm run tsc",
+    "build-2": "npm run clean-2 && npm run tsc-2",
     "test": "jest",
     "preversion": "npm run build",
     "postversion": "git push && git push --tags && npm publish",

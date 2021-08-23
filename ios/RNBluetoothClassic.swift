@@ -377,7 +377,7 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
      */
     @objc
     func getConnectedDevices(
-        resolver resolve: RCTPromiseResolveBlock,
+        _ resolve: RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
         guard checkBluetoothAdapter() else {

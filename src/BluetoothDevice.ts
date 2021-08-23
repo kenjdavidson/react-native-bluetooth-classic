@@ -114,7 +114,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
    *
    * @return Promise resolving whether the clear was successful
    */
-  async clear(): Promise<number> {
+  async clear(): Promise<boolean> {
     return this._bluetoothModule.clearFromDevice(this.address);
   }
 
