@@ -29,6 +29,9 @@ module.exports = {
           'IOS': [
             'ios/index'
           ],
+          'Expo': [
+            'expo/index'
+          ],
           'Guides': [
             'guides/hex-encoding-decoding'
           ]

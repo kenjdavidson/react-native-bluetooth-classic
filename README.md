@@ -97,27 +97,7 @@ Windows isn't added yet - it looks like with the latest `react-native init` ther
 2. Open up your `MainPage.cs` app
   - Add `using Bluetooth.Classic.RNBluetoothClassic;` to the usings at the top of the file
   - Add `new RNBluetoothClassicPackage()` to the `List<IReactPackage>` returned by the `Packages` method
-
-### Expo Installation
-Install `react-native-bluetooth-classic` and `with-rn-bluetooth-classic` (for auto-configuration of permissions and protocols) from `npm` with `expo install`:
-```
-expo install react-native-bluetooth-classic with-rn-bluetooth-classic
-```
-Configure `app.json` or `app.config.json` with the following:
-```
-"plugins": [
-      ["with-bluetooth-classic",
-        {
-          "peripheralUsageDescription": "Allow myDevice to check bluetooth peripheral info",
-          "alwaysUsageDescription": "Allow myDevice to always use bluetooth info",
-          "protocols": [
-            "com.myCompany.p1",
-            "com.myCompany.p2"
-          ]
-        }
-      ]
-    ]
-```
+  
 ## Contribute
 
 Feel free to contribute any changes or bug fixes you see fit.  Although when doing so please try to take into account that:
