@@ -1135,11 +1135,10 @@ public class RNBluetoothClassicModule
 
         EventType event = EventType.valueOf(eventType);
 
-        if (EventType.DEVICE_READ == event) {
-            if (!mConnections.containsKey(eventDevice)) {
-                throw new IllegalStateException(String.format("Cannot read from %s, not currently connected", eventType));
-            }
-
+        if (EventType.DEVICE_READ == event && mConnections.containsKey(eventDevice)) {
+            // #139 Originally if there was no current connection (ie. the device had already been disconnected) this would
+            // throw an exception.  At this point we don't really care, but if the connection does exist we need to 
+            // remove it and clear it.
             DeviceConnection connection = mConnections.get(eventDevice);
             connection.clearOnDataReceived();
         }
