@@ -1,6 +1,6 @@
 {
   "name": "react-native-bluetooth-classic",
-  "version": "1.60.0-rc.17",
+  "version": "1.60.0-rc.18",
   "description": "Implement bluetooth classic (serial) on Android (Bluetooth Adapter) and IOS (External Accessory)",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -13,7 +13,7 @@
     "build": "npm run clean && npm run tsc",
     "build-win": "npm run clean-2 && npm run tsc-2",
     "test": "jest",
-    "preversion": "npm run build",    
+    "preversion": "npm run build",
     "release": "npm version prerelease --preid=rc",
     "postversion": "git push && git push --tags",
     "publish-npm": "npm publish"
