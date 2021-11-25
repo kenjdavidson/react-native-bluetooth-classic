@@ -20,6 +20,7 @@ import kjd.reactnative.bluetooth.conn.DeviceConnectionFactory;
 import kjd.reactnative.bluetooth.conn.RfcommAcceptorThreadImpl;
 import kjd.reactnative.bluetooth.conn.RfcommConnectorThreadImpl;
 import kjd.reactnative.bluetooth.conn.StandardOption;
+import kjd.reactnative.bluetooth.conn.ByteArrayDeviceConnectionImpl;
 
 /**
  *
@@ -35,6 +36,7 @@ public class RNBluetoothClassicPackage implements ReactPackage {
     public static final Builder DEFAULT_BUILDER
             = RNBluetoothClassicPackage.builder()
                 .withConnectionFactory(StandardOption.CONNECTION_TYPE.defaultValue(), DelimitedStringDeviceConnectionImpl::new)
+                .withConnectionFactory("binary", ByteArrayDeviceConnectionImpl::new)
                 .withConnectorFactory(StandardOption.CONNECTOR_TYPE.defaultValue(), RfcommConnectorThreadImpl::new)
                 .withAcceptorFactory(StandardOption.ACCEPTOR_TYPE.defaultValue(), RfcommAcceptorThreadImpl::new);
 
@@ -63,9 +65,10 @@ public class RNBluetoothClassicPackage implements ReactPackage {
      * the constructors will be made private.
      */
     public RNBluetoothClassicPackage() {
-        this.mConnectionFactories = Collections.singletonMap(
-                StandardOption.CONNECTION_TYPE.defaultValue(),
-                DelimitedStringDeviceConnectionImpl::new);
+        this.mConnectionFactories = new HashMap<>() {{
+            put(StandardOption.CONNECTION_TYPE.defaultValue(), DelimitedStringDeviceConnectionImpl::new);
+            put("binary", ByteArrayDeviceConnectionImpl::new);
+        }};
         this.mAcceptorFactories = Collections.singletonMap(
                 StandardOption.ACCEPTOR_TYPE.defaultValue(),
                 RfcommAcceptorThreadImpl::new);
