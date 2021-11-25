@@ -1,29 +1,28 @@
-# Publish To NPM
+# Release and Publish to NPM
+# Triggered manually (at this point) from a specified branch/tag will perform the `npm run release`
 name: publish-npm
 
-# Publish on push to [master]
+# Run on workflow dispatch
+# Currently no custom input
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner on which this job will run
+    # Runs on Ubuntu-latest
+    # with node version(s) 12.16.3
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: ['12.16.3']
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    # - Checkout project
-    # - Run `npm install` to get dependencies
-    # - TODO: Run npm tests prior to release
-    # - Run `npm release` which takes care of the rest
+    # Checks out the appropriate branch (github.ref) and runs the appropriate
+    # npm run release 
     steps:
-      - uses: actions/checkout@v1
+      - name: Checking out ${{ github.ref_name }}
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
@@ -31,6 +30,6 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Build and Release
-        run: npm release
+        run: npm run release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}          
