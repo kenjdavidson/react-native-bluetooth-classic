@@ -65,7 +65,7 @@ public class RNBluetoothClassicPackage implements ReactPackage {
      * the constructors will be made private.
      */
     public RNBluetoothClassicPackage() {
-        this.mConnectionFactories = new HashMap<>() {{
+        this.mConnectionFactories = new HashMap<String, DeviceConnectionFactory>() {{
             put(StandardOption.CONNECTION_TYPE.defaultValue(), DelimitedStringDeviceConnectionImpl::new);
             put("binary", ByteArrayDeviceConnectionImpl::new);
         }};
