@@ -13,9 +13,9 @@
     "build": "npm run clean && npm run tsc",
     "build-win": "npm run clean-2 && npm run tsc-2",
     "test": "jest",
-    "preversion": "npm run build",
-    "postversion": "git push && git push --tags",
+    "preversion": "npm run build",    
     "release": "npm version prerelease --preid=rc",
+    "postversion": "git push && git push --tags",
     "publish-npm": "npm publish"
   },
   "repository": "git://github.com/kenjdavidson/react-native-bluetooth-classic.git",
