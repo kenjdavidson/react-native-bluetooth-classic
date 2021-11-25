@@ -36,6 +36,8 @@ jobs:
         env:
           GIT_AUTHOR_NAME: 'kenjdavidson'
           GIT_AUTHOR_EMAIL: 'ken.j.davidson@live.ca' 
+          GIT_COMMITTER_NAME: 'kenjdavidson'
+          GIT_COMMITTER_EMAIL: 'ken.j.davidson@live.ca' 
       - name: Publish released tag to NPM
         run: npm run publish-npm
         env:
