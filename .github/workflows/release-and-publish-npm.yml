@@ -33,6 +33,9 @@ jobs:
         run: npm ci
       - name: Build and release tag
         run: npm run release
+        env:
+          GIT_AUTHOR_NAME: 'kenjdavidson'
+          GIT_AUTHOR_EMAIL: 'ken.j.davidson@live.ca' 
       - name: Publish released tag to NPM
         run: npm run publish-npm
         env:
