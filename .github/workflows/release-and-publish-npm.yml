@@ -29,6 +29,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+          registry-url: 'https://registry.npmjs.org'
       - name: Install dependencies
         run: npm ci
       - name: Build and release tag
@@ -39,6 +40,8 @@ jobs:
           GIT_COMMITTER_NAME: 'kenjdavidson'
           GIT_COMMITTER_EMAIL: 'ken.j.davidson@live.ca' 
       - name: Publish released tag to NPM
-        run: npm run publish-npm
+        run: |
+          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}          
