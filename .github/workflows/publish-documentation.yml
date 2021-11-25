@@ -1,12 +1,14 @@
-# Publish Gatsby
-name: push-docs-publish
+# Publish library documentation to gh-pages
+# Previously this was a push(master) since it's been updated to be push(tag/1.*) and dispatch_workflow(manual)
+name: publish-documentation
 
 # Controls when the action will run. Triggers the workflow on push or pull request 
 # events but only for the master branch
 on:
   push:
-    branches:
-      - master
+    tags:
+      - '1.*'
+  workflow_dispatch:  
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -22,8 +24,11 @@ jobs:
     # - Checkout gatsby branch
     # - Update authentication for Github Package Registry @kenjdavidson/base16-scss
     # - Build gh-pages using action
-    steps:
-      - uses: actions/checkout@v1
+    steps:      
+      - name: Building documentation for ${{ github.ref_name }}
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:

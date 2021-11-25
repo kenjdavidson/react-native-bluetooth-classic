@@ -1,0 +1,39 @@
+# Release and Publish to NPM
+# Triggered manually (at this point) from a specified branch/tag will perform the `npm run release`
+name: publish-npm
+
+# Run on workflow dispatch
+# Currently no custom input
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    # Runs on Ubuntu-latest
+    # with node version(s) 12.16.3
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['12.16.3']
+
+    # Checks out the appropriate branch (github.ref)
+    # Creates release tag
+    # Publishes release tag (ish, actually the current ref but on which the tag was based)
+    # Todo: fixup
+    steps:
+      - name: Checking out ${{ github.ref_name }}
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm install
+      - name: Build and release tag
+        run: npm run release
+      - name: Publish released tag to NPM
+        run: npm run publish-npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}          
