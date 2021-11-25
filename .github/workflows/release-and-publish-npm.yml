@@ -1,6 +1,6 @@
 # Release and Publish to NPM
 # Triggered manually (at this point) from a specified branch/tag will perform the `npm run release`
-name: publish-npm
+name: release-and-publish-npm
 
 # Run on workflow dispatch
 # Currently no custom input
@@ -41,4 +41,4 @@ jobs:
       - name: Publish released tag to NPM
         run: npm run publish-npm
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}          
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}          
