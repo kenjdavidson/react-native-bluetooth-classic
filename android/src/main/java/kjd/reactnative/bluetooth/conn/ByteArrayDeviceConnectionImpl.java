@@ -83,7 +83,7 @@ public class ByteArrayDeviceConnectionImpl extends AbstractDeviceConnection {
      */
     @Override
     public String read() {
-        String message = Base64.encode(mBuffer.array(), Base64.DEFAULT).toString();
+        String message = Base64.encodeToString(mBuffer.array(), Base64.DEFAULT);
         clear();
 
         return message;
