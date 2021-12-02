@@ -34,7 +34,7 @@ let connectedDevice = device.connect({
 
 All parameters provided for `AbstractDeviceConnectionImpl` +
 
-`DELIMITER` - the delimiter by which data will be split into messages.  Defaults to `\n`.
+`DELIMITER` - the delimiter by which data will be split into messages.  Defaults to `\n`.  Passing in an empty delimiter will cause the full buffer to be sent on `read()` or `onDataReceived` - this is an opt in that was requested and added.s
 
 ```
 let connectedDevice = device.connect({

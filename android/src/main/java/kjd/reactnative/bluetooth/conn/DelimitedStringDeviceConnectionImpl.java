@@ -100,7 +100,7 @@ public class DelimitedStringDeviceConnectionImpl extends AbstractDeviceConnectio
             int count = 0;
             
             if (mDelimiter == null || mDelimiter.isEmpty()) {
-                counter = mBuffer.length();
+                count = mBuffer.length();
             } else {                
                 int lastIndex = -1;
                 while ((lastIndex = mBuffer.indexOf(mDelimiter, lastIndex+1)) > -1) {
@@ -121,7 +121,7 @@ public class DelimitedStringDeviceConnectionImpl extends AbstractDeviceConnectio
 
     /**
      * Reads the next message in from the buffer, based on the configured delimiter (dropping the
-     * delimter) and then removing the data from the Buffer.  This only returns the first available
+     * delimiter) and then removing the data from the Buffer.  This only returns the first available
      * message and should be called in conjunction with {@link #available()}.
      * 
      * This method is `synchronized` on the `buffer`.
