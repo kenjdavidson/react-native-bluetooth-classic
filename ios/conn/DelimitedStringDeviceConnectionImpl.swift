@@ -17,6 +17,9 @@ import ExternalAccessory
  * Note that charset in IOS is a UInt32, unlike Java, which will need to somehow be managed on the Javascript side
  * to make life easier.
  *
+ * If no delimiter is provided (blank or nil) then the full buffer is returned from all data requests (read, available,
+ * onDataReceived)
+ *
  * @author kendavidson
  */
 class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDelegate {
@@ -120,13 +123,20 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
     /**
      * Returns the number of mesages available.  As this is a delmited string connection, the number of messages
      * are the number of delimiters found.
+     *
+     * If no delimieter is provided then this returns the full size of the content
      */
     func available() -> Int {
         var count = 0;
-        
         let content = String(data: inBuffer, encoding: self.encoding)!
-        while (content.index(of: delimiter) != nil) {
-            count += 1
+        
+        // I really hate swift, apparently String.isEmpty is ambiguious??
+        if (delimiter.count == 0) {
+            count = content.count
+        } else {
+            while (content.index(of: delimiter) != nil) {
+                count += 1
+            }
         }
         
         return count;
@@ -166,10 +176,15 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
         let content = String(data: inBuffer, encoding: self.encoding)!
         var message:String?
 
-        if let index = content.index(of: self.delimiter) {
-            message = String(content[..<index])
-            inBuffer = String(content[content.index(after: index)...])
-                .data(using: self.encoding) ?? Data()
+        if (delimiter.count == 0) {
+            message = content
+            inBuffer.removeAll()
+        } else {
+            if let index = content.index(of: self.delimiter) {
+                message = String(content[..<index])
+                inBuffer = String(content[content.index(after: index)...])
+                    .data(using: self.encoding) ?? Data()
+            }
         }
         
         return message
