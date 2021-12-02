@@ -78,7 +78,7 @@ public class DelimitedStringDeviceConnectionImpl extends AbstractDeviceConnectio
                     "BluetoothEvent.READ listener is registered, providing data");
 
                 String message;
-                while ((message = read()) != null) {
+                while (!mBuffer.isEmpty() && (message = read()) != null) {
                     mOnDataReceived.accept(getDevice(), message);
                 }
             } else {
