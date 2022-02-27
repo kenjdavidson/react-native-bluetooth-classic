@@ -73,7 +73,7 @@ async connect() {
 `READ_TIMEOUT` - adds an extra timeout to the read cycle; defaults to `0`. This is a hold over from the original implementation with a value of `300`, it was removed as the read method is already blocking and had a large number of requests/forks.
 
 ```javascript
-let connected = await connect({
+const connected = await connect({
   CONNECTOR_TYPE: "rfcomm",
   DELIMITER: "\n",
   DEVICE_CHARSET: Platform.OS === "ios" ? 1536 : "utf-8",
@@ -89,7 +89,7 @@ Attempts to disconnect from the device.
 ```javascript
 async disconnect() {
   try {
-    let disconnected = await this.props.device.disconnect();
+    const disconnected = await this.props.device.disconnect();
     this.setState({connection: !disconnected});
   } catch(error) {
     // Handle error accordingly
@@ -105,7 +105,7 @@ Requests how much data is available for read. Resolves with a number based on th
 
 ```javascript
 try {
-  let messages = await this.props.device.available();
+  const messages = await this.props.device.available();
   if (messages.length > 0) {
     performRead();
   }
@@ -128,7 +128,7 @@ Reads from the device buffer and returns a `BluetoothMessage` containing informa
 
 ```javascript
 try {
-  let message = await this.props.device.read();
+  const message = await this.props.device.read();
   this.setState({ data: message.data });
 } catch (error) {
   // Handle error accordingly
