@@ -23,7 +23,7 @@ Requests whether the device supports Bluetooth. If Bluetooth is supported, retur
 
 ```javascript
 try {
-  await available = RNBluetoothClassic.isBluetoothAvailable();
+  const available = await RNBluetoothClassic.isBluetoothAvailable();
   this.setState({ available });
 } catch (err) {
   // Handle accordingly
@@ -38,7 +38,7 @@ Requests whether the device Bluetooth adapter is enabled `true` or disabled `fal
 
 ```javascript
 try {
-    await enabled = RNBluetoothClassic.isBluetoothEnabled();
+    const enabled = await RNBluetoothClassic.isBluetoothEnabled();
     this.setState({enabled});
 } catch (err) {
     // Handle accordingly
@@ -53,7 +53,7 @@ Requests an array of the bonded/paired `BluetoothDevice`(s).
 
 ```javascript
 try {
-    await paired = RNBluetoothClassic.getBondedDevices();
+    const paired = await RNBluetoothClassic.getBondedDevices();
     this.setState({paired});
 } catch (err) {
     // Error if Bluetooth is not enabled
@@ -69,7 +69,7 @@ Requests an array of the connected `BluetoothDevice`(s); in this context conncte
 
 ```javascript
 try {
-    await connected = RNBluetoothClassic.getConnectedDevices();
+    const connected = await RNBluetoothClassic.getConnectedDevices();
     this.setState({connected});
 } catch (err) {
     // Error if Bluetooth is not enabled
@@ -85,8 +85,8 @@ Requests whether a device `BluetoothDevice` is currently connected; in this cont
 
 ```javascript
 try {
-    let address = this.props.device.address;
-    await device = RNBluetoothClassic.getConnectedDevice(address);
+    const address = this.props.device.address;
+    const device = await RNBluetoothClassic.getConnectedDevice(address);
     this.setState({device});
 } catch (err) {
     // Error if Bluetooth is not enabled
@@ -201,7 +201,7 @@ componetWillUnmount() {
 }
 
 onDeviceDisconnected(event: BluetoothDeviceEvent) {
-    let device = this.state.device; // Or loop through paired devices
+    const device = this.state.device; // Or loop through paired devices
     device.connected = false;
     this.setState({ device });
 }
@@ -272,7 +272,7 @@ async requestAccessFineLocationPermission() {
 
 startDiscovery = async () => {
   try {
-    let granted = await requestAccessFineLocationPermission();
+    const granted = await requestAccessFineLocationPermission();
 
     if (!granted) {
     throw new Error(`Access fine location was not granted`);
@@ -281,7 +281,7 @@ startDiscovery = async () => {
     this.setState({ discovering: true });
 
     try {
-    let unpaired = await RNBluetoothClassic.startDiscovery();
+    const unpaired = await RNBluetoothClassic.startDiscovery();
             
     Toast.show({
         text: `Found ${unpaired.length} unpaired devices.`,
@@ -319,7 +319,7 @@ Cancels the discovery process.  This will automatically resolve the `startDiscov
 ```javascript
 cancelDiscovery = async () => {
   try {
-    let cancelled = await RNBluetoothClassic.cancelDiscovery();
+    const cancelled = await RNBluetoothClassic.cancelDiscovery();
   } catch(error) {
     Toast.show({
       text: `Error occurred while attempting to cancel discover devices`,
@@ -367,7 +367,7 @@ acceptConnections = async () => {
     this.setState({ accepting: true });
       
     try {      
-      let device = await RNBluetoothClassic.accept({});
+      const device = await RNBluetoothClassic.accept({});
       this.setState({device});
     } catch (error) {
       // Handle error accordingly
