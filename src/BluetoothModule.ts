@@ -402,20 +402,6 @@ export default class BluetoothModule {
   }
 
   /**
-   * Creates an EventSubscription which wraps the DEVICE_CONNECTED event type.
-   *
-   * @param listener
-   */
-  onDeviceConnected(
-    listener: BluetoothEventListener<BluetoothDeviceEvent>
-  ): BluetoothEventSubscription {
-    return this.createBluetoothEventSubscription(
-      BluetoothEventType.DEVICE_CONNECTED,
-      listener
-    );
-  }
-
-  /**
    * Creates an EventSubscription which wraps the DEVICE_DISCONNECTED event type.  Device disconnected events
    * can be thrown for the following:
    * - During a read the DeviceConnection receives an un-cancelled exception (generally a closure)

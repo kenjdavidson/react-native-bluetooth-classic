@@ -161,28 +161,6 @@ onStateChange(event: StateChangeEvent) {
 }
 ```
 
-### onDeviceConnected
-
-`onDeviceConnected(
-  listener: BluetoothEventListener<BluetoothDeviceEvent>
-): BluetoothEventSubscription`
-
-When a device opens a new `Socket` connection.  This was a hold over from the original library and I'm not entirely sure whether it will be used with the advent of `BluetoothDevice#connect()`, but it's here.
-
-```javascript
-componentDidMount() {
-    this.subscription = RNBluetoothClassic.onDeviceConnected(this.onDeviceConnected);
-}
-
-componetWillUnmount() {    
-    this.subscription.remove(); // don't forget!
-}
-
-onDeviceConnected(event: BluetoothDeviceEvent) {
-    this.setState({ device: event.device });
-}
-```
-
 ### onDeviceDisconnected
 
 `onDeviceDisconnected(
