@@ -65,7 +65,7 @@ try {
 
 `getConnectedDevices(): Promise<BluetoothDevice[]>`
 
-Requests an array of the connected `BluetoothDevice`(s); in this context conncted means an active `Socket`.
+Requests an array of the connected `BluetoothDevice`(s); in this context connected means an active `Socket`.
 
 ```javascript
 try {
@@ -81,7 +81,7 @@ try {
 
 `getConnectedDevice(address: string): Promise<BluetoothDevice>`
 
-Requests whether a device `BluetoothDevice` is currently connected; in this context conncted means an active `Socket`.
+Requests whether a device `BluetoothDevice` is currently connected; in this context connected means an active `Socket`.
 
 ```javascript
 try {
@@ -167,7 +167,7 @@ onStateChange(event: StateChangeEvent) {
   listener: BluetoothEventListener<BluetoothDeviceEvent>
 ): BluetoothEventSubscription`
 
-Provides a listener for events fired when `Socket` connections are: closed, dropped, failed, etc.  This was a hold over from the original library, it's a little more useful as a global check on connetivity than just using the `BluetoothDevice#disconnect()` function.
+Provides a listener for events fired when `Socket` connections are: closed, dropped, failed, etc.  This was a hold over from the original library, it's a little more useful as a global check on connectivity than just using the `BluetoothDevice#disconnect()` function.
 
 ```javascript
 componentDidMount() {
@@ -390,7 +390,7 @@ Request that Android enable the `BluetoothAdapter`.  This will resolve `true` if
 
 `setBluetoothAdapterName(name: string): Promise<boolean>`
 
-Attempt to change the name of the `BluetoothAdatper`.
+Attempt to change the name of the `BluetoothAdapter`.
 
 This is another hold over from the original library.  I'm not sure if it's in use, but it's marked as deprecated for now without any plans to remove it.
 
