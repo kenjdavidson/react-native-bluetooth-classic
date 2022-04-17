@@ -590,7 +590,7 @@ public class RNBluetoothClassicModule
 
             try {
                 BluetoothDevice device = mAdapter.getRemoteDevice(address);
-                Method m = device.getClass().getMethod("createBond", (Class[]) null);
+                Method m = device.getClass().getMethod("removeBond", (Class[]) null);
                 m.invoke(device, (Object[]) null);
 
                 IntentFilter intentFilter = new IntentFilter();
