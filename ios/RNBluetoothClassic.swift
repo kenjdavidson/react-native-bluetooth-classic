@@ -40,7 +40,17 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
     var connectionFactories: Dictionary<String,DeviceConnectionFactory>
     
     private let eaManager: EAAccessoryManager
-    private let cbCentral: CBCentralManager
+
+    /**
+    *  By default, initialize CBCentralManager when bluetooth is not available prompts
+    *  "Turn On Bluetooth to Allow [app name] to Connect to Accessories" dialog.
+    *  See CBCentralManagerOptionShowPowerAlertKey for more details about this behavior
+    *
+    *  By using Lazy initialization on CBCentralManager it will prompt bluetooth permission
+    *  on first call of any bluetooth-related method.
+    */
+    private lazy var cbCentral: CBCentralManager = CBCentralManager()
+
     private let notificationCenter: NotificationCenter
     private let supportedProtocols: [String]
     
@@ -54,7 +64,6 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
      */
     override init() {
         self.eaManager = EAAccessoryManager.shared()
-        self.cbCentral = CBCentralManager()
         self.notificationCenter = NotificationCenter.default
         self.supportedProtocols = Bundle.main
             .object(forInfoDictionaryKey: "UISupportedExternalAccessoryProtocols") as! [String]
