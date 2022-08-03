@@ -569,7 +569,7 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
      }
      
     @objc
-    func removeListener(_ requestedEvent: String) throws {
+    func removeListener(_ requestedEvent: String) {
         var eventName = requestedEvent
         var eventDevice: String?
          
@@ -596,7 +596,7 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
     }
      
     @objc
-    func removeAllListeners(_ requestedEvent: String) throws {
+    func removeAllListeners(_ requestedEvent: String) {
         var eventName = requestedEvent
         var eventDevice: String?
         
