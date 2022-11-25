@@ -59,3 +59,31 @@ There are two current implementations available:
 ## Customization
 
 Customization of the native module is done through implementation of your own `RNBluetoothClassicPackage`.  For more information take a look at the [package documentation](/android/rn-bluetooth-classic-package) or some of the guides available.
+
+## Android Permissions
+
+Android permissions need to be requested within your application (much like Camera).  To do this check out the example application code, and look for the [PermissionsAndroid](https://reactnative.dev/docs/permissionsandroid) within `react-native`:
+
+```
+import { PermissionsAndroid } from 'react-native';
+
+/**
+ * See https://reactnative.dev/docs/permissionsandroid for more information
+ * on why this is required (dangerous permissions).
+ */
+const requestAccessFineLocationPermission = async () => {
+  const granted = await PermissionsAndroid.request(
+    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    {
+      title: 'Access fine location required for discovery',
+      message:
+        'In order to perform discovery, you must enable/allow ' +
+        'fine location access.',
+      buttonNeutral: 'Ask Me Later',
+      buttonNegative: 'Cancel',
+      buttonPositive: 'OK',
+    }
+  );
+  return granted === PermissionsAndroid.RESULTS.GRANTED;
+};
+```
