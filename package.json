@@ -64,7 +64,7 @@
     "jest-ts-auto-mock": "^1.0.11",
     "npm-version": "^1.1.0",
     "react": "^16.8.6",
-    "react-native": "^0.60.0",
+    "react-native": "^0.62.3",
     "ts-auto-mock": "^2.6.5",
     "ts-jest": "^26.4.3",
     "ttypescript": "^1.5.12",
