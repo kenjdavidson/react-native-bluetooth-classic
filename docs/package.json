@@ -6,7 +6,7 @@
   "keywords": [],
   "description": "",
   "dependencies": {
-    "gatsby": "^2.20.13",
+    "gatsby": "^5.5.0",
     "gatsby-plugin-typography": "^2.5.13",
     "gatsby-theme-apollo-docs": "^4.1.4",
     "puppeteer": "^2.1.1",
