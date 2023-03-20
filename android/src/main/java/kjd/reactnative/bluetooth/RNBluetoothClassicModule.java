@@ -669,6 +669,13 @@ public class RNBluetoothClassicModule
                             ct.start();
 
                             promise.resolve(nativeDevice.map());
+
+                            // Clear the connection acceptor, as the connection has been successfully established
+                            if (mAcceptor != null) {
+                                mAcceptor.cancel();
+                                mAcceptor = null;
+                            }
+
                         } catch (IOException e) {
                             promise.reject(new ConnectionFailedException(nativeDevice, e));
                         }
@@ -1137,7 +1144,7 @@ public class RNBluetoothClassicModule
 
         if (EventType.DEVICE_READ == event && mConnections.containsKey(eventDevice)) {
             // #139 Originally if there was no current connection (ie. the device had already been disconnected) this would
-            // throw an exception.  At this point we don't really care, but if the connection does exist we need to 
+            // throw an exception.  At this point we don't really care, but if the connection does exist we need to
             // remove it and clear it.
             DeviceConnection connection = mConnections.get(eventDevice);
             connection.clearOnDataReceived();
