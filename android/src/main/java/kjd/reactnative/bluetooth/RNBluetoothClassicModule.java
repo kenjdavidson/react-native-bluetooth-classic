@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nullable;
 
@@ -181,7 +182,7 @@ public class RNBluetoothClassicModule
      * of how many are configured.  Current accepting should be cancelled and restarted in order
      * to change the type.
      */
-    private ConnectionAcceptor mAcceptor;
+    private AtomicReference<ConnectionAcceptor> mAcceptor;
 
     //region: Constructors
 
@@ -670,14 +671,14 @@ public class RNBluetoothClassicModule
 
                             promise.resolve(nativeDevice.map());
 
-                            // Clear the connection acceptor, as the connection has been successfully established
-                            if (mAcceptor != null) {
-                                mAcceptor.cancel();
-                                mAcceptor = null;
-                            }
-
                         } catch (IOException e) {
                             promise.reject(new ConnectionFailedException(nativeDevice, e));
+                        } finally {
+                            // Clear the connection acceptor, as the connection has been successfully established
+                            if (mAcceptor != null) {
+                                mAcceptor.get().cancel();
+                                mAcceptor = null;
+                            }
                         }
                     }
 
@@ -687,8 +688,8 @@ public class RNBluetoothClassicModule
                     }
                 });
 
-                this.mAcceptor = acceptor;
-                this.mAcceptor.start();
+                this.mAcceptor = new AtomicReference<ConnectionAcceptor>(acceptor);
+                this.mAcceptor.get().start();
 
             } catch(IOException e) {
                 promise.reject(new AcceptFailedException(e.getMessage(), e));
@@ -719,7 +720,7 @@ public class RNBluetoothClassicModule
                     Exceptions.BLUETOOTH_NOT_ENABLED.message());
         } else {
             if (mAcceptor != null) {
-                mAcceptor.cancel();
+                mAcceptor.get().cancel();
             }
 
             mAcceptor = null;
