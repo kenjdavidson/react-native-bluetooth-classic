@@ -182,7 +182,7 @@ public class RNBluetoothClassicModule
      * of how many are configured.  Current accepting should be cancelled and restarted in order
      * to change the type.
      */
-    private AtomicReference<ConnectionAcceptor> mAcceptor;
+    private AtomicReference<ConnectionAcceptor> mAcceptor = new AtomicReference(null);
 
     //region: Constructors
 
@@ -636,7 +636,7 @@ public class RNBluetoothClassicModule
         if (!checkBluetoothAdapter()) {
             promise.reject(Exceptions.BLUETOOTH_NOT_ENABLED.name(),
                     Exceptions.BLUETOOTH_NOT_ENABLED.message());
-        } else if (mAcceptor != null) {
+        } else if (mAcceptor.get() != null) {
             promise.reject(Exceptions.BLUETOOTH_IN_ACCEPTING.name(),
                     Exceptions.BLUETOOTH_IN_ACCEPTING.message());
         } else {
@@ -675,9 +675,9 @@ public class RNBluetoothClassicModule
                             promise.reject(new ConnectionFailedException(nativeDevice, e));
                         } finally {
                             // Clear the connection acceptor, as the connection has been successfully established
-                            if (mAcceptor != null) {
+                            if (mAcceptor.get() != null) {
                                 mAcceptor.get().cancel();
-                                mAcceptor = null;
+                                mAcceptor.set(null);
                             }
                         }
                     }
@@ -688,7 +688,7 @@ public class RNBluetoothClassicModule
                     }
                 });
 
-                this.mAcceptor = new AtomicReference<ConnectionAcceptor>(acceptor);
+                this.mAcceptor.set(acceptor);
                 this.mAcceptor.get().start();
 
             } catch(IOException e) {
@@ -719,11 +719,10 @@ public class RNBluetoothClassicModule
             promise.reject(Exceptions.BLUETOOTH_NOT_ENABLED.name(),
                     Exceptions.BLUETOOTH_NOT_ENABLED.message());
         } else {
-            if (mAcceptor != null) {
+            if (mAcceptor.get() != null) {
                 mAcceptor.get().cancel();
+                mAcceptor.set(null);
             }
-
-            mAcceptor = null;
 
             promise.resolve(true);
         }
