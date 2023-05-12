@@ -582,7 +582,7 @@ public class RNBluetoothClassicModule
         if (!checkBluetoothAdapter()) {
             promise.reject(Exceptions.BLUETOOTH_NOT_ENABLED.name(),
                     Exceptions.BLUETOOTH_NOT_ENABLED.message());
-        } else if (Build.VERSION.SDK_INT >= 19) {
+        } else if (Build.VERSION.SDK_INT < 19) {
             promise.reject(Exceptions.BONDING_UNAVAILABLE_API.name(),
                     Exceptions.BONDING_UNAVAILABLE_API.message());
         } else {
