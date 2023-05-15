@@ -340,21 +340,21 @@ Will throw an error if:
 
 `pairDevice(address: string): Promise<BluetoothDevice>`
 
-Attempts to pair the specified device.
-
-**Note** I haven't actually used or spent any time testing this.  It was a hold over from the original library.  Feel free to update me with information on whether this is working.
+Attempts to pair the specified device. Requires Android API level 19 or higher.
 
 ###### Parameters
 
-`address: string` the address of the device to be paired.  This will be provided by the `BluetoothDevice.address` found from discovery.
+`address: string` the address of the device to be paired. This will be provided by the `BluetoothDevice.address` found from discovery.
 
 ### unpairDevice
 
 `unpairDevice(address: string): Promise<boolean>`
 
-Attempts to unpair the specified device.
+Attempts to unpair the specified device. Requires Android API level 19 or higher.
 
-**Note** I haven't actually used or spent any time testing this.  It was a hold over from the original library.  Feel free to update me with information on whether this is working.
+###### Parameters
+
+`address: string` the address of the device to be unpaired.
 
 ### accept 
 
