@@ -289,7 +289,7 @@ export default class BluetoothModule {
    *
    * @param properties used during the connection and connected process(es)
    */
-  async accept(properties: Map<string, object>): Promise<BluetoothDevice> {
+  async accept(properties: StandardOptions): Promise<BluetoothDevice> {
     if (Platform.OS == "ios") throw new Error("Method not implemented.");
     let paired: BluetoothNativeDevice = await this._nativeModule.accept(
       properties
