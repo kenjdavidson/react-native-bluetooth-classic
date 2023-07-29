@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nullable;
 
@@ -181,7 +182,7 @@ public class RNBluetoothClassicModule
      * of how many are configured.  Current accepting should be cancelled and restarted in order
      * to change the type.
      */
-    private ConnectionAcceptor mAcceptor;
+    private AtomicReference<ConnectionAcceptor> mAcceptor = new AtomicReference(null);
 
     //region: Constructors
 
@@ -581,7 +582,7 @@ public class RNBluetoothClassicModule
         if (!checkBluetoothAdapter()) {
             promise.reject(Exceptions.BLUETOOTH_NOT_ENABLED.name(),
                     Exceptions.BLUETOOTH_NOT_ENABLED.message());
-        } else if (Build.VERSION.SDK_INT >= 19) {
+        } else if (Build.VERSION.SDK_INT < 19) {
             promise.reject(Exceptions.BONDING_UNAVAILABLE_API.name(),
                     Exceptions.BONDING_UNAVAILABLE_API.message());
         } else {
@@ -635,7 +636,7 @@ public class RNBluetoothClassicModule
         if (!checkBluetoothAdapter()) {
             promise.reject(Exceptions.BLUETOOTH_NOT_ENABLED.name(),
                     Exceptions.BLUETOOTH_NOT_ENABLED.message());
-        } else if (mAcceptor != null) {
+        } else if (mAcceptor.get() != null) {
             promise.reject(Exceptions.BLUETOOTH_IN_ACCEPTING.name(),
                     Exceptions.BLUETOOTH_IN_ACCEPTING.message());
         } else {
@@ -669,8 +670,15 @@ public class RNBluetoothClassicModule
                             ct.start();
 
                             promise.resolve(nativeDevice.map());
+
                         } catch (IOException e) {
                             promise.reject(new ConnectionFailedException(nativeDevice, e));
+                        } finally {
+                            // Clear the connection acceptor, as the connection has been successfully established
+                            if (mAcceptor.get() != null) {
+                                mAcceptor.get().cancel();
+                                mAcceptor.set(null);
+                            }
                         }
                     }
 
@@ -680,8 +688,8 @@ public class RNBluetoothClassicModule
                     }
                 });
 
-                this.mAcceptor = acceptor;
-                this.mAcceptor.start();
+                this.mAcceptor.set(acceptor);
+                this.mAcceptor.get().start();
 
             } catch(IOException e) {
                 promise.reject(new AcceptFailedException(e.getMessage(), e));
@@ -711,11 +719,10 @@ public class RNBluetoothClassicModule
             promise.reject(Exceptions.BLUETOOTH_NOT_ENABLED.name(),
                     Exceptions.BLUETOOTH_NOT_ENABLED.message());
         } else {
-            if (mAcceptor != null) {
-                mAcceptor.cancel();
+            if (mAcceptor.get() != null) {
+                mAcceptor.get().cancel();
+                mAcceptor.set(null);
             }
-
-            mAcceptor = null;
 
             promise.resolve(true);
         }
@@ -1137,7 +1144,7 @@ public class RNBluetoothClassicModule
 
         if (EventType.DEVICE_READ == event && mConnections.containsKey(eventDevice)) {
             // #139 Originally if there was no current connection (ie. the device had already been disconnected) this would
-            // throw an exception.  At this point we don't really care, but if the connection does exist we need to 
+            // throw an exception.  At this point we don't really care, but if the connection does exist we need to
             // remove it and clear it.
             DeviceConnection connection = mConnections.get(eventDevice);
             connection.clearOnDataReceived();

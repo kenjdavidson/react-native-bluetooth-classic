@@ -278,7 +278,7 @@ export default class BluetoothModule {
    */
   unpairDevice(address: string): Promise<boolean> {
     if (Platform.OS == "ios") throw new Error("Method not implemented.");
-    return this._nativeModule.cancelDiscovery();
+    return this._nativeModule.unpairDevice(address);
   }
 
   /**
