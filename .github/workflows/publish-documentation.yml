@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ['12.16.3']
+        node-version: ['16']
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     # - Checkout gatsby branch
@@ -26,7 +26,7 @@ jobs:
     # - Build gh-pages using action
     steps:      
       - name: Building documentation for ${{ github.ref_name }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.ref }}
       - name: Use Node.js ${{ matrix.node-version }}
@@ -35,7 +35,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Authenticate with GitHub package registry
         run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.ACCESS_TOKEN }}" > ~/.npmrc
-      - uses: kenjdavidson/gatsby-gh-pages-action@v2.2.1
+      - uses: enriikke/gatsby-gh-pages-action@v2
         with:
           access-token: ${{ secrets.ACCESS_TOKEN }}
           deploy-branch: gh-pages
