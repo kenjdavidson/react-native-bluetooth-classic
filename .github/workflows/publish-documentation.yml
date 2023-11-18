@@ -18,14 +18,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ['16']
+        node-version: ['18']
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     # - Checkout gatsby branch
     # - Update authentication for Github Package Registry @kenjdavidson/base16-scss
     # - Build gh-pages using action
     steps:      
-      - name: Building documentation for ${{ github.ref_name }}
+      - name: Checking out project ${{ github.ref_name }}
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}

@@ -1,7 +1,6 @@
 ---
 title: API Overview
-description: ""
-summary: Overview and links to the React Native API
+description: Provide a breif overview of the available APIs and to which OS they are available.
 ---
 
 import { IoLogoAndroid } from 'react-icons/io';
@@ -46,7 +45,8 @@ Provides access to the following:
 | [setBluetoothAdapterName](/react-native/rn-bluetooth-classic/#setbluetoothadaptername) | Attempt to rename the `BluetoothAdapter`                         | <IoLogoAndroid/>                |
 | [openBluetoothSettings](/react-native/rn-bluetooth-classic/#openbluetoothsettings)     | Opens Android's Bluetooth Settings programmatically              | <IoLogoAndroid/>                |
 
-> The term **connection** refers to an active `socket`; not just being paired/bonded.  Please be aware of this prior to opening any issues.
+> IMPORTANT: The term **connection** refers to an active `socket`!  Most of the questions received are related to the fact that the terms **connected**
+> and **connection** are being used when **bonded** is meant.
 
 ## Bluetooth Device
 
