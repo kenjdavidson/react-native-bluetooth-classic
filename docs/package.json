@@ -1,24 +1,32 @@
 {
   "name": "react-native-bluetooth-classic-docs",
+  "private": true,
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "React Native Bluetooth Classic docsite",
+  "author": "Ken Davidson <kenjdavidson@live.ca> (@kenjdavidson)",
   "license": "MIT",
-  "keywords": [],
-  "description": "",
+  "starter-name": "gatsby-starter-rocketdocs",
   "dependencies": {
-    "gatsby": "^2.20.13",
-    "gatsby-plugin-typography": "^2.5.13",
-    "gatsby-theme-apollo-docs": "^4.1.4",
-    "puppeteer": "^2.1.1",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-icons": "^3.11.0",
-    "react-typography": "^0.16.19",
-    "typography": "^0.16.19",
-    "typography-theme-kirkham": "^0.16.19"
+    "@rocketseat/gatsby-theme-docs": "^4.0.0",
+    "gatsby": "^5.9.0",
+    "gatsby-plugin-canonical-urls": "^5.9.0",
+    "gatsby-plugin-google-analytics": "^5.9.0",
+    "gatsby-plugin-manifest": "^5.9.0",
+    "gatsby-plugin-offline": "^6.9.0",
+    "gatsby-plugin-sitemap": "^6.9.0",
+    "prop-types": "^15.8.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
+  "devDependencies": {},
+  "keywords": [
+    "gatsby",
+    "gatsby-starter"
+  ],
   "scripts": {
+    "build": "gatsby build",
     "start": "gatsby develop",
-    "build": "gatsby build"
+    "serve": "gatsby serve",
+    "clean": "gatsby clean"
   }
 }

@@ -1,32 +1,33 @@
----
-title: Getting Started
-description: ""
-summary: Introduction and installation of React Native Bluetooth Classic
----
-
-## Introduction
+# React Native Bluetooth Classic
 
 **React Native Bluetooth Classic** was developed to bridge the gaps in the available React Native Bluetooth moduless:
 
 - [https://github.com/rusel1989/react-native-bluetooth-serial](https://github.com/rusel1989/react-native-bluetooth-serial)
 - [https://github.com/nuttawutmalee/react-native-bluetooth-serial-next](https://github.com/nuttawutmalee/react-native-bluetooth-serial-next)
 
-are both fantastic implementations but they fall back to BLE on IOS.  
+are both fantastic implementations but they fall back to BLE on IOS. 
 
-### IOS 
+## Environments
 
-The hardware in which my company was working would only communicate over Bluetooth Classic and required communication through the [External Accessory](https://developer.apple.com/documentation/externalaccessory) framework.  Please note that while working with this library on IOS, you'll need to become accustomed with the Apple and their [MFi program](https://en.wikipedia.org/wiki/MFi_Program).  Here are some links to check out:
+The following environments are supported with React Native and this library:
+
+## IOS 
+
+Devices using bluetooth classic and MFi requires communication through the [External Accessory](https://developer.apple.com/documentation/externalaccessory) framework.  Please note that while working with this library on IOS, you'll need to become accustomed with the Apple and their [MFi program](https://en.wikipedia.org/wiki/MFi_Program).  
+
+Here are some links to check out:
 
 - [MFi_Program](https://en.wikipedia.org/wiki/MFi_Program)
 - [EA Demo Introduction](https://developer.apple.com/library/archive/samplecode/EADemo/Introduction/Intro.html)
+- [Streams](https://developer.apple.com/documentation/foundation/stream)
 
-### Android 
+## Android 
 
-The Android functionality is pretty common and well documented, there are a number of examples which can be reviewed:
+Android uses the standard BluetoothAdapter for communication:
 
 - [Android Bluetooth](https://developer.android.com/guide/topics/connectivity/bluetooth)
 
-## Working Versions
+## Versions
 
 The project doesn't follow [semantic versioning](https://semver.org/).  It started with just some random versioning in order for me to determine the actual best way to do this.  The final product moving forward is going to be:
 
@@ -42,15 +43,19 @@ so for example:
 
 ### Versions
 
-| Version | React Native | Android | IOS | Branch |
-| --- | --- | --- | --- | --- | --- |
-| 0.9.x | 0.59.9 | 4.1 (16) | IOS 9 | releases/0.9.x |
-| 0.10.x | 0.60.0 | 4.1 (16) | IOS 9 | releases/0.10.x |
-| 1.60.x | 0.60.0 | 8.0 (24) | IOS 9 | master |
+The following tables contains the best version availability based on OS type and version:
 
-#### Caveat
+| Version | React Native | Android  | IOS   | Dev Branch      |
+| ------- | ------------ | -------- | ----- | --------------- |
+| 0.9.x   | 0.59.9       | 4.1 (16) | IOS 9 | releases/0.9.x  |
+| 0.10.x  | 0.60.0       | 4.1 (16) | IOS 9 | releases/0.10.x |
+| 1.60.x  | 0.60.0       | 8 (24)   | IOS 9 | releases/1.60.x |
+| 1.70.x  | 0.70.0       | 11 ()    | IOS 9 | main            |
 
-It may be possible to use the library in lower versions that those noted, if you confirm it working, please submit a pull request with updated version details.
+> With how crazy mobile development is, it may or may not be possible to use the library in lower or
+> higher versions that those noted.  I will always accept reasonable pull requests that bridge the gap 
+> between usable and required versions.   This library can also be modified directly in your project and 
+> stored within your own project repository if needed.
 
 ## Changes
 
@@ -85,6 +90,6 @@ Feel free to submit any [issues](https://github.com/kenjdavidson/react-native-bl
 
 ### Pull Requests
 
-Feel free to submit any pull requests.  Try to document which issue (if any) it resolves, or provide some details on what you're adding.  I regularly try to look at the forks to see what changes there are and if there is value in adding them to the project. 
+I'm always interested in how people are using this library, and will always accept new pull requests if they are well documented and provide functionality that provides substance.   Since there are differenced between Android and IOS, the functionality doesn't need to be available in both (although it should be if possible); if this is the case, it should be fully documented and handled in the React Native module.
 
-**Please update it accordingly when submitting a pull request!!**
+Thanks, good luck!!!
