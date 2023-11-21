@@ -17,7 +17,7 @@ Once installed [autolinking](https://github.com/react-native-community/cli/blob/
 
 Remember to make sure you have your protocol strings provided within your application `plist` file - this is a requirement of the External Accessory framework.  This is the top cause of:
 
-> `Unhandled JS Exception: TypeError: Cannot read property 'xxx' of undefined` 
+> `Unhandled JS Exception: TypeError: Cannot read property 'xxx' of undefined`
 
 while attempting to use the library.  An example of what this looks like in your own `plist` file is:
 
@@ -42,6 +42,9 @@ There are also a number of other IOS security related items that are required:
 
 ```
 
+
+> In iOS17 a seemingly silent change has occurred where `utf` encoded strings with newline characters are encoded in an unexpected way. This means that the default delimiter of a new line character does not get picked up in the `read` function and so no message is returned. To fix this the default encoding has been changed to  `nonLossyASCII`. [Encoding Docs](https://developer.apple.com/documentation/swift/string/encoding/nonlossyascii).
+
 ## F.A.Q
 
 #### Why isn't my protocol working?
@@ -52,7 +55,7 @@ Remember these are MFi protocols, they are not communication protocols.  This is
 
 You either need to find the protocols listed on the companies website (Zebra for example has some posted) but in most cases these are kept super secret; like Fight Club secret!
 
-Getting devices MFi compliant costs companies a boat load of money, so they don't generally give these out for free.  You'll need to work with a vendor constantly (as you'll find there are some super annoying things to do for releasing). 
+Getting devices MFi compliant costs companies a boat load of money, so they don't generally give these out for free.  You'll need to work with a vendor constantly (as you'll find there are some super annoying things to do for releasing).
 
 #### I Can See my Device in Bluetooth Screen
 

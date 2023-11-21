@@ -5,15 +5,15 @@
 - [https://github.com/rusel1989/react-native-bluetooth-serial](https://github.com/rusel1989/react-native-bluetooth-serial)
 - [https://github.com/nuttawutmalee/react-native-bluetooth-serial-next](https://github.com/nuttawutmalee/react-native-bluetooth-serial-next)
 
-are both fantastic implementations but they fall back to BLE on IOS. 
+are both fantastic implementations but they fall back to BLE on IOS.
 
 ## Environments
 
 The following environments are supported with React Native and this library:
 
-## IOS 
+## IOS
 
-Devices using bluetooth classic and MFi requires communication through the [External Accessory](https://developer.apple.com/documentation/externalaccessory) framework.  Please note that while working with this library on IOS, you'll need to become accustomed with the Apple and their [MFi program](https://en.wikipedia.org/wiki/MFi_Program).  
+Devices using bluetooth classic and MFi requires communication through the [External Accessory](https://developer.apple.com/documentation/externalaccessory) framework.  Please note that while working with this library on IOS, you'll need to become accustomed with the Apple and their [MFi program](https://en.wikipedia.org/wiki/MFi_Program).
 
 Here are some links to check out:
 
@@ -21,7 +21,9 @@ Here are some links to check out:
 - [EA Demo Introduction](https://developer.apple.com/library/archive/samplecode/EADemo/Introduction/Intro.html)
 - [Streams](https://developer.apple.com/documentation/foundation/stream)
 
-## Android 
+> In iOS17 a seemingly silent change has occurred where `utf` encoded strings with newline characters are encoded in an unexpected way. This means that the default delimiter of a new line character does not get picked up in the `read` function and so no message is returned. To fix this the default encoding has been changed to  `nonLossyASCII`. [Encoding Docs](https://developer.apple.com/documentation/swift/string/encoding/nonlossyascii).
+
+## Android
 
 Android uses the standard BluetoothAdapter for communication:
 
@@ -53,8 +55,8 @@ The following tables contains the best version availability based on OS type and
 | 1.70.x  | 0.70.0       | 11 ()    | IOS 9 | main            |
 
 > With how crazy mobile development is, it may or may not be possible to use the library in lower or
-> higher versions that those noted.  I will always accept reasonable pull requests that bridge the gap 
-> between usable and required versions.   This library can also be modified directly in your project and 
+> higher versions that those noted.  I will always accept reasonable pull requests that bridge the gap
+> between usable and required versions.   This library can also be modified directly in your project and
 > stored within your own project repository if needed.
 
 ## Changes
@@ -69,7 +71,7 @@ Installation, like almost everything, is done through `npm`:
 $ npm install react-native-bluetooth-classic --save
 ```
 
-Once installed [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) will take over within your application.  
+Once installed [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) will take over within your application.
 
 > With the changes in v1.0.0 it's possible that Autolinking doesn't actually work (just be prepared for that).  The goal is to have it 100% working and customizable as per the React Native documentation, but until then just beware.
 
