@@ -1,7 +1,7 @@
 
 # react-native-bluetooth-classic
 
-React Native Bluetooth Classic is meand to bridge the gap found with regards to IOS Bluetooth Classic using the External Accessory framework. 
+React Native Bluetooth Classic is meant to bridge the gap found with regards to IOS Bluetooth Classic using the External Accessory framework. 
 
 Based off the [react-native-bluetooth-serial](https://github.com/rusel1989/react-native-bluetooth-serial) port, and updated to replace [CoreBluetooth](https://developer.apple.com/documentation/corebluetooth) (BLE) on IOS with [External Accessory](https://developer.apple.com/documentation/externalaccessory/eaaccessory).
 
