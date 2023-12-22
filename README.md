@@ -13,7 +13,9 @@ Since there seem to be some breaking changes introduced within React Native 0.60
 | --- | --- | --- | --- | --- |
 | 0.9.x | 0.41.0 - 0.59.9 | >= 4.1 (16) | >= IOS 9 | - Accept connection mode |
 | 0.10.x | >= 0.60.0 | >= 4.1 (16) | >= IOS 9 | - Accept connection mode |
-| 1.60.x | >= 0.60.0 | >= 8 (26) | >= IOS 9 | |
+| 1.60.x | >= 0.60.0 < 0.73.0 | >= 8 (26) | >= IOS 9 | |
+
+> It was recently determined that the library is none functioning with React Native 0.73, as there were some (at least) changes to the Android interfaces/classes in which the Native Module is inheriting.
 
 If this breaks in a newer version of React Native, Android or IOS please open an issue.  Not sure what the resulting versions will (or should be) since `1.0.x (0.60.0)`, `2.0.x (0.64.0)` for example seems weird.  Although maybe `1.60.0` and `1.64.0` is pretty apparent to which version needs to be used?
 
