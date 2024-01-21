@@ -16,6 +16,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.facebook.react.BuildConfig;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
@@ -253,7 +254,6 @@ public class RNBluetoothClassicModule
         return MODULE_NAME;
     }
 
-    @Override
     public boolean hasConstants() {
         return true;
     }
@@ -416,7 +416,7 @@ public class RNBluetoothClassicModule
      *
      * @param promise resolve based on Bluetooth status
      */
-    @ReactMetho
+    @ReactMethod
     @SuppressWarnings("unused")
     public void isBluetoothEnabled(Promise promise) {
         promise.resolve(checkBluetoothAdapter());
