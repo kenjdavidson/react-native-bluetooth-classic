@@ -1,6 +1,6 @@
 {
   "name": "react-native-bluetooth-classic",
-  "version": "1.60.0-rc.30",
+  "version": "1.70.0",
   "description": "Implement bluetooth classic (serial) on Android (Bluetooth Adapter) and IOS (External Accessory)",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -36,7 +36,8 @@
     "Andrew Krugliak (https://github.com/andreykrugliak)",
     "Anton Petrov (https://github.com/tpettrov)",
     "Stephen Woodruff (https://github.com/woodrufs)",
-    "Phil Pettican (https://github.com/philpettican)"
+    "Phil Pettican (https://github.com/philpettican)",
+    "Mark Ormandy <mark.ormandy@myracelab.com>(https://github.com/myracelab)"
   ],
   "license": "MIT",
   "bugs": {
@@ -44,7 +45,7 @@
   },
   "homepage": "https://github.com/kenjdavidson/react-native-bluetooth-classic",
   "peerDependencies": {
-    "react-native": ">=0.60.0"
+    "react-native": ">=0.73.1"
   },
   "dependencies": {
     "buffer": "^5.4.3"
@@ -64,7 +65,7 @@
     "jest-ts-auto-mock": "^1.0.11",
     "npm-version": "^1.1.0",
     "react": "^16.8.6",
-    "react-native": "^0.60.0",
+    "react-native": "^0.73.1",
     "ts-auto-mock": "^2.6.5",
     "ts-jest": "^26.4.3",
     "ttypescript": "^1.5.12",
