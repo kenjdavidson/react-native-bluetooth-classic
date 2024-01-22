@@ -14,6 +14,7 @@ Since there seem to be some breaking changes introduced within React Native 0.60
 | 0.9.x | 0.41.0 - 0.59.9 | >= 4.1 (16) | >= IOS 9 | - Accept connection mode |
 | 0.10.x | >= 0.60.0 | >= 4.1 (16) | >= IOS 9 | - Accept connection mode |
 | 1.60.x | >= 0.60.0 < 0.73.0 | >= 8 (26) | >= IOS 9 | |
+| 1.70.x | >= 0.73.0 < ?? | >= ? (??) | >= IOS 9 | |
 
 > It was recently determined that the library is none functioning with React Native 0.73, as there were some (at least) changes to the Android interfaces/classes in which the Native Module is inheriting.
 

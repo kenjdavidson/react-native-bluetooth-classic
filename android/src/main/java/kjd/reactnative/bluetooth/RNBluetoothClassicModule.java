@@ -16,6 +16,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.facebook.react.BuildConfig;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
@@ -61,26 +62,29 @@ import kjd.reactnative.bluetooth.receiver.PairingReceiver;
 import kjd.reactnative.bluetooth.receiver.StateChangeReceiver;
 
 /**
- * Provides bridge between native Android functionality and React Native javascript.  Provides
+ * Provides bridge between native Android functionality and React Native
+ * javascript. Provides
  * {@code @ReactMethod} methods to Javascript to allow controlling/monitoring:
  * <ul>
- *  <li>the Android Bluetooth configuration status</li>
- *  <li>connecting/disconnecting to specific devices</li>
- *  <li>sending and receiving manual data</li>
- *  <li>receiving pushed messages from a connected device</li>
+ * <li>the Android Bluetooth configuration status</li>
+ * <li>connecting/disconnecting to specific devices</li>
+ * <li>sending and receiving manual data</li>
+ * <li>receiving pushed messages from a connected device</li>
  * </ul>
  * For more details on React Native modules see:
  * <ul>
- *  <li>https://facebook.github.io/react-native/docs/native-modules-setup</li>
- *  <li>https://facebook.github.io/react-native/docs/native-modules-android</li>
+ * <li>https://facebook.github.io/react-native/docs/native-modules-setup</li>
+ * <li>https://facebook.github.io/react-native/docs/native-modules-android</li>
  * </ul>
- * The {@link RNBluetoothClassicModule} is configured with a number of different connection
- * types (this is done through {@link DeviceConnectionFactory}(s).  The standard factories are
+ * The {@link RNBluetoothClassicModule} is configured with a number of different
+ * connection
+ * types (this is done through {@link DeviceConnectionFactory}(s). The standard
+ * factories are
  * ACCEPT and CONNECT which use delimited data handlers.
  *
  * @author kendavidson
  */
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({ "WeakerAccess" })
 public class RNBluetoothClassicModule
         extends ReactContextBaseJavaModule
         implements ActivityEventListener,
@@ -91,7 +95,7 @@ public class RNBluetoothClassicModule
     /**
      * Name of the module when provided to React Native {@code NativeModules}.
      */
-    public  static final String MODULE_NAME = "RNBluetoothClassic";
+    public static final String MODULE_NAME = "RNBluetoothClassic";
 
     /**
      * Logging definition.
@@ -99,12 +103,13 @@ public class RNBluetoothClassicModule
     private static final String TAG = RNBluetoothClassicModule.class.getSimpleName();
 
     /**
-     * Local access to the default {@link BluetoothAdapter}.  Generally we just need to check things
+     * Local access to the default {@link BluetoothAdapter}. Generally we just need
+     * to check things
      * like:
      * <ul>
-     *     <li>Is bluetooth enabled?</li>
-     *     <li>Is bluetooth searching / advertising?</li>
-     *     <li>Etc.</li>
+     * <li>Is bluetooth enabled?</li>
+     * <li>Is bluetooth searching / advertising?</li>
+     * <li>Etc.</li>
      * </ul>
      */
     private final BluetoothAdapter mAdapter;
@@ -115,89 +120,109 @@ public class RNBluetoothClassicModule
     private final Map<String, ConnectionAcceptorFactory> mAcceptorFactories;
 
     /**
-     * Provides a map of all available {@link ConnectionConnectorFactory} available to the
-     * {@link #connectToDevice} method.   A {@link ConnectionConnector} is first started, then upon
-     * completion the {@link BluetoothSocket} is passed into the requested {@link DeviceConnection}.
+     * Provides a map of all available {@link ConnectionConnectorFactory} available
+     * to the
+     * {@link #connectToDevice} method. A {@link ConnectionConnector} is first
+     * started, then upon
+     * completion the {@link BluetoothSocket} is passed into the requested
+     * {@link DeviceConnection}.
      */
     private final Map<String, ConnectionConnectorFactory> mConnectorFactories;
 
     /**
-     * Provides a map of all the available {@link DeviceConnectionFactory} available to the
+     * Provides a map of all the available {@link DeviceConnectionFactory} available
+     * to the
      * {@link #connectToDevice} method.
      */
-    private final Map<String,DeviceConnectionFactory> mConnectionFactories;
+    private final Map<String, DeviceConnectionFactory> mConnectionFactories;
 
     /**
      * Manages {@link DeviceConnection} wrapping {@link BluetoothDevice} by
-     * {@link BluetoothDevice#getAddress()}.  Currently the initial capacity is 1, since the main
-     * goal of this was a simple connection.  This may need to be updated to have the default
+     * {@link BluetoothDevice#getAddress()}. Currently the initial capacity is 1,
+     * since the main
+     * goal of this was a simple connection. This may need to be updated to have the
+     * default
      * size updated during package creation.
      */
     private Map<String, DeviceConnection> mConnections;
 
     /**
-     * Maintains a map of {@link ConnectionConnector}(s) keyed on {@link BluetoothDevice} address.
-     * Connectors are added during the {@link #connectToDevice} request and removed when either
+     * Maintains a map of {@link ConnectionConnector}(s) keyed on
+     * {@link BluetoothDevice} address.
+     * Connectors are added during the {@link #connectToDevice} request and removed
+     * when either
      * successful or failed.
      */
     private Map<String, ConnectionConnector> mConnecting;
 
     /**
-     * Manages intents while the application and {@link BluetoothAdapter} are in discovery mode.
+     * Manages intents while the application and {@link BluetoothAdapter} are in
+     * discovery mode.
      * This will be cancelled when the application is paused or ends discovery.
      */
     private BroadcastReceiver mDiscoveryReceiver;
 
     /**
-     * Intent receiver responsible for handling changes to BluetoothAdapter state (on/off).  Fires
+     * Intent receiver responsible for handling changes to BluetoothAdapter state
+     * (on/off). Fires
      * an event to the ReactNative emitter based on the new state.
      * https://developer.android.com/reference/android/bluetooth/BluetoothAdapter#ACTION_STATE_CHANGED
      */
     private BroadcastReceiver mStateChangeReceiver;
 
     /**
-     * Intent receiver responsible for handling changes to Bluetooth connections.  This Intent is
-     * fired when the BluetoothAdapter connection state to any device changes.  It fires an event
-     * to the ReactNative emitter containing the state and deviceId which was connected.
+     * Intent receiver responsible for handling changes to Bluetooth connections.
+     * This Intent is
+     * fired when the BluetoothAdapter connection state to any device changes. It
+     * fires an event
+     * to the ReactNative emitter containing the state and deviceId which was
+     * connected.
      * https://developer.android.com/reference/android/bluetooth/BluetoothAdapter#ACTION_CONNECTION_STATE_CHANGED
      */
     private BroadcastReceiver mActionACLReceiver;
 
     /**
-     * Promise must be maintained across Activity requests for managing the enabled request
+     * Promise must be maintained across Activity requests for managing the enabled
+     * request
      * status.
      */
     private Promise mEnabledPromise;
 
     /**
-     * Manage the number of listeners of a specific type - these event types are that of
-     * the bluetooth mAdapter in general (connect, disconnect, etc.) and not those which are
-     * reading.  Those are managed separately within the device itself.
+     * Manage the number of listeners of a specific type - these event types are
+     * that of
+     * the bluetooth mAdapter in general (connect, disconnect, etc.) and not those
+     * which are
+     * reading. Those are managed separately within the device itself.
      */
     private Map<String, AtomicInteger> mListenerCounts;
 
     /**
-     * Maintains the {@link ConnectionAcceptor} when the module has been placed into accept
-     * mode.   Only one type of {@link ConnectionAcceptor} is allowed at one time, regardless
-     * of how many are configured.  Current accepting should be cancelled and restarted in order
+     * Maintains the {@link ConnectionAcceptor} when the module has been placed into
+     * accept
+     * mode. Only one type of {@link ConnectionAcceptor} is allowed at one time,
+     * regardless
+     * of how many are configured. Current accepting should be cancelled and
+     * restarted in order
      * to change the type.
      */
     private AtomicReference<ConnectionAcceptor> mAcceptor = new AtomicReference(null);
 
-    //region: Constructors
+    // region: Constructors
 
     /**
-     * Creates the RNBlutoothClassicModule.  As a final step of initialization the appropriate
+     * Creates the RNBlutoothClassicModule. As a final step of initialization the
+     * appropriate
      * {@link EventType#BLUETOOTH_ENABLED}/{@link EventType#BLUETOOTH_DISABLED} is
      * sent and the activity and lifecyle listeners are register.
      *
-     * @param context React application context
+     * @param context   React application context
      * @param factories {@link DeviceConnection} factories
      */
     public RNBluetoothClassicModule(ReactApplicationContext context,
-                                    Map<String,ConnectionAcceptorFactory> acceptFactories,
-                                    Map<String,ConnectionConnectorFactory> connectFactories,
-                                    Map<String,DeviceConnectionFactory> factories) {
+            Map<String, ConnectionAcceptorFactory> acceptFactories,
+            Map<String, ConnectionConnectorFactory> connectFactories,
+            Map<String, DeviceConnectionFactory> factories) {
         super(context);
 
         this.mAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -221,23 +246,24 @@ public class RNBluetoothClassicModule
         getReactApplicationContext().addActivityEventListener(this);
         getReactApplicationContext().addLifecycleEventListener(this);
     }
-    //endregion
+    // endregion
 
-    //region: ReactContextBaseJavaModule methods
+    // region: ReactContextBaseJavaModule methods
     @Override
     @NonNull
     public String getName() {
         return MODULE_NAME;
     }
 
-    @Override
     public boolean hasConstants() {
         return true;
     }
 
     /**
-     * Previously this returned the Bluetooth events and common character sets that were available
-     * on the Android system.  This wasn't testable, and I've decided to open it up to make things
+     * Previously this returned the Bluetooth events and common character sets that
+     * were available
+     * on the Android system. This wasn't testable, and I've decided to open it up
+     * to make things
      * more generic, and let users handle their own issues.
      *
      * @return constants provided by
@@ -248,23 +274,27 @@ public class RNBluetoothClassicModule
     public Map<String, Object> getConstants() {
         return Collections.emptyMap();
     }
-    //endregion
+    // endregion
 
-    //region: Helper/Utility Methods
+    // region: Helper/Utility Methods
     private boolean checkBluetoothAdapter() {
         return (mAdapter != null && mAdapter.isEnabled());
     }
-    //endregion
+    // endregion
 
-    //region: ActivityEventListener
+    // region: ActivityEventListener
     /**
-     * Handles results from the requested Android Intents.  Currently there are only two activities
+     * Handles results from the requested Android Intents. Currently there are only
+     * two activities
      * started for result:
      * <ul>
-     * <li><strong>ENABLE_BLUETOOTH</strong> requests the user to enable Bluetooth from settings.</li>
-     * <li><strong>PAIR_DEVICE</strong> after a user has completed pairing the device.</li>
+     * <li><strong>ENABLE_BLUETOOTH</strong> requests the user to enable Bluetooth
+     * from settings.</li>
+     * <li><strong>PAIR_DEVICE</strong> after a user has completed pairing the
+     * device.</li>
      * </ul>
-     * This sends a {@link EventType#BLUETOOTH_ENABLED} event.  It probably shouldn't duplicate
+     * This sends a {@link EventType#BLUETOOTH_ENABLED} event. It probably shouldn't
+     * duplicate
      * the promise but this gives the opportunity to do both things.
      *
      * @param activity    the activity which is returning the result
@@ -299,15 +329,14 @@ public class RNBluetoothClassicModule
         }
     }
 
-
     @Override
     public void onNewIntent(Intent intent) {
         if (BuildConfig.DEBUG)
             Log.d(TAG, "onNewIntent: " + intent.getAction());
     }
-    //endregion
+    // endregion
 
-    //region: LifecycleEventListener
+    // region: LifecycleEventListener
     @Override
     public void onHostResume() {
         if (BuildConfig.DEBUG)
@@ -331,18 +360,22 @@ public class RNBluetoothClassicModule
 
         mAdapter.cancelDiscovery();
     }
-    //endregion
+    // endregion
 
     /**
-     * Requests that the Android Bluetooth mAdapter be enabled.  If the mAdapter is already enabled
-     * then the promise is returned true.  If the mAdapter is not enabled, an Intent request is sent
+     * Requests that the Android Bluetooth mAdapter be enabled. If the mAdapter is
+     * already enabled
+     * then the promise is returned true. If the mAdapter is not enabled, an Intent
+     * request is sent
      * to Android (promised saved for use upon result).
      * <p>
-     * Note that this does not inherently fire a state change event, as the manual act seems to
+     * Note that this does not inherently fire a state change event, as the manual
+     * act seems to
      * skip the StateChangeReceiver functionality.
      *
-     * @param promise resolves <strong>true</strong> if Bluetooth is already enabled or when
-     *                Bluetooth becomes enabled.  Rejects if anything else
+     * @param promise resolves <strong>true</strong> if Bluetooth is already enabled
+     *                or when
+     *                Bluetooth becomes enabled. Rejects if anything else
      */
     @ReactMethod
     @SuppressWarnings("unused")
@@ -365,7 +398,8 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Determine whether Bluetooth is available.  The promise is never rejected, only resolved with the
+     * Determine whether Bluetooth is available. The promise is never rejected, only
+     * resolved with the
      * appropriate boolean flag.
      *
      * @param promise resolve based on Bluetooth being available on the device.
@@ -377,7 +411,8 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Determine whether Bluetooth is enabled.  The promise is never rejected, only resolved with the
+     * Determine whether Bluetooth is enabled. The promise is never rejected, only
+     * resolved with the
      * appropriate boolean flag.
      *
      * @param promise resolve based on Bluetooth status
@@ -389,8 +424,10 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Retrieves the currently bonded devices.  Bonded devices may or may not be connected.  This
-     * method was refactored from <strong>list</strong> as there was a bunch of confusion with bonded
+     * Retrieves the currently bonded devices. Bonded devices may or may not be
+     * connected. This
+     * method was refactored from <strong>list</strong> as there was a bunch of
+     * confusion with bonded
      * and connected devices.
      *
      * @param promise resolves the list of bonded devices.
@@ -413,9 +450,11 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Lists all the currently connected devices.  Provides a {@link WritableArray}
-     * of {@link BluetoothDevice}(s) which currently have an active/open connection.  Please note
-     * that this does NOT list PAIRED devices, only those that are actually connected!
+     * Lists all the currently connected devices. Provides a {@link WritableArray}
+     * of {@link BluetoothDevice}(s) which currently have an active/open connection.
+     * Please note
+     * that this does NOT list PAIRED devices, only those that are actually
+     * connected!
      *
      * @param promise resolves with the currently connected devices, may be empty.
      */
@@ -423,7 +462,7 @@ public class RNBluetoothClassicModule
     @SuppressWarnings("unused")
     public void getConnectedDevices(Promise promise) {
         WritableArray connected = Arguments.createArray();
-        for (DeviceConnection connection: mConnections.values()) {
+        for (DeviceConnection connection : mConnections.values()) {
             connected.pushMap(new NativeDevice(connection.getDevice()).map());
         }
 
@@ -486,7 +525,7 @@ public class RNBluetoothClassicModule
      */
     @ReactMethod
     @SuppressWarnings("unused")
-    public void openBluetoothSettings(){
+    public void openBluetoothSettings() {
         Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
         if (intent.resolveActivity(getReactApplicationContext().getPackageManager()) != null) {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -495,11 +534,14 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Attempts to cancel the discovery process.  Cancel request is always resolved as true at this
-     * point, which may need to be changed, but for now whether anything happens or not it's
+     * Attempts to cancel the discovery process. Cancel request is always resolved
+     * as true at this
+     * point, which may need to be changed, but for now whether anything happens or
+     * not it's
      * seen as successful.
      * <p>
-     * Note - the Discovery promise will be resolved with any devices that were found during the
+     * Note - the Discovery promise will be resolved with any devices that were
+     * found during the
      * discovery period, so effectively cancelling resolves two promises.
      *
      * @param promise resolves cancel request
@@ -516,12 +558,15 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Attempts to pair/bond with the device specified by address, {@link BluetoothDevice#createBond()}
+     * Attempts to pair/bond with the device specified by address,
+     * {@link BluetoothDevice#createBond()}
      * is only available after SDK v19.
      *
      * @param address the address of the BluetoothDevice to which we attempt pairing
-     * @param promise resolves when the BluetoothDevice is paired, rejects if the SDK version is
-     *                less than 19, Bluetooth is not enabled, or an Exception occurs.
+     * @param promise resolves when the BluetoothDevice is paired, rejects if the
+     *                SDK version is
+     *                less than 19, Bluetooth is not enabled, or an Exception
+     *                occurs.
      */
     @ReactMethod
     @SuppressWarnings("unused")
@@ -537,18 +582,18 @@ public class RNBluetoothClassicModule
                 Log.d(TAG, String.format("Attempting to pair with device %s", address));
 
             final PairingReceiver pr = new PairingReceiver(getReactApplicationContext(),
-                new PairingReceiver.PairingCallback() {
-                    @Override
-                    public void onPairingSuccess(NativeDevice device) {
-                        promise.resolve(device.map());
-                    }
+                    new PairingReceiver.PairingCallback() {
+                        @Override
+                        public void onPairingSuccess(NativeDevice device) {
+                            promise.resolve(device.map());
+                        }
 
-                    @Override
-                    public void onPairingFailure(Exception cause) {
-                        promise.reject(new DevicePairingException(null, cause));
-                    }
-                });
-                getReactApplicationContext().registerReceiver(pr, PairingReceiver.intentFilter());
+                        @Override
+                        public void onPairingFailure(Exception cause) {
+                            promise.reject(new DevicePairingException(null, cause));
+                        }
+                    });
+            getReactApplicationContext().registerReceiver(pr, PairingReceiver.intentFilter());
             try {
                 BluetoothDevice device = mAdapter.getRemoteDevice(address);
                 Method m = device.getClass().getMethod("createBond", (Class[]) null);
@@ -570,11 +615,13 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Request that a device be unpaired.  The device Id is required - looked up using the
+     * Request that a device be unpaired. The device Id is required - looked up
+     * using the
      * BluetoothAdapter and unpaired.
      *
      * @param address the address of the BluetoothDevice to which we attempt pairing
-     * @param promise resolves when the BluetoothDevice is paired, rejects if there are any issues
+     * @param promise resolves when the BluetoothDevice is paired, rejects if there
+     *                are any issues
      */
     @ReactMethod
     @SuppressWarnings("unused")
@@ -625,7 +672,8 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Puts the {@link BluetoothAdapter} into an accept mode using the provided accept type
+     * Puts the {@link BluetoothAdapter} into an accept mode using the provided
+     * accept type
      * configured on the module.
      *
      * @param promise resolve or reject the requested listening
@@ -674,7 +722,8 @@ public class RNBluetoothClassicModule
                         } catch (IOException e) {
                             promise.reject(new ConnectionFailedException(nativeDevice, e));
                         } finally {
-                            // Clear the connection acceptor, as the connection has been successfully established
+                            // Clear the connection acceptor, as the connection has been successfully
+                            // established
                             if (mAcceptor.get() != null) {
                                 mAcceptor.get().cancel();
                                 mAcceptor.set(null);
@@ -691,7 +740,7 @@ public class RNBluetoothClassicModule
                 this.mAcceptor.set(acceptor);
                 this.mAcceptor.get().start();
 
-            } catch(IOException e) {
+            } catch (IOException e) {
                 promise.reject(new AcceptFailedException(e.getMessage(), e));
             } catch (IllegalStateException e) {
                 promise.reject(e);
@@ -702,12 +751,16 @@ public class RNBluetoothClassicModule
     /**
      * Attempts to cancel the Accepting thread.
      * <p>
-     * If the {@link BluetoothAdapter} is unavailable then the promise will be rejected with a
+     * If the {@link BluetoothAdapter} is unavailable then the promise will be
+     * rejected with a
      * Bluetooth not enabled message.
      * <p>
-     * Otherwise the promise will be resolved {@code true}.  This was changed as previously an
-     * reject would also occur if the Device was not in accept mode.  This has been changed as it
-     * made more sense to just let React Native app set {@code accepting: false} (kind of like a
+     * Otherwise the promise will be resolved {@code true}. This was changed as
+     * previously an
+     * reject would also occur if the Device was not in accept mode. This has been
+     * changed as it
+     * made more sense to just let React Native app set {@code accepting: false}
+     * (kind of like a
      * status check without {@code isAccepting} being required.
      *
      * @param promise the {@link Promise} resolved/rejected based on cancel success
@@ -729,16 +782,18 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Attempts to connect to the device with the provided Id.  While the connection request is
-     * active the Cancellable request will be found in the connecting map; once completed the
+     * Attempts to connect to the device with the provided Id. While the connection
+     * request is
+     * active the Cancellable request will be found in the connecting map; once
+     * completed the
      * connection will be moved to the connections map.
      * <p>
-     * The default client connection type will be used.  If you've provided
+     * The default client connection type will be used. If you've provided
      * customized {@link DeviceConnection}(s) then it'll be used.
      *
-     * @param address the address to which we want to connect
+     * @param address    the address to which we want to connect
      * @param parameters the parameters controlling the type of connection to make
-     * @param promise resolve or reject the requested connection
+     * @param promise    resolve or reject the requested connection
      */
     @ReactMethod
     @SuppressWarnings("unused")
@@ -761,7 +816,8 @@ public class RNBluetoothClassicModule
                 // Issue/84 just in case the React Native side gets circumvented somehow
                 // this matches the IOS side of a new parameters being added to a NSDictionary
                 Properties properties = parameters == null
-                        ? new Properties() : Utilities.mapToProperties(parameters);
+                        ? new Properties()
+                        : Utilities.mapToProperties(parameters);
 
                 final String connectorType = StandardOption.CONNECTOR_TYPE.get(properties);
                 if (!mConnectorFactories.containsKey(connectorType)) {
@@ -842,8 +898,10 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Check to see whether the requested device has a currently established connection.  Note that
-     * this is NOT paired, the connection is specific to an RFCOMM socket being open.
+     * Check to see whether the requested device has a currently established
+     * connection. Note that
+     * this is NOT paired, the connection is specific to an RFCOMM socket being
+     * open.
      *
      * @param address the address of the device which is being queried
      * @param promise resolved with the connected status
@@ -881,11 +939,13 @@ public class RNBluetoothClassicModule
         }
     }
 
-
     /**
-     * Attempts to write to the device.  I'm not sure if there is a better way to do this, but all
-     * communication needs to come through the module.  It would be awesome if we could
-     * dynamically add a BluetoothConnectionModuleXXXX to the Application in order to allow
+     * Attempts to write to the device. I'm not sure if there is a better way to do
+     * this, but all
+     * communication needs to come through the module. It would be awesome if we
+     * could
+     * dynamically add a BluetoothConnectionModuleXXXX to the Application in order
+     * to allow
      * each device to be it's own module for communication.
      *
      * @param address address of the device to which we will write the data
@@ -902,7 +962,8 @@ public class RNBluetoothClassicModule
             promise.reject(Exceptions.NOT_CURRENTLY_CONNECTED.name(),
                     Exceptions.NOT_CURRENTLY_CONNECTED.message(address));
         } else {
-            // Decode the Base64 value provided by React Native module.  At this point it gets
+            // Decode the Base64 value provided by React Native module. At this point it
+            // gets
             // left in it's raw byte[] and it's up to the DeviceConnection to handle/write
             // accordingly
             byte[] data = Base64.decode(message, Base64.DEFAULT);
@@ -918,11 +979,14 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Attempts to read from the device.  The full buffer is read (then cleared) without using the
-     * mDelimiter.  Note - there will never be data within the buffer if the application is currently
+     * Attempts to read from the device. The full buffer is read (then cleared)
+     * without using the
+     * mDelimiter. Note - there will never be data within the buffer if the
+     * application is currently
      * registered to receive read events.
      * <p>
-     * Might be configurable to reject when there is no data, instead of resolve null.
+     * Might be configurable to reject when there is no data, instead of resolve
+     * null.
      *
      * @param address device address to which we wish to read
      * @param promise resolves with data, could be null or 0 length
@@ -964,8 +1028,10 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Gets the available information within the buffer.  There is no concept of the delimiter in
-     * this request - which may need to be changed - since in most cases I can see a full message
+     * Gets the available information within the buffer. There is no concept of the
+     * delimiter in
+     * this request - which may need to be changed - since in most cases I can see a
+     * full message
      * needing to be available.
      *
      * @param address device address for which the client wishes to read
@@ -990,8 +1056,10 @@ public class RNBluetoothClassicModule
      *
      * @param newName the name to which the mAdapter will be changed
      * @param promise resolves true
-     * @deprecated unsure if this is really required from the application.  Not a fan of having
-     * extra functionality in here that may never get called and isn't available on IOS
+     * @deprecated unsure if this is really required from the application. Not a fan
+     *             of having
+     *             extra functionality in here that may never get called and isn't
+     *             available on IOS
      */
     @Deprecated
     @ReactMethod
@@ -1007,11 +1075,12 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Registers the module wide {@link BroadcastReceiver}(s).  These include:
+     * Registers the module wide {@link BroadcastReceiver}(s). These include:
      * <ul>
-     *     <li>{@link BluetoothAdapter} state changes</li>
-     *     <li>{@link BluetoothDevice} ACL action changes - these include device connections and
-     *          disconnections</li>
+     * <li>{@link BluetoothAdapter} state changes</li>
+     * <li>{@link BluetoothDevice} ACL action changes - these include device
+     * connections and
+     * disconnections</li>
      * </ul>
      */
     private void registerBluetoothReceivers() {
@@ -1029,7 +1098,8 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Unregister receivers.  "Global" receivers need to always be removed, they are not configured
+     * Unregister receivers. "Global" receivers need to always be removed, they are
+     * not configured
      * to be removed on their own.
      */
     private void unregisterBluetoothReceivers() {
@@ -1050,34 +1120,39 @@ public class RNBluetoothClassicModule
         }
     }
 
-    private BiConsumer<BluetoothDevice,Exception> onDisconnect = (BluetoothDevice device, Exception e) -> {
-            Log.d(TAG, String.format("Disconnected from device %s due to %s", device.getName(), e.getMessage()));
+    private BiConsumer<BluetoothDevice, Exception> onDisconnect = (BluetoothDevice device, Exception e) -> {
+        Log.d(TAG, String.format("Disconnected from device %s due to %s", device.getName(), e.getMessage()));
 
-            // At this point just remove the connection, the DEVICE_DISCONNECTED should have been
-            // sent from the ACL message already.
-            mConnections.remove(device.getAddress());
-            sendEvent(EventType.DEVICE_DISCONNECTED, new NativeDevice(device), new BluetoothException(e.getMessage()).map());
-        };
+        // At this point just remove the connection, the DEVICE_DISCONNECTED should have
+        // been
+        // sent from the ACL message already.
+        mConnections.remove(device.getAddress());
+        sendEvent(EventType.DEVICE_DISCONNECTED, new NativeDevice(device),
+                new BluetoothException(e.getMessage()).map());
+    };
 
-    private BiConsumer<BluetoothDevice,String> onReceivedData = (BluetoothDevice device, String data) -> {
-            Log.d(TAG, String.format("Received translated data from the device: %s", data));
+    private BiConsumer<BluetoothDevice, String> onReceivedData = (BluetoothDevice device, String data) -> {
+        Log.d(TAG, String.format("Received translated data from the device: %s", data));
 
-            NativeDevice nativeDevice = new NativeDevice(device);
-            BluetoothMessage bluetoothMessage = new BluetoothMessage<>(nativeDevice.map(), data);
-            sendEvent(EventType.DEVICE_READ, nativeDevice, bluetoothMessage.asMap());
-        };
+        NativeDevice nativeDevice = new NativeDevice(device);
+        BluetoothMessage bluetoothMessage = new BluetoothMessage<>(nativeDevice.map(), data);
+        sendEvent(EventType.DEVICE_READ, nativeDevice, bluetoothMessage.asMap());
+    };
 
     /**
      * Adds a new listener for the {@link EventType} provided.
      * <p>
-     * Listeners can be provided with or without a device context.  A device context is applied
-     * by sending the event name followed by a device's address.  An example of this would be
+     * Listeners can be provided with or without a device context. A device context
+     * is applied
+     * by sending the event name followed by a device's address. An example of this
+     * would be
      * {@code READ@12:34:56:78:90}.
      *
-     * @param requestedEvent {@link EventType} name for which the client wishes to listen
+     * @param requestedEvent {@link EventType} name for which the client wishes to
+     *                       listen
      */
     @ReactMethod
-    @SuppressWarnings({"unused"})
+    @SuppressWarnings({ "unused" })
     public void addListener(String requestedEvent) {
         String eventType = requestedEvent,
                 eventDevice = null;
@@ -1096,7 +1171,8 @@ public class RNBluetoothClassicModule
 
         if (EventType.DEVICE_READ == event) {
             if (!mConnections.containsKey(eventDevice)) {
-                throw new IllegalStateException(String.format("Cannot read from %s, not currently connected", requestedEvent));
+                throw new IllegalStateException(
+                        String.format("Cannot read from %s, not currently connected", requestedEvent));
             }
 
             DeviceConnection connection = mConnections.get(eventDevice);
@@ -1117,15 +1193,18 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Removes the specified {@link EventType}.  If this is a {@link EventType#DEVICE_READ}
-     * the device address must be supplied (separated by an @) in the same way as when the
+     * Removes the specified {@link EventType}. If this is a
+     * {@link EventType#DEVICE_READ}
+     * the device address must be supplied (separated by an @) in the same way as
+     * when the
      * listener was applied.
      *
-     * @param requestedEvent name of the {@link EventType} for which the client wishes to remove
-     *                  listener.
+     * @param requestedEvent name of the {@link EventType} for which the client
+     *                       wishes to remove
+     *                       listener.
      */
     @ReactMethod
-    @SuppressWarnings({"unused"})
+    @SuppressWarnings({ "unused" })
     public void removeListener(String requestedEvent) {
         String eventType = requestedEvent,
                 eventDevice = null;
@@ -1143,14 +1222,17 @@ public class RNBluetoothClassicModule
         EventType event = EventType.valueOf(eventType);
 
         if (EventType.DEVICE_READ == event && mConnections.containsKey(eventDevice)) {
-            // #139 Originally if there was no current connection (ie. the device had already been disconnected) this would
-            // throw an exception.  At this point we don't really care, but if the connection does exist we need to
+            // #139 Originally if there was no current connection (ie. the device had
+            // already been disconnected) this would
+            // throw an exception. At this point we don't really care, but if the connection
+            // does exist we need to
             // remove it and clear it.
             DeviceConnection connection = mConnections.get(eventDevice);
             connection.clearOnDataReceived();
         }
 
-        // Only remove the listener if it currently exists.  If you're attemping to remove a listener
+        // Only remove the listener if it currently exists. If you're attemping to
+        // remove a listener
         // which hasn't been added, just let it go.
         if (mListenerCounts.containsKey(eventType)) {
             AtomicInteger listenerCount = mListenerCounts.get(eventType);
@@ -1163,13 +1245,15 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Remove all the listeners for the provided eventName.   Removing all listeners also has a
-     * context (prefixed with @) which will remove all the listeners for that specified device.
+     * Remove all the listeners for the provided eventName. Removing all listeners
+     * also has a
+     * context (prefixed with @) which will remove all the listeners for that
+     * specified device.
      *
      * @param requestedEvent for which all listeners will be removed
      */
     @ReactMethod
-    @SuppressWarnings({"unused"})
+    @SuppressWarnings({ "unused" })
     public void removeAllListeners(String requestedEvent) {
         String eventType = requestedEvent,
                 eventDevice = null;
@@ -1188,14 +1272,16 @@ public class RNBluetoothClassicModule
 
         if (EventType.DEVICE_READ == event) {
             if (!mConnections.containsKey(eventDevice)) {
-                throw new IllegalStateException(String.format("Cannot read from %s, not currently connected", eventType));
+                throw new IllegalStateException(
+                        String.format("Cannot read from %s, not currently connected", eventType));
             }
 
             DeviceConnection connection = mConnections.get(eventDevice);
             connection.clearOnDataReceived();
         }
 
-        // Only remove the listener if it currently exists.  If you're attemping to remove a listener
+        // Only remove the listener if it currently exists. If you're attemping to
+        // remove a listener
         // which hasn't been added, just let it go.
         if (mListenerCounts.containsKey(eventType)) {
             AtomicInteger listenerCount = mListenerCounts.get(eventType);
@@ -1206,11 +1292,12 @@ public class RNBluetoothClassicModule
                             eventType, 0));
         }
     }
-    //endregion
+    // endregion
 
     /**
-     * Called from the {@link StateChangeReceiver} when the {@link BluetoothAdapter} state
-     * is changed.  Fires the appropriate event to any listeners.
+     * Called from the {@link StateChangeReceiver} when the {@link BluetoothAdapter}
+     * state
+     * is changed. Fires the appropriate event to any listeners.
      *
      * @param newState the new {@link BluetoothState}
      * @param oldState the previous {@link BluetoothState}
@@ -1221,7 +1308,8 @@ public class RNBluetoothClassicModule
         Log.d(TAG, "onStateChange from " + oldState.name() + "  to " + newState.name());
 
         EventType event = (BluetoothState.ENABLED == newState)
-                ? EventType.BLUETOOTH_ENABLED : EventType.BLUETOOTH_DISABLED;
+                ? EventType.BLUETOOTH_ENABLED
+                : EventType.BLUETOOTH_DISABLED;
 
         sendEvent(event, new BluetoothStateEvent(newState).map());
     }
@@ -1231,7 +1319,8 @@ public class RNBluetoothClassicModule
      *
      * @param device the {@link NativeDevice} which just requested disconnect
      *
-     * @deprecated may be removed at some point unless it is found useful (opposed to ACLDisconnected)
+     * @deprecated may be removed at some point unless it is found useful (opposed
+     *             to ACLDisconnected)
      */
     @Deprecated
     @Override
@@ -1240,11 +1329,14 @@ public class RNBluetoothClassicModule
     }
 
     /**
-     * Called when we get an ACL level device disconnection.  This happens when a socket is closed,
-     * for whatever reason.  If there is a currently active connection (which there should be)
+     * Called when we get an ACL level device disconnection. This happens when a
+     * socket is closed,
+     * for whatever reason. If there is a currently active connection (which there
+     * should be)
      * it's disconnected, then a DEVICE_DISCONNECTED event is fired.
      * <p>
-     * This also sends an event to the {@code DEVICE_DISCONNECTED@address} making the Device more
+     * This also sends an event to the {@code DEVICE_DISCONNECTED@address} making
+     * the Device more
      * responsible for it's own connectivity.
      *
      * @param device the {@link NativeDevice} which was just disconnected
@@ -1261,11 +1353,12 @@ public class RNBluetoothClassicModule
      * Sends a {@link EventType} to the React Native JS module
      * {@link com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter}.
      * <p>
-     * Currently having no active {@link com.facebook.react.bridge.CatalystInstance} will not cause
+     * Currently having no active {@link com.facebook.react.bridge.CatalystInstance}
+     * will not cause
      * the application to crash, although I'm not sure if it should.
      *
      * @param event the {@link EventType} being sent
-     * @param body the content of the event
+     * @param body  the content of the event
      */
     private void sendEvent(EventType event, WritableMap body) {
         ReactContext context = getReactApplicationContext();
@@ -1281,16 +1374,19 @@ public class RNBluetoothClassicModule
 
     /**
      * Sends a {@link EventType} to the React Native JS module
-     * {@link com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter}.  This
-     * version allows for sending events do a specific Device (providing the address along side
+     * {@link com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter}.
+     * This
+     * version allows for sending events do a specific Device (providing the address
+     * along side
      * the event name separated by a semi-colon).
      * <p>
-     * This should generally only be used for {@link EventType#DEVICE_READ} events, but nothing
+     * This should generally only be used for {@link EventType#DEVICE_READ} events,
+     * but nothing
      * stops it from providing other types.
      *
-     * @param event the {@link EventType} being sent to React Native JS
+     * @param event  the {@link EventType} being sent to React Native JS
      * @param device the {@link NativeDevice} which caused/receiving the event
-     * @param body the event content
+     * @param body   the event content
      */
     synchronized private void sendEvent(EventType event, NativeDevice device, WritableMap body) {
         ReactContext context = getReactApplicationContext();
