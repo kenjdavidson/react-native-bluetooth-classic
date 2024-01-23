@@ -1,6 +1,3 @@
-import { EmitterSubscription } from 'react-native';
-import { BluetoothEventListener, BluetoothDeviceReadEvent } from './BluetoothEvent';
-
 /**
  * kjd.reactnative.bluetooth.device.NativeDevice
  * 

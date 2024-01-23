@@ -1,4 +1,3 @@
-import { EmitterSubscription } from 'react-native';
 import BluetoothNativeDevice from "./BluetoothNativeDevice";
 
 /**

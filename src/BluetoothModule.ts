@@ -1,9 +1,3 @@
-import {
-  NativeEventEmitter,
-  EventSubscriptionVendor,
-  Platform,
-  EventSubscription,
-} from "react-native";
 import RNBluetoothClassicModule, {
   StandardOptions,
 } from "./BluetoothNativeModule";
@@ -18,6 +12,7 @@ import {
   BluetoothEvent,
 } from "./BluetoothEvent";
 import { BluetoothDeviceReadEvent } from "./BluetoothEvent";
+import { NativeEventEmitter, Platform } from "../node_modules/react-native/types/index";
 
 global.Buffer = global.Buffer || require("buffer").Buffer;
 

@@ -1,8 +1,5 @@
 
-import { mocked } from 'ts-jest/utils'
 import { Platform } from 'react-native';
-import BluetoothNativeModule from '../lib/BluetoothNativeModule';
-import BluetoothModule from '../src/BluetoothModule';
 
 jest.mock('react-native', () => ({
   Platform: { OS: 'ios' }

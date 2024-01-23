@@ -1,4 +1,3 @@
-import { NativeEventEmitter, Platform } from "react-native";
 import BluetoothNativeDevice from "../src/BluetoothNativeDevice";
 import BluetoothModule from "../src/BluetoothModule";
 import BluetoothDevice from "../src/BluetoothDevice";
