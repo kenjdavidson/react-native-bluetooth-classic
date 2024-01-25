@@ -1,11 +1,10 @@
-
 import { Platform } from 'react-native';
 
 jest.mock('react-native', () => ({
-  Platform: { OS: 'ios' }
+  Platform: { OS: 'ios' },
 }));
 
-describe("React Native Platform", () => {
+describe('React Native Platform', () => {
   test("Platform.OS should be 'ios'", () => {
     expect(Platform.OS).toBe('ios');
   });
@@ -14,7 +13,7 @@ describe("React Native Platform", () => {
 // let nativeModule: BluetoothNativeModule = mocked(<BluetoothNativeModule>{}, true);
 // let bluetoothModule: BluetoothModule;
 
-// describe("BluetoothModule Android Only features", () => {  
+// describe("BluetoothModule Android Only features", () => {
 //   test("startDiscovery should throw", () => {
 //     expect(bluetoothModule.startDiscovery()).toThrow();
 //   });

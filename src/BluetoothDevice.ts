@@ -1,12 +1,12 @@
-import BluetoothModule from "./BluetoothModule";
-import BluetoothNativeDevice from "./BluetoothNativeDevice";
+import BluetoothModule from './BluetoothModule';
+import BluetoothNativeDevice from './BluetoothNativeDevice';
 import {
-  BluetoothEvent,
   BluetoothEventListener,
   BluetoothDeviceReadEvent,
   BluetoothEventSubscription,
-} from "./BluetoothEvent";
-import { StandardOptions } from "./BluetoothNativeModule";
+} from './BluetoothEvent';
+import { StandardOptions } from './BluetoothNativeModule';
+import { Buffer } from 'buffer';
 
 /**
  * Implements the BluetoothNativeDevice which is used to communicate with the Android
@@ -27,10 +27,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
   rssi: Number;
   extra: Map<string, Object>;
 
-  constructor(
-    nativeDevice: BluetoothNativeDevice,
-    bluetoothModule: BluetoothModule
-  ) {
+  constructor(nativeDevice: BluetoothNativeDevice, bluetoothModule: BluetoothModule) {
     this._bluetoothModule = bluetoothModule;
     this._nativeDevice = nativeDevice;
 
@@ -56,10 +53,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
   async connect<T extends StandardOptions>(options?: T): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
       try {
-        let connected = await this._bluetoothModule.connectToDevice(
-          this.address,
-          options
-        );
+        let connected = await this._bluetoothModule.connectToDevice(this.address, options);
         resolve(!!connected);
       } catch (err) {
         reject(err);
@@ -107,7 +101,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
   async read(): Promise<String> {
     return this._bluetoothModule.readFromDevice(this.address);
   }
-  
+
   /**
    * Clear the current device buffer - this will generally only be required when using
    * manual reads (as `onRead` should continually keep the buffer clean).
@@ -129,16 +123,16 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
   async write(
     data: string | Buffer,
     encoding?:
-      | "utf-8"
-      | "ascii"
-      | "utf8"
-      | "utf16le"
-      | "ucs2"
-      | "ucs-2"
-      | "base64"
-      | "latin1"
-      | "binary"
-      | "hex"
+      | 'utf-8'
+      | 'ascii'
+      | 'utf8'
+      | 'utf16le'
+      | 'ucs2'
+      | 'ucs-2'
+      | 'base64'
+      | 'latin1'
+      | 'binary'
+      | 'hex'
       | undefined
   ): Promise<boolean> {
     return this._bluetoothModule.writeToDevice(this.address, data, encoding);
