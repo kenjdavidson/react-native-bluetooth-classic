@@ -1,18 +1,18 @@
-import BluetoothNativeDevice from "./BluetoothNativeDevice";
+import BluetoothNativeDevice from './BluetoothNativeDevice';
 
 /**
- * Available Bluetooth events.  This replaces the events provided by the 
+ * Available Bluetooth events.  This replaces the events provided by the
  * NativeModule.
  */
 export enum BluetoothEventType {
-    BLUETOOTH_ENABLED = "BLUETOOTH_ENABLED",
-    BLUETOOTH_DISABLED = "BLUETOOTH_DISABLED",
-    DEVICE_CONNECTED = "DEVICE_CONNECTED",
-    DEVICE_DISCONNECTED = "DEVICE_DISCONNECTED",
-    DEVICE_READ = "DEVICE_READ",
-    ERROR = "ERROR",
-    DEVICE_DISCOVERED = "DEVICE_DISCOVERED"
-};
+  BLUETOOTH_ENABLED = 'BLUETOOTH_ENABLED',
+  BLUETOOTH_DISABLED = 'BLUETOOTH_DISABLED',
+  DEVICE_CONNECTED = 'DEVICE_CONNECTED',
+  DEVICE_DISCONNECTED = 'DEVICE_DISCONNECTED',
+  DEVICE_READ = 'DEVICE_READ',
+  ERROR = 'ERROR',
+  DEVICE_DISCOVERED = 'DEVICE_DISCOVERED',
+}
 
 /**
  * BluetoothEvent wraps the message content coming from the native module.  In most cases it will
@@ -21,17 +21,17 @@ export enum BluetoothEventType {
  * are using the same content type.
  */
 export interface BluetoothEvent {
-    device: BluetoothNativeDevice;
-    eventType: BluetoothEventType;
-    timestamp: string;
+  device: BluetoothNativeDevice;
+  eventType: BluetoothEventType;
+  timestamp: string;
 }
 
 /**
  * State change event used for enable/disable
  */
 export interface StateChangeEvent extends BluetoothEvent {
-    state: string;
-    enabled: boolean;
+  state: string;
+  enabled: boolean;
 }
 
 /**
@@ -39,14 +39,14 @@ export interface StateChangeEvent extends BluetoothEvent {
  * the device and can probably be removed.
  */
 export interface BluetoothDeviceEvent extends BluetoothEvent {
-    device: BluetoothNativeDevice;
+  device: BluetoothNativeDevice;
 }
 
 /**
  * Device read events.
  */
 export interface BluetoothDeviceReadEvent extends BluetoothDeviceEvent {
-    data: string;
+  data: string;
 }
 
 /**
@@ -55,8 +55,8 @@ export interface BluetoothDeviceReadEvent extends BluetoothDeviceEvent {
 export type BluetoothEventListener<T extends BluetoothEvent> = (event: T) => void;
 
 /**
- * Used to wrap EmitterSubscription or EventSubscription 
+ * Used to wrap EmitterSubscription or EventSubscription
  */
 export interface BluetoothEventSubscription {
-    remove(): void;
+  remove(): void;
 }

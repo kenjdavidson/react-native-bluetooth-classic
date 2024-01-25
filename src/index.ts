@@ -1,6 +1,6 @@
-import { NativeModules } from "../node_modules/react-native/types/index";
-import BluetoothDevice from "./BluetoothDevice";
-import BluetoothError from "./BluetoothError";
+import { NativeModules } from '../node_modules/react-native/types/index';
+import BluetoothDevice from './BluetoothDevice';
+import BluetoothError from './BluetoothError';
 import {
   BluetoothEvent,
   BluetoothDeviceEvent,
@@ -8,10 +8,10 @@ import {
   BluetoothEventListener,
   BluetoothEventSubscription,
   BluetoothEventType,
-} from "./BluetoothEvent";
-import BluetoothModule from "./BluetoothModule";
-import BluetoothNativeDevice from "./BluetoothNativeDevice"
-import BluetoothNativeModule, { StandardOptions } from "./BluetoothNativeModule";
+} from './BluetoothEvent';
+import BluetoothModule from './BluetoothModule';
+import BluetoothNativeDevice from './BluetoothNativeDevice';
+import BluetoothNativeModule, { StandardOptions } from './BluetoothNativeModule';
 
 export default new BluetoothModule(NativeModules.RNBluetoothClassic);
 
@@ -26,5 +26,5 @@ export type {
   BluetoothEventType,
   BluetoothNativeDevice,
   BluetoothNativeModule,
-  StandardOptions
+  StandardOptions,
 };

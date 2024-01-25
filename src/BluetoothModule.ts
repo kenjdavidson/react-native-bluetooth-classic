@@ -1,8 +1,6 @@
-import RNBluetoothClassicModule, {
-  StandardOptions,
-} from "./BluetoothNativeModule";
-import BluetoothDevice from "./BluetoothDevice";
-import BluetoothNativeDevice from "./BluetoothNativeDevice";
+import RNBluetoothClassicModule, { StandardOptions } from './BluetoothNativeModule';
+import BluetoothDevice from './BluetoothDevice';
+import BluetoothNativeDevice from './BluetoothNativeDevice';
 import {
   BluetoothEventListener,
   StateChangeEvent,
@@ -10,10 +8,10 @@ import {
   BluetoothDeviceEvent,
   BluetoothEventSubscription,
   BluetoothEvent,
-} from "./BluetoothEvent";
-import { BluetoothDeviceReadEvent } from "./BluetoothEvent";
-import { NativeEventEmitter, Platform } from "react-native";
-import { Buffer } from "buffer";
+} from './BluetoothEvent';
+import { BluetoothDeviceReadEvent } from './BluetoothEvent';
+import { NativeEventEmitter, Platform } from 'react-native';
+import { Buffer } from 'buffer';
 
 /**
  * Provides access to native module.  In general the methods will be direct calls
@@ -53,7 +51,7 @@ export default class BluetoothModule {
    * @return Promise resolved with whether Bluetooth is available for the current device.
    */
   isBluetoothAvailable(): Promise<boolean> {
-    if (Platform.OS == "ios") return Promise.resolve(true);
+    if (Platform.OS == 'ios') return Promise.resolve(true);
     return this._nativeModule.isBluetoothAvailable();
   }
 
@@ -168,10 +166,7 @@ export default class BluetoothModule {
     // Comming from the Java world this is nuts - not being able to assign anything to
     // options because it's a <T extends StandardOptions> even with something that matches
     // the StandardOptions interface
-    let connected = await this._nativeModule.connectToDevice(
-      address,
-      options || {}
-    );
+    let connected = await this._nativeModule.connectToDevice(address, options || {});
     return new BluetoothDevice(connected, this);
   }
 
@@ -202,22 +197,20 @@ export default class BluetoothModule {
     address: string,
     message: string | Buffer,
     encoding?:
-      | "utf-8"
-      | "ascii"
-      | "utf8"
-      | "utf16le"
-      | "ucs2"
-      | "ucs-2"
-      | "base64"
-      | "latin1"
-      | "binary"
-      | "hex"
+      | 'utf-8'
+      | 'ascii'
+      | 'utf8'
+      | 'utf16le'
+      | 'ucs2'
+      | 'ucs-2'
+      | 'base64'
+      | 'latin1'
+      | 'binary'
+      | 'hex'
       | undefined
   ): Promise<boolean> {
-    let data = Buffer.isBuffer(message)
-      ? (message as Buffer)
-      : Buffer.from(message, encoding);
-    return this._nativeModule.writeToDevice(address, data.toString("base64"));
+    let data = Buffer.isBuffer(message) ? (message as Buffer) : Buffer.from(message, encoding);
+    return this._nativeModule.writeToDevice(address, data.toString('base64'));
   }
 
   /**
@@ -226,7 +219,7 @@ export default class BluetoothModule {
    * This is an Anroid only function.
    */
   async startDiscovery(): Promise<BluetoothDevice[]> {
-    if (Platform.OS == "ios") throw new Error("Method not implemented.");
+    if (Platform.OS == 'ios') throw new Error('Method not implemented.');
     let discoveredDevices: BluetoothNativeDevice[] = await this._nativeModule.startDiscovery();
 
     let devices: BluetoothDevice[] = [];
@@ -244,7 +237,7 @@ export default class BluetoothModule {
    * This is an Android only feature.
    */
   cancelDiscovery(): Promise<boolean> {
-    if (Platform.OS == "ios") throw new Error("Method not implemented.");
+    if (Platform.OS == 'ios') throw new Error('Method not implemented.');
     return this._nativeModule.cancelDiscovery();
   }
 
@@ -256,10 +249,8 @@ export default class BluetoothModule {
    * @param address address of the device we wish to pair
    */
   async pairDevice(address: string): Promise<BluetoothDevice> {
-    if (Platform.OS == "ios") throw new Error("Method not implemented.");
-    let paired: BluetoothNativeDevice = await this._nativeModule.pairDevice(
-      address
-    );
+    if (Platform.OS == 'ios') throw new Error('Method not implemented.');
+    let paired: BluetoothNativeDevice = await this._nativeModule.pairDevice(address);
     return new BluetoothDevice(paired, this);
   }
 
@@ -271,7 +262,7 @@ export default class BluetoothModule {
    * @param address address of the device we wish to unpair
    */
   unpairDevice(address: string): Promise<boolean> {
-    if (Platform.OS == "ios") throw new Error("Method not implemented.");
+    if (Platform.OS == 'ios') throw new Error('Method not implemented.');
     return this._nativeModule.unpairDevice(address);
   }
 
@@ -284,10 +275,8 @@ export default class BluetoothModule {
    * @param properties used during the connection and connected process(es)
    */
   async accept<T extends StandardOptions>(properties: T): Promise<BluetoothDevice> {
-    if (Platform.OS == "ios") throw new Error("Method not implemented.");
-    let paired: BluetoothNativeDevice = await this._nativeModule.accept(
-      properties
-    );
+    if (Platform.OS == 'ios') throw new Error('Method not implemented.');
+    let paired: BluetoothNativeDevice = await this._nativeModule.accept(properties);
     return new BluetoothDevice(paired, this);
   }
   /**
@@ -296,7 +285,7 @@ export default class BluetoothModule {
    * This is an Android only feature.
    */
   cancelAccept(): Promise<boolean> {
-    if (Platform.OS == "ios") throw new Error("Method not implemented.");
+    if (Platform.OS == 'ios') throw new Error('Method not implemented.');
     return this._nativeModule.cancelAccept();
   }
 
@@ -308,7 +297,7 @@ export default class BluetoothModule {
    * @param state
    */
   requestBluetoothEnabled(): Promise<boolean> {
-    if (Platform.OS == "ios") throw new Error("Method not implemented.");
+    if (Platform.OS == 'ios') throw new Error('Method not implemented.');
     return this._nativeModule.requestBluetoothEnabled();
   }
 
@@ -320,7 +309,7 @@ export default class BluetoothModule {
    * @param name the name to which we will change BluetoothAdapter
    */
   setBluetoothAdapterName(name: string): Promise<boolean> {
-    if (Platform.OS == "ios") throw new Error("Method not implemented.");
+    if (Platform.OS == 'ios') throw new Error('Method not implemented.');
     return this._nativeModule.setBluetoothAdapterName(name);
   }
 
@@ -349,10 +338,7 @@ export default class BluetoothModule {
   onBluetoothEnabled(
     listener: BluetoothEventListener<StateChangeEvent>
   ): BluetoothEventSubscription {
-    return this.createBluetoothEventSubscription(
-      BluetoothEventType.BLUETOOTH_ENABLED,
-      listener
-    );
+    return this.createBluetoothEventSubscription(BluetoothEventType.BLUETOOTH_ENABLED, listener);
   }
 
   /**
@@ -364,10 +350,7 @@ export default class BluetoothModule {
   onBluetoothDisabled(
     listener: BluetoothEventListener<StateChangeEvent>
   ): BluetoothEventSubscription {
-    return this.createBluetoothEventSubscription(
-      BluetoothEventType.BLUETOOTH_DISABLED,
-      listener
-    );
+    return this.createBluetoothEventSubscription(BluetoothEventType.BLUETOOTH_DISABLED, listener);
   }
 
   /**
@@ -375,9 +358,7 @@ export default class BluetoothModule {
    *
    * @param listener
    */
-  onStateChanged(
-    listener: BluetoothEventListener<StateChangeEvent>
-  ): BluetoothEventSubscription {
+  onStateChanged(listener: BluetoothEventListener<StateChangeEvent>): BluetoothEventSubscription {
     let enabledSubscription = this._eventEmitter.addListener(
       BluetoothEventType.BLUETOOTH_ENABLED,
       listener
@@ -403,10 +384,7 @@ export default class BluetoothModule {
   onDeviceConnected(
     listener: BluetoothEventListener<BluetoothDeviceEvent>
   ): BluetoothEventSubscription {
-    return this.createBluetoothEventSubscription(
-      BluetoothEventType.DEVICE_CONNECTED,
-      listener
-    );
+    return this.createBluetoothEventSubscription(BluetoothEventType.DEVICE_CONNECTED, listener);
   }
 
   /**
@@ -421,10 +399,7 @@ export default class BluetoothModule {
   onDeviceDisconnected(
     listener: BluetoothEventListener<BluetoothDeviceEvent>
   ): BluetoothEventSubscription {
-    return this.createBluetoothEventSubscription(
-      BluetoothEventType.DEVICE_DISCONNECTED,
-      listener
-    );
+    return this.createBluetoothEventSubscription(BluetoothEventType.DEVICE_DISCONNECTED, listener);
   }
 
   /**
@@ -457,13 +432,8 @@ export default class BluetoothModule {
    *
    * @param listener
    */
-  onError(
-    listener: BluetoothEventListener<BluetoothDeviceEvent>
-  ): BluetoothEventSubscription {
-    return this.createBluetoothEventSubscription(
-      BluetoothEventType.ERROR,
-      listener
-    );
+  onError(listener: BluetoothEventListener<BluetoothDeviceEvent>): BluetoothEventSubscription {
+    return this.createBluetoothEventSubscription(BluetoothEventType.ERROR, listener);
   }
 
   /**
@@ -478,17 +448,14 @@ export default class BluetoothModule {
   onDeviceDiscovered(
     listener: BluetoothEventListener<BluetoothDeviceEvent>
   ): BluetoothEventSubscription {
-    return this.createBluetoothEventSubscription(
-      BluetoothEventType.DEVICE_DISCOVERED,
-      listener
-    );
+    return this.createBluetoothEventSubscription(BluetoothEventType.DEVICE_DISCOVERED, listener);
   }
 
   /**
    * Opens Android's Bluetooth Settings activity.
    */
   openBluetoothSettings(): void {
-    if (Platform.OS == "ios") throw new Error("Method not implemented.");
+    if (Platform.OS == 'ios') throw new Error('Method not implemented.');
     return this._nativeModule.openBluetoothSettings();
   }
 }
