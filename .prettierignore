@@ -1,0 +1,32 @@
+package-lock.json
+build.json
+
+# distribution
+dist/
+lib/
+
+# build
+build/
+
+# coverage
+coverage
+coverage/
+
+# test reports
+reports/
+
+tmp/
+
+# Translations
+i18n/
+
+# Generated message files
+*.messages.json
+
+# Generated metadata files
+*.metadata.json
+
+# Native
+ios/
+android/
+windows/

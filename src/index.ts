@@ -15,7 +15,7 @@ import BluetoothNativeModule, { StandardOptions } from "./BluetoothNativeModule"
 
 export default new BluetoothModule(NativeModules.RNBluetoothClassic);
 
-export {
+export type {
   BluetoothDevice,
   BluetoothError,
   BluetoothEvent,

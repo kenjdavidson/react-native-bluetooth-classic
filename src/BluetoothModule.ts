@@ -12,9 +12,8 @@ import {
   BluetoothEvent,
 } from "./BluetoothEvent";
 import { BluetoothDeviceReadEvent } from "./BluetoothEvent";
-import { NativeEventEmitter, Platform } from "../node_modules/react-native/types/index";
-
-global.Buffer = global.Buffer || require("buffer").Buffer;
+import { NativeEventEmitter, Platform } from "react-native";
+import { Buffer } from "buffer";
 
 /**
  * Provides access to native module.  In general the methods will be direct calls

@@ -1,12 +1,12 @@
 import BluetoothModule from "./BluetoothModule";
 import BluetoothNativeDevice from "./BluetoothNativeDevice";
 import {
-  BluetoothEvent,
   BluetoothEventListener,
   BluetoothDeviceReadEvent,
   BluetoothEventSubscription,
 } from "./BluetoothEvent";
 import { StandardOptions } from "./BluetoothNativeModule";
+import { Buffer } from "buffer";
 
 /**
  * Implements the BluetoothNativeDevice which is used to communicate with the Android
