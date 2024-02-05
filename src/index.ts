@@ -1,4 +1,4 @@
-import { NativeModules } from '../node_modules/react-native/types/index';
+import { NativeModules } from 'react-native';
 import BluetoothDevice from './BluetoothDevice';
 import BluetoothError from './BluetoothError';
 import {
