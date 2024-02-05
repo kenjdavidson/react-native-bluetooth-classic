@@ -61,7 +61,7 @@
     "react-native.config.js"
   ],
   "devDependencies": {
-    "@tsconfig/react-native": "^3.0.3",
+    "@react-native/typescript-config": "^0.74.0",
     "@types/jest": "^29.5.11",
     "@types/node": "^18.19.8",
     "@types/react": "^18.2.48",
