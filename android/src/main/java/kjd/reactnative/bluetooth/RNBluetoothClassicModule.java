@@ -351,8 +351,8 @@ public class RNBluetoothClassicModule
             promise.resolve(true);
         } else {
             Activity activity = getCurrentActivity();
+            mEnabledPromise = promise;
             if (activity != null) {
-                mEnabledPromise = promise;
 
                 Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 activity.startActivityForResult(intent, BluetoothRequest.ENABLE_BLUETOOTH.code);
