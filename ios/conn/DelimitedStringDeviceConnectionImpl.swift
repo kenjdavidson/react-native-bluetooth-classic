@@ -148,18 +148,14 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
      * - parameter message: the encoded message which will be written
      */
     func write(_ data: Data) -> Bool {
-        if let sending = String(data: data, encoding: self.encoding) {
-            NSLog("(BluetoothDevice:writeToDevice) Writing %@ to device %@", sending, accessory.serialNumber)
-            outBuffer.append(data)
+        NSLog("(BluetoothDevice:writeToDevice) Writing to device %@", accessory.serialNumber)
+        outBuffer.append(data)
 
-            // If there is space available for writing then we want to kick off the process.
-            // If all the data cannot be fully written, then the hasSpaceAvailable will be
-            // fired and we can continue.  In most cases, we shouldn't be sending that much
-            // data.
-            writeDataToStream((session?.outputStream)!)
-        } else {
-            return false
-        }
+        // If there is space available for writing then we want to kick off the process.
+        // If all the data cannot be fully written, then the hasSpaceAvailable will be
+        // fired and we can continue.  In most cases, we shouldn't be sending that much
+        // data.
+        writeDataToStream((session?.outputStream)!)
 
         return true
     }
