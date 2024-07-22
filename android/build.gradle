@@ -16,6 +16,13 @@ def getExtOrDefault(name, fallback) {
 }
 
 android {
+    // Check AGP version for backward compatibility w/react-native versions still on gradle plugin 6
+    // it looks like this causes issues between 7 and 8, so for the time being 
+    def agpVersion = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION    
+    if (agpVersion.tokenize('.')[0].toInteger() >= 7) {
+        namespace = "kjd.reactnative.bluetooth"
+    }
+    
     compileSdkVersion getExtOrDefault('compileSdkVersion', 34)
     buildToolsVersion getExtOrDefault('buildToolsVersion', "34.0.0")
 
