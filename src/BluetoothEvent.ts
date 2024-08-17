@@ -38,9 +38,7 @@ export interface StateChangeEvent extends BluetoothEvent {
  * Device events used for connection/disconnection.  This looks like it's duplicating
  * the device and can probably be removed.
  */
-export interface BluetoothDeviceEvent extends BluetoothEvent {
-  device: BluetoothNativeDevice;
-}
+export interface BluetoothDeviceEvent extends BluetoothNativeDevice { }
 
 /**
  * Device read events.
