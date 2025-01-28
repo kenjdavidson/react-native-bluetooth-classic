@@ -36,6 +36,11 @@ export default interface BluetoothNativeDevice {
   rssi: Number;
 
   /**
+   * Bluetooth device type of the remote device
+   */
+  type: 'CLASSIC' | 'LOW_ENERGY' | 'DUAL' | 'UNKNOWN'
+
+  /**
    * Extra information.  This could contain things like RSSI value
    * or other details.
    */
