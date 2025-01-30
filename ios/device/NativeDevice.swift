@@ -30,6 +30,7 @@ class NativeDevice: NSObject, Mappable {
             "bonded": accessory.isConnected,
             "deviceClass": accessory.modelNumber,
             "protocolStrings": accessory.protocolStrings,
+            "type": "CLASSIC",
             "extra": [:]
         ];
     }
