@@ -25,6 +25,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
   bonded?: Boolean;
   deviceClass?: string;
   rssi: Number;
+  type: 'CLASSIC' | 'LOW_ENERGY' | 'DUAL' | 'UNKNOWN';
   extra: Map<string, Object>;
 
   constructor(nativeDevice: BluetoothNativeDevice, bluetoothModule: BluetoothModule) {
@@ -37,6 +38,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
     this.bonded = nativeDevice.bonded;
     this.deviceClass = nativeDevice.deviceClass;
     this.rssi = nativeDevice.rssi;
+    this.type = nativeDevice.type;
     this.extra = nativeDevice.extra;
   }
 

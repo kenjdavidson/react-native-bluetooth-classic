@@ -58,6 +58,15 @@ public class NativeDevice implements Mappable {
         return (T) mExtra.put(key, value);
     }
 
+    private String getBlutoothTypeString() {
+        return switch (mDevice.getType()) {
+            case BluetoothDevice.DEVICE_TYPE_CLASSIC -> "CLASSIC";
+            case BluetoothDevice.DEVICE_TYPE_LE -> "LOW_ENERGY";
+            case BluetoothDevice.DEVICE_TYPE_DUAL -> "DUAL";
+            default -> "UNKNOWN";
+        };
+    }
+
     @Override
     public WritableMap map() {
         WritableMap mapped = Arguments.createMap();
@@ -66,6 +75,7 @@ public class NativeDevice implements Mappable {
         mapped.putString("address", mDevice.getAddress());
         mapped.putString("id", mDevice.getAddress());
         mapped.putBoolean("bonded", mDevice.getBondState() == BluetoothDevice.BOND_BONDED);
+        mapped.putString("type", this.getBlutoothTypeString());
 
         if (mDevice.getBluetoothClass() != null) {
             WritableMap deviceClass = Arguments.createMap();
