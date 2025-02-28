@@ -66,7 +66,7 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
         self.eaManager = EAAccessoryManager.shared()
         self.notificationCenter = NotificationCenter.default
         self.supportedProtocols = Bundle.main
-            .object(forInfoDictionaryKey: "UISupportedExternalAccessoryProtocols") as! [String]
+            .object(forInfoDictionaryKey: "UISupportedExternalAccessoryProtocols") as? [String] ?? []
         
         self.connectionFactories = Dictionary()
         self.connectionFactories["delimited"] = DelimitedStringDeviceConnectionFactory()
