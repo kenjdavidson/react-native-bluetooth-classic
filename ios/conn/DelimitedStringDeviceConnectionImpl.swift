@@ -169,7 +169,11 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
         NSLog("(BluetoothDevice:readFromDevice) Reading device %@ until delimiter %@",
               self.accessory.serialNumber, self.delimiter)
 
-        let content = String(data: inBuffer, encoding: self.encoding)!
+        //let content = String(data: inBuffer, encoding: self.encoding)!
+        guard let content = String(data: inBuffer, encoding: self.encoding) else {
+            NSLog("Error: unable to decode the buffer")
+            return nil
+        }
         var message:String?
 
         if (delimiter.count == 0) {
