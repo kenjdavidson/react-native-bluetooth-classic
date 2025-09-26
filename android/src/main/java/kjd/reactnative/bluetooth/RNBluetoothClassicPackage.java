@@ -106,6 +106,7 @@ public class RNBluetoothClassicPackage implements ReactPackage {
     /**
      * @deprecated in version 0.47
      */
+    @Deprecated
     public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
     }
