@@ -52,7 +52,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
    * 					DeviceConnector and DeviceConnection.
    * @return Promise resolving true|false whether the connetion was established
    */
-  async connect<T extends StandardOptions>(options?: T): Promise<boolean> {
+  connect = <T extends StandardOptions>(options?: T): Promise<boolean> => {
     return new Promise(async (resolve, reject) => {
       try {
         let connected = await this._bluetoothModule.connectToDevice(this.address, options);
@@ -69,7 +69,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
    *
    * @return Promise resolving true|false based on connection status
    */
-  async isConnected(): Promise<boolean> {
+  isConnected = (): Promise<boolean> => {
     return this._bluetoothModule.isDeviceConnected(this.address);
   }
 
@@ -78,7 +78,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
    *
    * @return Promise resolving true|false whether disconnection was successful
    */
-  async disconnect(): Promise<boolean> {
+  disconnect = (): Promise<boolean> => {
     return this._bluetoothModule.disconnectFromDevice(this.address);
   }
 
@@ -89,7 +89,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
    *
    * @return Promise resolving the number of messages/data available
    */
-  async available(): Promise<number> {
+  available = (): Promise<number> => {
     return this._bluetoothModule.availableFromDevice(this.address);
   }
 
@@ -100,7 +100,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
    *
    * @return Promise resolved with the message content (not including delimited)
    */
-  async read(): Promise<String> {
+  read = (): Promise<String> => {
     return this._bluetoothModule.readFromDevice(this.address);
   }
 
@@ -110,7 +110,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
    *
    * @return Promise resolving whether the clear was successful
    */
-  async clear(): Promise<boolean> {
+  clear = (): Promise<boolean> => {
     return this._bluetoothModule.clearFromDevice(this.address);
   }
 
@@ -122,7 +122,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
    * @param data to be written to the device.
    * @param encoding the encoding used when wrapping non Buffer data
    */
-  async write(
+  write = (
     data: string | Buffer,
     encoding?:
       | 'utf-8'
@@ -136,7 +136,7 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
       | 'binary'
       | 'hex'
       | undefined
-  ): Promise<boolean> {
+  ): Promise<boolean> => {
     return this._bluetoothModule.writeToDevice(this.address, data, encoding);
   }
 
@@ -147,9 +147,9 @@ export default class BluetoothDevice implements BluetoothNativeDevice {
    *
    * @param listener the BluetoothEventListener which will receive incoming data
    */
-  onDataReceived(
+  onDataReceived = (
     listener: BluetoothEventListener<BluetoothDeviceReadEvent>
-  ): BluetoothEventSubscription {
+  ): BluetoothEventSubscription => {
     return this._bluetoothModule.onDeviceRead(this.address, listener);
   }
 }
