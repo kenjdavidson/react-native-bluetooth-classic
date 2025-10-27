@@ -185,7 +185,7 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule, CBCentralManagerDelegate {
     @objc
     func isBluetoothEnabled(
         _ resolve: @escaping RCTPromiseResolveBlock,
-        rejecter reject: RCTPromiseRejectBlock
+        rejecter reject: @escaping RCTPromiseRejectBlock
     ) -> Void {
         // If state is already determined (not unknown), return immediately
         if centralManagerState != .unknown {
@@ -199,8 +199,12 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule, CBCentralManagerDelegate {
         
         // Add callback to be executed when state updates
         stateUpdateCallbacks.append { [weak self] state in
-            guard let self = self else { return }
-            resolve(self.checkBluetoothAdapter())
+            if let self = self {
+                resolve(self.checkBluetoothAdapter())
+            } else {
+                // If self is deallocated, resolve with false as a safe default
+                resolve(false)
+            }
         }
     }
     
