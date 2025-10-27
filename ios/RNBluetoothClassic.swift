@@ -30,7 +30,7 @@ import CoreBluetooth
  data is done in Javascript/client rather than in the module.
  */
 @objc(RNBluetoothClassic)
-class RNBluetoothClassic : NSObject, RCTBridgeModule {
+class RNBluetoothClassic : NSObject, RCTBridgeModule, CBCentralManagerDelegate {
     
     static func moduleName() -> String! {
         return "RNBluetoothClassic"
@@ -49,13 +49,17 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
     *  By using Lazy initialization on CBCentralManager it will prompt bluetooth permission
     *  on first call of any bluetooth-related method.
     */
-    private lazy var cbCentral: CBCentralManager = CBCentralManager()
+    private lazy var cbCentral: CBCentralManager = CBCentralManager(delegate: self, queue: nil)
 
     private let notificationCenter: NotificationCenter
     private let supportedProtocols: [String]
     
     private var listeners: Dictionary<String,Int>
     private var connections: Dictionary<String,DeviceConnection>
+    
+    // Track CBCentralManager state
+    private var centralManagerState: CBManagerState = .unknown
+    private var stateUpdateCallbacks: [(CBManagerState) -> Void] = []
     
     /**
      * Initializes the RNBluetoothClassic module.  At this point it's not quite as customizable as the
@@ -180,10 +184,24 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
      */
     @objc
     func isBluetoothEnabled(
-        _ resolve: RCTPromiseResolveBlock,
+        _ resolve: @escaping RCTPromiseResolveBlock,
         rejecter reject: RCTPromiseRejectBlock
     ) -> Void {
-        resolve(checkBluetoothAdapter())
+        // If state is already determined (not unknown), return immediately
+        if centralManagerState != .unknown {
+            resolve(checkBluetoothAdapter())
+            return
+        }
+        
+        // State is unknown, need to wait for state update
+        // Trigger lazy initialization if needed
+        _ = cbCentral
+        
+        // Add callback to be executed when state updates
+        stateUpdateCallbacks.append { [weak self] state in
+            guard let self = self else { return }
+            resolve(self.checkBluetoothAdapter())
+        }
     }
     
     /**
@@ -193,9 +211,9 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
         var enabled = false
         
         if #available(iOS 10.0, *) {
-            enabled = (cbCentral.state == CBManagerState.poweredOn)
+            enabled = (centralManagerState == CBManagerState.poweredOn)
         } else {
-            enabled = (cbCentral.state.rawValue == CBCentralManagerState.poweredOn.rawValue)
+            enabled = (centralManagerState.rawValue == CBCentralManagerState.poweredOn.rawValue)
         }
         
         return enabled
@@ -644,6 +662,30 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
             connection.dataReceivedDelegate = nil;
         } else {
             NSLog("Device %@ is not currently connected, unable to remove delegate", deviceId)
+        }
+    }
+}
+
+// MARK: CBCentralManagerDelegate implementation
+/**
+ * Extension implementing the CBCentralManagerDelegate
+ *
+ * Required to properly track the CBCentralManager state which is asynchronously
+ * initialized. This fixes the issue where isBluetoothEnabled would return false
+ * on the first call because the state hadn't been initialized yet.
+ */
+extension RNBluetoothClassic {
+    
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        // Update our cached state
+        centralManagerState = central.state
+        
+        // Execute any pending callbacks waiting for state update
+        let callbacks = stateUpdateCallbacks
+        stateUpdateCallbacks.removeAll()
+        
+        for callback in callbacks {
+            callback(central.state)
         }
     }
 }
