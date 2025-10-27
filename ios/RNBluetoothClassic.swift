@@ -198,7 +198,7 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule, CBCentralManagerDelegate {
         _ = cbCentral
         
         // Add callback to be executed when state updates
-        stateUpdateCallbacks.append { [weak self] state in
+        stateUpdateCallbacks.append { [weak self] _ in
             if let self = self {
                 resolve(self.checkBluetoothAdapter())
             } else {
