@@ -1,6 +1,7 @@
 
 package kjd.reactnative.bluetooth;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -9,6 +10,7 @@ import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.util.Base64;
@@ -280,6 +282,20 @@ public class RNBluetoothClassicModule
     private boolean checkBluetoothAdapter() {
         return (mAdapter != null && mAdapter.isEnabled());
     }
+
+    /**
+     * Check if BLUETOOTH_SCAN permission is granted for Android 12+ (API 31+).
+     * For devices running Android 11 and below, this will return true as the permission is not required.
+     *
+     * @return true if permission is granted or not required, false otherwise
+     */
+    private boolean hasBluetoothScanPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return getReactApplicationContext().checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN)
+                    == PackageManager.PERMISSION_GRANTED;
+        }
+        return true;
+    }
     // endregion
 
     // region: ActivityEventListener
@@ -358,7 +374,13 @@ public class RNBluetoothClassicModule
         if (BuildConfig.DEBUG)
             Log.d(TAG, "onHostDestroy: stop discovery, connections and unregister receivers");
 
-        mAdapter.cancelDiscovery();
+        if (mAdapter != null && hasBluetoothScanPermission()) {
+            try {
+                mAdapter.cancelDiscovery();
+            } catch (SecurityException e) {
+                Log.e(TAG, "Failed to cancel discovery due to missing permission: " + e.getMessage());
+            }
+        }
     }
     // endregion
 
@@ -1114,7 +1136,13 @@ public class RNBluetoothClassicModule
         }
 
         if (mDiscoveryReceiver != null) {
-            mAdapter.cancelDiscovery();
+            if (mAdapter != null && hasBluetoothScanPermission()) {
+                try {
+                    mAdapter.cancelDiscovery();
+                } catch (SecurityException e) {
+                    Log.e(TAG, "Failed to cancel discovery due to missing permission: " + e.getMessage());
+                }
+            }
             getReactApplicationContext().unregisterReceiver(mDiscoveryReceiver);
             mDiscoveryReceiver = null;
         }
