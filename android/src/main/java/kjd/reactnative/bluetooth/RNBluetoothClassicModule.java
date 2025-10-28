@@ -291,7 +291,11 @@ public class RNBluetoothClassicModule
      */
     private boolean hasBluetoothScanPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            return getReactApplicationContext().checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN)
+            ReactApplicationContext context = getReactApplicationContext();
+            if (context == null) {
+                return false;
+            }
+            return context.checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN)
                     == PackageManager.PERMISSION_GRANTED;
         }
         return true;
