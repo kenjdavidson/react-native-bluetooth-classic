@@ -35,4 +35,6 @@
     - label: 'Using with Expo'
       link: '/guides/using-with-expo'
     - label: 'Hex Encoding/Decoding'
-      link: '/guides/hex-encoding-decoding'      
+      link: '/guides/hex-encoding-decoding'
+    - label: 'Platform Specific Usage'
+      link: '/guides/platform-specific-usage'      
