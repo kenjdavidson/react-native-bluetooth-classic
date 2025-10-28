@@ -162,7 +162,6 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
             NSLog("(BluetoothDevice:writeToDevice) Error: session or outputStream is nil")
             return false
         }
-        
         writeDataToStream(outputStream)
 
         return true
