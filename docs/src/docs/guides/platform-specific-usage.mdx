@@ -1,0 +1,143 @@
+---
+title: Platform Specific Usage
+description: Configure the library to work on specific platforms only
+---
+
+## Using on Android Only
+
+If you only need to support Bluetooth Classic on Android and want to avoid iOS-specific requirements (such as MFi protocol declarations), you can disable the iOS autolinking while keeping Android support.
+
+### Why Disable iOS?
+
+Apple's App Store review process may reject applications that link to the External Accessory framework without proper MFi (Made for iPhone/iPad/iPod) protocol declarations. If you:
+
+- Only need Bluetooth Classic functionality on Android
+- Want your app to work on iOS without Bluetooth Classic features
+- Don't have MFi protocol strings to declare
+
+Then disabling iOS autolinking is the recommended approach.
+
+### Disabling iOS Autolinking
+
+You can disable iOS autolinking by creating or updating a `react-native.config.js` file in the root of your project:
+
+```javascript
+// react-native.config.js
+module.exports = {
+  dependencies: {
+    'react-native-bluetooth-classic': {
+      platforms: {
+        ios: null,
+      }
+    }
+  }
+};
+```
+
+This configuration tells React Native's autolinking system to skip the iOS platform for `react-native-bluetooth-classic`.
+
+### Using on iOS Only
+
+Similarly, if you only need iOS support and want to disable Android:
+
+```javascript
+// react-native.config.js
+module.exports = {
+  dependencies: {
+    'react-native-bluetooth-classic': {
+      platforms: {
+        android: null,
+      }
+    }
+  }
+};
+```
+
+### Handling in JavaScript
+
+When you disable a platform, the native module will not be available on that platform. You should check for module availability before using it:
+
+```javascript
+import RNBluetoothClassic from 'react-native-bluetooth-classic';
+import { Platform } from 'react-native';
+
+// Check if the module is available
+const isBluetoothAvailable = () => {
+  if (Platform.OS === 'android') {
+    // On Android, the module should be available if not disabled
+    return RNBluetoothClassic !== null && RNBluetoothClassic !== undefined;
+  } else if (Platform.OS === 'ios') {
+    // On iOS, check if module is available (will be null if disabled)
+    return RNBluetoothClassic !== null && RNBluetoothClassic !== undefined;
+  }
+  return false;
+};
+
+// Use the module only if available
+const MyBluetoothComponent = () => {
+  useEffect(() => {
+    if (isBluetoothAvailable()) {
+      // Safe to use Bluetooth features
+      RNBluetoothClassic.isBluetoothEnabled()
+        .then(enabled => console.log('Bluetooth enabled:', enabled))
+        .catch(err => console.error('Bluetooth error:', err));
+    } else {
+      console.log('Bluetooth Classic not available on this platform');
+    }
+  }, []);
+
+  // ... rest of component
+};
+```
+
+### Alternative Approach: Platform-Specific Code
+
+You can also use React Native's platform-specific file extensions:
+
+```javascript
+// BluetoothService.android.js
+import RNBluetoothClassic from 'react-native-bluetooth-classic';
+export default RNBluetoothClassic;
+
+// BluetoothService.ios.js
+export default null; // or a mock implementation
+
+// Usage in your app:
+// import BluetoothService from './BluetoothService';
+```
+
+### Important Notes
+
+- After modifying `react-native.config.js`, you may need to run `npx react-native clean` and rebuild your project
+- On iOS, make sure to remove any MFi protocol strings from your `Info.plist` if you're disabling iOS support
+- The JavaScript module will still be imported, but the native module will be `null` or `undefined` on disabled platforms
+- Always check for module availability before calling any native methods to avoid runtime errors
+
+### Testing Both Platforms
+
+If you want to test your app on both platforms but only have Bluetooth functionality on one:
+
+1. Use conditional rendering based on `Platform.OS`
+2. Provide appropriate UI feedback when Bluetooth is not available
+3. Consider using a BLE library (like `react-native-ble-plx`) as a fallback on iOS if needed
+
+For example:
+
+```javascript
+import { Platform, Text } from 'react-native';
+
+const BluetoothFeature = () => {
+  if (Platform.OS !== 'android') {
+    return <Text>Bluetooth Classic is only available on Android</Text>;
+  }
+
+  // Android-specific Bluetooth implementation
+  return <BluetoothComponent />;
+};
+```
+
+### Related Resources
+
+- [React Native Autolinking Documentation](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md)
+- [Apple MFi Program](https://en.wikipedia.org/wiki/MFi_Program)
+- [External Accessory Framework](https://developer.apple.com/documentation/externalaccessory)
