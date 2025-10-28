@@ -58,19 +58,12 @@ module.exports = {
 When you disable a platform, the native module will not be available on that platform. You should check for module availability before using it:
 
 ```javascript
+import React, { useEffect } from 'react';
 import RNBluetoothClassic from 'react-native-bluetooth-classic';
-import { Platform } from 'react-native';
 
 // Check if the module is available
 const isBluetoothAvailable = () => {
-  if (Platform.OS === 'android') {
-    // On Android, the module should be available if not disabled
-    return RNBluetoothClassic !== null && RNBluetoothClassic !== undefined;
-  } else if (Platform.OS === 'ios') {
-    // On iOS, check if module is available (will be null if disabled)
-    return RNBluetoothClassic !== null && RNBluetoothClassic !== undefined;
-  }
-  return false;
+  return RNBluetoothClassic !== null && RNBluetoothClassic !== undefined;
 };
 
 // Use the module only if available
@@ -124,6 +117,7 @@ If you want to test your app on both platforms but only have Bluetooth functiona
 For example:
 
 ```javascript
+import React from 'react';
 import { Platform, Text } from 'react-native';
 
 const BluetoothFeature = () => {
