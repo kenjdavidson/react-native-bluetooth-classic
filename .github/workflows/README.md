@@ -35,7 +35,9 @@ Automatically builds and tests the iOS library on pull requests.
 5. Builds the iOS library using xcodebuild
 6. Uploads build logs on failure
 
-### Test and Build (`test-and-build.yml`)
+### Other Workflows
+
+#### Test and Build (`test-and-build.yml`)
 
 Manual workflow for comprehensive testing across all environments.
 
@@ -46,9 +48,9 @@ Manual workflow for comprehensive testing across all environments.
 1. Runs JavaScript tests
 2. Builds the TypeScript library
 3. Builds Android with Gradle
-4. Validates iOS build
+4. Sets up iOS environment (build steps incomplete)
 
-### Other Workflows
+#### Documentation and Release
 
 - `publish-documentation.yml` - Publishes documentation to GitHub Pages
 - `release-and-publish-npm.yml` - Handles releases and npm publishing
