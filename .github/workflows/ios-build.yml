@@ -13,6 +13,8 @@ on:
 jobs:
   build-ios:
     runs-on: macos-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
