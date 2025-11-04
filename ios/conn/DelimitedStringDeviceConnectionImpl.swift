@@ -128,7 +128,10 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
      */
     func available() -> Int {
         var count = 0;
-        let content = String(data: inBuffer, encoding: self.encoding)!
+        guard let content = String(data: inBuffer, encoding: self.encoding) else {
+            NSLog("(BluetoothDevice:available) Error: unable to decode the buffer")
+            return 0
+        }
 
         // I really hate swift, apparently String.isEmpty is ambiguious??
         if (delimiter.count == 0) {
@@ -155,7 +158,11 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
         // If all the data cannot be fully written, then the hasSpaceAvailable will be
         // fired and we can continue.  In most cases, we shouldn't be sending that much
         // data.
-        writeDataToStream((session?.outputStream)!)
+        guard let outputStream = session?.outputStream else {
+            NSLog("(BluetoothDevice:writeToDevice) Error: session or outputStream is nil")
+            return false
+        }
+        writeDataToStream(outputStream)
 
         return true
     }
@@ -213,14 +220,22 @@ class DelimitedStringDeviceConnectionImpl : NSObject, DeviceConnection, StreamDe
             break;
         case .hasBytesAvailable:
             NSLog("Stream %@ has bytes available", aStream)
-            readDataFromStream(aStream as! InputStream)
+            guard let inputStream = aStream as? InputStream else {
+                NSLog("(BluetoothDevice:stream) Error: stream is not an InputStream")
+                break
+            }
+            readDataFromStream(inputStream)
             break;
         case .hasSpaceAvailable:
             // As per the documents, this event occurs repeatedly as long as you're writing data
             // in the examples I've found they just assume the initial write will work (using
             // a smaller value) and then continues on doing so.
             NSLog("Stream %@ has space available", aStream)
-            writeDataToStream(aStream as! OutputStream)
+            guard let outputStream = aStream as? OutputStream else {
+                NSLog("(BluetoothDevice:stream) Error: stream is not an OutputStream")
+                break
+            }
+            writeDataToStream(outputStream)
             break;
         case .errorOccurred:
             NSLog("Stream %@ has had an error occur", aStream)
