@@ -53,6 +53,7 @@ import kjd.reactnative.bluetooth.conn.ConnectionConnector;
 import kjd.reactnative.bluetooth.conn.ConnectionConnectorFactory;
 import kjd.reactnative.bluetooth.conn.ConnectionFailedException;
 import kjd.reactnative.bluetooth.conn.StandardOption;
+import kjd.reactnative.bluetooth.event.BluetoothDeviceEvent;
 import kjd.reactnative.bluetooth.event.BluetoothStateEvent;
 import kjd.reactnative.bluetooth.event.EventType;
 import kjd.reactnative.bluetooth.conn.DeviceConnection;
@@ -517,7 +518,8 @@ public class RNBluetoothClassicModule
                 public void onDeviceDiscovered(NativeDevice device) {
                     // This wasn't previously an event, but now we can send out and request them
                     Log.d(TAG, String.format("Discovered device %s", device.getAddress()));
-                    sendEvent(EventType.DEVICE_DISCOVERED, device.map());
+                    BluetoothDeviceEvent event = new BluetoothDeviceEvent(EventType.DEVICE_DISCOVERED, device);
+                    sendEvent(EventType.DEVICE_DISCOVERED, event.map());
                 }
 
                 @Override
@@ -1378,7 +1380,8 @@ public class RNBluetoothClassicModule
         Log.d(TAG, "onACLDisconnected to " + device.getAddress());
 
         mConnections.remove(device.getAddress());
-        sendEvent(EventType.DEVICE_DISCONNECTED, device.map());
+        BluetoothDeviceEvent event = new BluetoothDeviceEvent(EventType.DEVICE_DISCONNECTED, device);
+        sendEvent(EventType.DEVICE_DISCONNECTED, event.map());
     }
 
     /**

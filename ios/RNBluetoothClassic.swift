@@ -127,8 +127,10 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
         // Unlike the disconnect we just need to pass the event to the application.  It
         // will decide whether or not to connect.
         if let connected: EAAccessory = notification.userInfo!["EAAccessoryKey"] as? EAAccessory {
+            let event = BluetoothDeviceEvent(eventType: EventType.DEVICE_CONNECTED,
+                                             device: NativeDevice(accessory: connected))
             sendEvent(EventType.DEVICE_CONNECTED.name,
-                      body: NativeDevice(accessory: connected).map())
+                      body: event.map())
         }
     }
     
@@ -148,8 +150,10 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule {
             }
             
             // Finally send the notification
+            let event = BluetoothDeviceEvent(eventType: EventType.DEVICE_DISCONNECTED,
+                                             device: NativeDevice(accessory: disconnected))
             sendEvent(EventType.DEVICE_DISCONNECTED.name,
-                      body: NativeDevice(accessory: disconnected).map())
+                      body: event.map())
         }
     }
     
