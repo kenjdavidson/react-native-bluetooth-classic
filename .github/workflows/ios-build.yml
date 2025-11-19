@@ -1,0 +1,65 @@
+name: iOS Build
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'ios/**'
+      - 'src/**'
+      - 'package.json'
+      - 'react-native-bluetooth-classic.podspec'
+      - '.github/workflows/ios-build.yml'
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+          bundler-cache: false
+          
+      - name: Install CocoaPods
+        run: |
+          gem install cocoapods
+          pod --version
+          
+      - name: Validate Podspec
+        run: pod lib lint react-native-bluetooth-classic.podspec --allow-warnings --skip-import-validation
+        
+      - name: Build iOS library
+        run: |
+          cd ios
+          xcodebuild clean build \
+            -project RNBluetoothClassic.xcodeproj \
+            -scheme RNBluetoothClassic \
+            -sdk iphonesimulator \
+            -configuration Release \
+            -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+            
+      - name: Upload build logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-logs
+          path: ~/Library/Logs/xcodebuild/
+          retention-days: 7
