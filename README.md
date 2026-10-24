@@ -108,6 +108,15 @@ Feel free to contribute any changes or bug fixes you see fit.  Although when doi
 - Changes should be customizable where possible (especially when possibly breaking to others)
 - Changes should be documented
 
+### Continuous Integration
+
+The project uses GitHub Actions for continuous integration. When you open a pull request:
+
+- **Android Build**: Automatically compiles the Android library to ensure your changes don't break the build
+- **iOS Build**: Automatically compiles the iOS library to ensure your changes don't break the build
+
+These workflows run automatically when you modify relevant files (android/, ios/, or src/ directories). See [.github/workflows/README.md](.github/workflows/README.md) for more details.
+
 #### Android
 
 When first building the Android project there were issues with react-native-create-library and the version of Android/Gradle installed on my machine.  This needed to be resolved by ensuring that the project was inline with the version of Android Studio and the Android plugin for gradle.  In my case, the project was configured with 1.3.1 and 2.2, which caused problems, in order to resolve [Android plugin for gradle versions](https://developer.android.com/studio/releases/gradle-plugin.html)
