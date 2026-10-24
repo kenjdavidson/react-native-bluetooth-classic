@@ -187,23 +187,30 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule, CBCentralManagerDelegate {
         _ resolve: @escaping RCTPromiseResolveBlock,
         rejecter reject: @escaping RCTPromiseRejectBlock
     ) -> Void {
-        // If state is already determined (not unknown), return immediately
-        if centralManagerState != .unknown {
-            resolve(checkBluetoothAdapter())
-            return
-        }
-        
-        // State is unknown, need to wait for state update
-        // Trigger lazy initialization if needed
-        _ = cbCentral
-        
-        // Add callback to be executed when state updates
-        stateUpdateCallbacks.append { [weak self] _ in
-            if let self = self {
-                resolve(self.checkBluetoothAdapter())
-            } else {
-                // If self is deallocated, resolve with false as a safe default
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
                 resolve(false)
+                return
+            }
+
+            // If state is already determined (not unknown), return immediately
+            if self.centralManagerState != .unknown {
+                resolve(self.checkBluetoothAdapter())
+                return
+            }
+            
+            // State is unknown, need to wait for state update
+            // Trigger lazy initialization if needed
+            _ = self.cbCentral
+            
+            // Add callback to be executed when state updates
+            self.stateUpdateCallbacks.append { [weak self] _ in
+                if let self = self {
+                    resolve(self.checkBluetoothAdapter())
+                } else {
+                    // If self is deallocated, resolve with false as a safe default
+                    resolve(false)
+                }
             }
         }
     }
@@ -212,6 +219,13 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule, CBCentralManagerDelegate {
      * Check the Core Bluetooth Central Manager for status
      */
     private func checkBluetoothAdapter() -> Bool {
+        if !Thread.isMainThread {
+            return DispatchQueue.main.sync { [weak self] in
+                guard let self = self else { return false }
+                return self.checkBluetoothAdapter()
+            }
+        }
+        
         var enabled = false
         
         if #available(iOS 10.0, *) {
@@ -219,7 +233,7 @@ class RNBluetoothClassic : NSObject, RCTBridgeModule, CBCentralManagerDelegate {
         } else {
             enabled = (centralManagerState.rawValue == CBCentralManagerState.poweredOn.rawValue)
         }
-        
+
         return enabled
     }
     
