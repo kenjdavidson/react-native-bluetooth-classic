@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -541,7 +542,7 @@ public class RNBluetoothClassicModule
                 }
             });
 
-            getReactApplicationContext().registerReceiver(mDiscoveryReceiver,
+            registerReceiver(mDiscoveryReceiver,
                     DiscoveryReceiver.intentFilter());
 
             mAdapter.startDiscovery();
@@ -621,7 +622,7 @@ public class RNBluetoothClassicModule
                             promise.reject(new DevicePairingException(null, cause));
                         }
                     });
-            getReactApplicationContext().registerReceiver(pr, PairingReceiver.intentFilter());
+            registerReceiver(pr, PairingReceiver.intentFilter());
             try {
                 BluetoothDevice device = mAdapter.getRemoteDevice(address);
                 Method m = device.getClass().getMethod("createBond", (Class[]) null);
@@ -685,7 +686,7 @@ public class RNBluetoothClassicModule
                             }
                         });
 
-                getReactApplicationContext().registerReceiver(pr, intentFilter);
+                registerReceiver(pr, intentFilter);
             } catch (IllegalAccessException e) {
                 promise.reject(Exceptions.BONDING_UNAVAILABLE_API.name(),
                         Exceptions.BONDING_UNAVAILABLE_API.message());
@@ -1103,6 +1104,21 @@ public class RNBluetoothClassicModule
     }
 
     /**
+     * Registers a receiver for Bluetooth broadcasts with an explicit export flag.
+     * It has to be exported: discovery, bonding and ACL broadcasts are sent by the
+     * Bluetooth app (com.android.bluetooth), not the system, so a non-exported
+     * receiver never gets them. They are protected broadcasts, so other apps
+     * can't send them anyway.
+     */
+    private void registerReceiver(BroadcastReceiver receiver, IntentFilter filter) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getReactApplicationContext().registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED);
+        } else {
+            getReactApplicationContext().registerReceiver(receiver, filter);
+        }
+    }
+
+    /**
      * Registers the module wide {@link BroadcastReceiver}(s). These include:
      * <ul>
      * <li>{@link BluetoothAdapter} state changes</li>
@@ -1114,14 +1130,12 @@ public class RNBluetoothClassicModule
     private void registerBluetoothReceivers() {
         if (mStateChangeReceiver == null) {
             mStateChangeReceiver = new StateChangeReceiver(this);
-            getReactApplicationContext()
-                    .registerReceiver(mStateChangeReceiver, StateChangeReceiver.intentFilter());
+            registerReceiver(mStateChangeReceiver, StateChangeReceiver.intentFilter());
         }
 
         if (mActionACLReceiver == null) {
             mActionACLReceiver = new ActionACLReceiver(this);
-            getReactApplicationContext()
-                    .registerReceiver(mActionACLReceiver, ActionACLReceiver.intentFilter());
+            registerReceiver(mActionACLReceiver, ActionACLReceiver.intentFilter());
         }
     }
 
