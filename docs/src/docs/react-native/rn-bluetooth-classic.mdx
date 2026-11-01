@@ -342,6 +342,8 @@ Will throw an error if:
 
 Attempts to pair the specified device. Requires Android API level 19 or higher.
 
+Resolves with the device once it is bonded, or right away if it already was. Rejects with `PAIRING_FAILED` when the pairing is rejected, cancelled or times out.
+
 ###### Parameters
 
 `address: string` the address of the device to be paired. This will be provided by the `BluetoothDevice.address` found from discovery.
@@ -351,6 +353,8 @@ Attempts to pair the specified device. Requires Android API level 19 or higher.
 `unpairDevice(address: string): Promise<boolean>`
 
 Attempts to unpair the specified device. Requires Android API level 19 or higher.
+
+Resolves once the bond is removed, or right away if the device wasn't paired.
 
 ###### Parameters
 

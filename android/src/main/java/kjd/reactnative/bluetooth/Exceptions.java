@@ -25,6 +25,7 @@ public enum Exceptions {
     CONNECTION_FAILED("Connection to %s failed."),
     CONNECTION_LOST("Connection to %s was lost"),
     PAIRING_FAILED("Unable to complete pairing with %s"),
+    UNPAIRING_FAILED("Unable to complete unpairing with %s"),
     INVALID_CONNECTOR_TYPE("Invalid connector type: %s"),
     INVALID_ACCEPTOR_TYPE("Invalid acceptor type: %s"),
     INVALID_CONNECTION_TYPE("Invalid connection type: %s"),
