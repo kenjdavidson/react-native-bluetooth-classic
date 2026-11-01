@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -541,7 +542,7 @@ public class RNBluetoothClassicModule
                 }
             });
 
-            getReactApplicationContext().registerReceiver(mDiscoveryReceiver,
+            registerReceiver(mDiscoveryReceiver,
                     DiscoveryReceiver.intentFilter());
 
             mAdapter.startDiscovery();
@@ -591,10 +592,10 @@ public class RNBluetoothClassicModule
      * is only available after SDK v19.
      *
      * @param address the address of the BluetoothDevice to which we attempt pairing
-     * @param promise resolves when the BluetoothDevice is paired, rejects if the
-     *                SDK version is
-     *                less than 19, Bluetooth is not enabled, or an Exception
-     *                occurs.
+     * @param promise resolves when the BluetoothDevice is paired (right away if it
+     *                already is), rejects if the SDK version is less than 19,
+     *                Bluetooth is not enabled, or the pairing is rejected, cancelled
+     *                or times out.
      */
     @ReactMethod
     @SuppressWarnings("unused")
@@ -609,7 +610,13 @@ public class RNBluetoothClassicModule
             if (BuildConfig.DEBUG)
                 Log.d(TAG, String.format("Attempting to pair with device %s", address));
 
-            final PairingReceiver pr = new PairingReceiver(getReactApplicationContext(),
+            final BluetoothDevice device = mAdapter.getRemoteDevice(address);
+            if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
+                promise.resolve(new NativeDevice(device).map());
+                return;
+            }
+
+            final PairingReceiver pr = new PairingReceiver(getReactApplicationContext(), device, true,
                     new PairingReceiver.PairingCallback() {
                         @Override
                         public void onPairingSuccess(NativeDevice device) {
@@ -617,24 +624,22 @@ public class RNBluetoothClassicModule
                         }
 
                         @Override
-                        public void onPairingFailure(Exception cause) {
-                            promise.reject(new DevicePairingException(null, cause));
+                        public void onPairingFailure(NativeDevice device) {
+                            promise.reject(Exceptions.PAIRING_FAILED.name(),
+                                    Exceptions.PAIRING_FAILED.message(device.getAddress()));
                         }
                     });
-            getReactApplicationContext().registerReceiver(pr, PairingReceiver.intentFilter());
+            registerReceiver(pr, PairingReceiver.intentFilter());
             try {
-                BluetoothDevice device = mAdapter.getRemoteDevice(address);
+                // createBond returns false when nothing was started, so no bond state
+                // change will follow and the promise has to be settled here.
                 Method m = device.getClass().getMethod("createBond", (Class[]) null);
-                m.invoke(device, (Object[]) null);
-            } catch (IllegalAccessException e) {
-                getReactApplicationContext().unregisterReceiver(pr);
-                promise.reject(Exceptions.BONDING_UNAVAILABLE_API.name(),
-                        Exceptions.BONDING_UNAVAILABLE_API.message());
-            } catch (InvocationTargetException e) {
-                getReactApplicationContext().unregisterReceiver(pr);
-                promise.reject(Exceptions.BONDING_UNAVAILABLE_API.name(),
-                        Exceptions.BONDING_UNAVAILABLE_API.message());
-            } catch (NoSuchMethodException e) {
+                if (!Boolean.TRUE.equals(m.invoke(device, (Object[]) null))) {
+                    getReactApplicationContext().unregisterReceiver(pr);
+                    promise.reject(Exceptions.PAIRING_FAILED.name(),
+                            Exceptions.PAIRING_FAILED.message(address));
+                }
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 getReactApplicationContext().unregisterReceiver(pr);
                 promise.reject(Exceptions.BONDING_UNAVAILABLE_API.name(),
                         Exceptions.BONDING_UNAVAILABLE_API.message());
@@ -647,9 +652,9 @@ public class RNBluetoothClassicModule
      * using the
      * BluetoothAdapter and unpaired.
      *
-     * @param address the address of the BluetoothDevice to which we attempt pairing
-     * @param promise resolves when the BluetoothDevice is paired, rejects if there
-     *                are any issues
+     * @param address the address of the BluetoothDevice to which we attempt unpairing
+     * @param promise resolves when the BluetoothDevice is unpaired (right away if it
+     *                wasn't paired), rejects if there are any issues
      */
     @ReactMethod
     @SuppressWarnings("unused")
@@ -662,37 +667,37 @@ public class RNBluetoothClassicModule
                     Exceptions.BONDING_UNAVAILABLE_API.message());
         } else {
             if (BuildConfig.DEBUG)
-                Log.d(TAG, String.format("Attempting to pair with device %s", address));
+                Log.d(TAG, String.format("Attempting to unpair device %s", address));
 
+            final BluetoothDevice device = mAdapter.getRemoteDevice(address);
+            if (device.getBondState() == BluetoothDevice.BOND_NONE) {
+                promise.resolve(new NativeDevice(device).map());
+                return;
+            }
+
+            final PairingReceiver pr = new PairingReceiver(getReactApplicationContext(), device, false,
+                    new PairingReceiver.PairingCallback() {
+                        @Override
+                        public void onPairingSuccess(NativeDevice device) {
+                            promise.resolve(device.map());
+                        }
+
+                        @Override
+                        public void onPairingFailure(NativeDevice device) {
+                            promise.reject(Exceptions.UNPAIRING_FAILED.name(),
+                                    Exceptions.UNPAIRING_FAILED.message(device.getAddress()));
+                        }
+                    });
+            registerReceiver(pr, PairingReceiver.intentFilter());
             try {
-                BluetoothDevice device = mAdapter.getRemoteDevice(address);
                 Method m = device.getClass().getMethod("removeBond", (Class[]) null);
-                m.invoke(device, (Object[]) null);
-
-                IntentFilter intentFilter = new IntentFilter();
-                intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-
-                PairingReceiver pr = new PairingReceiver(getReactApplicationContext(),
-                        new PairingReceiver.PairingCallback() {
-                            @Override
-                            public void onPairingSuccess(NativeDevice device) {
-                                promise.resolve(device.map());
-                            }
-
-                            @Override
-                            public void onPairingFailure(Exception cause) {
-                                promise.reject(new DevicePairingException(new NativeDevice(device), cause));
-                            }
-                        });
-
-                getReactApplicationContext().registerReceiver(pr, intentFilter);
-            } catch (IllegalAccessException e) {
-                promise.reject(Exceptions.BONDING_UNAVAILABLE_API.name(),
-                        Exceptions.BONDING_UNAVAILABLE_API.message());
-            } catch (InvocationTargetException e) {
-                promise.reject(Exceptions.BONDING_UNAVAILABLE_API.name(),
-                        Exceptions.BONDING_UNAVAILABLE_API.message());
-            } catch (NoSuchMethodException e) {
+                if (!Boolean.TRUE.equals(m.invoke(device, (Object[]) null))) {
+                    getReactApplicationContext().unregisterReceiver(pr);
+                    promise.reject(Exceptions.UNPAIRING_FAILED.name(),
+                            Exceptions.UNPAIRING_FAILED.message(address));
+                }
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                getReactApplicationContext().unregisterReceiver(pr);
                 promise.reject(Exceptions.BONDING_UNAVAILABLE_API.name(),
                         Exceptions.BONDING_UNAVAILABLE_API.message());
             }
@@ -1103,6 +1108,21 @@ public class RNBluetoothClassicModule
     }
 
     /**
+     * Registers a receiver for Bluetooth broadcasts with an explicit export flag.
+     * It has to be exported: discovery, bonding and ACL broadcasts are sent by the
+     * Bluetooth app (com.android.bluetooth), not the system, so a non-exported
+     * receiver never gets them. They are protected broadcasts, so other apps
+     * can't send them anyway.
+     */
+    private void registerReceiver(BroadcastReceiver receiver, IntentFilter filter) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getReactApplicationContext().registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED);
+        } else {
+            getReactApplicationContext().registerReceiver(receiver, filter);
+        }
+    }
+
+    /**
      * Registers the module wide {@link BroadcastReceiver}(s). These include:
      * <ul>
      * <li>{@link BluetoothAdapter} state changes</li>
@@ -1114,14 +1134,12 @@ public class RNBluetoothClassicModule
     private void registerBluetoothReceivers() {
         if (mStateChangeReceiver == null) {
             mStateChangeReceiver = new StateChangeReceiver(this);
-            getReactApplicationContext()
-                    .registerReceiver(mStateChangeReceiver, StateChangeReceiver.intentFilter());
+            registerReceiver(mStateChangeReceiver, StateChangeReceiver.intentFilter());
         }
 
         if (mActionACLReceiver == null) {
             mActionACLReceiver = new ActionACLReceiver(this);
-            getReactApplicationContext()
-                    .registerReceiver(mActionACLReceiver, ActionACLReceiver.intentFilter());
+            registerReceiver(mActionACLReceiver, ActionACLReceiver.intentFilter());
         }
     }
 

@@ -19,6 +19,10 @@ import kjd.reactnative.bluetooth.device.NativeDevice;
  * {@link PairingReceiver}(s) are self un-registering, by implementing {@link LifecycleEventListener}
  * and applying the un-register to {@link LifecycleEventListener#onHostPause()} and
  * {@link LifecycleEventListener#onHostDestroy()}.
+ * <p>
+ * A receiver waits for one device and one outcome: {@link BluetoothDevice#BOND_BONDED} when
+ * pairing, {@link BluetoothDevice#BOND_NONE} when un-pairing. Bond changes of other devices
+ * are ignored, and a pairing that ends in {@link BluetoothDevice#BOND_NONE} is a failure.
  *
  * @author kdavidson
  *
@@ -29,35 +33,57 @@ public class PairingReceiver extends BroadcastReceiver
     private static final String TAG = PairingReceiver.class.getSimpleName();
 
     private ReactApplicationContext mContext;
+    private BluetoothDevice mDevice;
+    private boolean mPairing;
     private PairingCallback mCallback;
 
-    public PairingReceiver(ReactApplicationContext context, PairingCallback callback) {
+    /**
+     * @param context
+     * @param device the device being paired or un-paired
+     * @param pairing true when waiting for a pairing, false when waiting for an un-pairing
+     * @param callback
+     */
+    public PairingReceiver(ReactApplicationContext context, BluetoothDevice device,
+                           boolean pairing, PairingCallback callback) {
         this.mContext = context;
+        this.mDevice = device;
+        this.mPairing = pairing;
         this.mCallback = callback;
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(intent.getAction())) {
-            final int state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR);
-            final int prevState	= intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, BluetoothDevice.ERROR);
-            final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            final NativeDevice wrapper = new NativeDevice(device);
+        if (!BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(intent.getAction()))
+            return;
 
-            if (state == BluetoothDevice.BOND_BONDED) {
-                if (BuildConfig.DEBUG)
-                    Log.d(TAG, String.format("Successfully paired with device %s", device.getAddress()));
+        final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        if (device == null || !device.equals(mDevice))
+            return;
 
-                mCallback.onPairingSuccess(wrapper);
-                context.unregisterReceiver(this);
-            } else if (state == BluetoothDevice.BOND_NONE){
-                if (BuildConfig.DEBUG)
-                    Log.d(TAG, String.format("Completed un-pairing with device %s", device.getAddress()));
+        final int state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR);
+        final NativeDevice wrapper = new NativeDevice(device);
 
-                mCallback.onPairingSuccess(wrapper);
-                context.unregisterReceiver(this);
-            }
+        if (state == BluetoothDevice.BOND_BONDED && mPairing) {
+            if (BuildConfig.DEBUG)
+                Log.d(TAG, String.format("Successfully paired with device %s", device.getAddress()));
+
+            mCallback.onPairingSuccess(wrapper);
+        } else if (state == BluetoothDevice.BOND_NONE && !mPairing) {
+            if (BuildConfig.DEBUG)
+                Log.d(TAG, String.format("Completed un-pairing with device %s", device.getAddress()));
+
+            mCallback.onPairingSuccess(wrapper);
+        } else if (state == BluetoothDevice.BOND_NONE) {
+            if (BuildConfig.DEBUG)
+                Log.d(TAG, String.format("Pairing with device %s failed", device.getAddress()));
+
+            mCallback.onPairingFailure(wrapper);
+        } else {
+            // BOND_BONDING, keep waiting
+            return;
         }
+
+        context.unregisterReceiver(this);
     }
 
     public static IntentFilter intentFilter() {
@@ -85,18 +111,19 @@ public class PairingReceiver extends BroadcastReceiver
     public interface PairingCallback {
 
         /**
-         * Whether a successful pairing/bonding or unpairing/unbonding was completed.
+         * The device reached the requested bond state: bonded when pairing, not bonded when
+         * un-pairing.
          *
          * @param device
          */
         void onPairingSuccess(NativeDevice device);
 
         /**
-         * If an exception occurs while attempting to bond/pair or unbond/pair.
+         * Pairing ended without a bond: the request was rejected, cancelled or timed out.
          *
-         * @param cause
+         * @param device
          */
-        void onPairingFailure(Exception cause);
+        void onPairingFailure(NativeDevice device);
 
     }
 }
