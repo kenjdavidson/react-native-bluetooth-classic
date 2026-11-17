@@ -236,7 +236,7 @@ export default class BluetoothModule {
    *
    * This is an Android only feature.
    */
-  cancelDiscovery(): Promise<boolean> {
+  async cancelDiscovery(): Promise<boolean> {
     if (Platform.OS == 'ios') throw new Error('Method not implemented.');
     return this._nativeModule.cancelDiscovery();
   }
@@ -261,7 +261,7 @@ export default class BluetoothModule {
    *
    * @param address address of the device we wish to unpair
    */
-  unpairDevice(address: string): Promise<boolean> {
+  async unpairDevice(address: string): Promise<boolean> {
     if (Platform.OS == 'ios') throw new Error('Method not implemented.');
     return this._nativeModule.unpairDevice(address);
   }
@@ -284,7 +284,7 @@ export default class BluetoothModule {
    *
    * This is an Android only feature.
    */
-  cancelAccept(): Promise<boolean> {
+  async cancelAccept(): Promise<boolean> {
     if (Platform.OS == 'ios') throw new Error('Method not implemented.');
     return this._nativeModule.cancelAccept();
   }
@@ -296,7 +296,7 @@ export default class BluetoothModule {
    *
    * @param state
    */
-  requestBluetoothEnabled(): Promise<boolean> {
+  async requestBluetoothEnabled(): Promise<boolean> {
     if (Platform.OS == 'ios') throw new Error('Method not implemented.');
     return this._nativeModule.requestBluetoothEnabled();
   }
@@ -308,7 +308,7 @@ export default class BluetoothModule {
    *
    * @param name the name to which we will change BluetoothAdapter
    */
-  setBluetoothAdapterName(name: string): Promise<boolean> {
+  async setBluetoothAdapterName(name: string): Promise<boolean> {
     if (Platform.OS == 'ios') throw new Error('Method not implemented.');
     return this._nativeModule.setBluetoothAdapterName(name);
   }
